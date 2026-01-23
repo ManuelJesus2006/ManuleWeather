@@ -1,0 +1,38 @@
+name: manule_weather
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  geolocator: ^14.0.2
+  go_router: ^17.0.1
+  google_fonts: ^6.3.3
+  http: ^1.6.0
+  lucide_icons: ^0.257.0
+
+dev_dependencies:
+  flutter_launcher_icons: ^0.13.1
+  flutter_lints: ^5.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+  fonts:
+    - family: BBHHegarty
+      fonts:
+        - asset: assets/fonts/BBHHegarty-Regular.ttf
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/LogoApp.png"
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "assets/images/LogoApp.png"
