@@ -3,8 +3,10 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manule_weather/models/tiempo_horas_model.dart';
 import 'package:manule_weather/models/tiempo_model.dart';
+import 'package:manule_weather/providers/weather_provider.dart';
 import 'package:manule_weather/services/localizacion_service.dart';
 import 'package:manule_weather/services/tiempo_service.dart';
+import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -58,7 +60,19 @@ class _SplashScreenState extends State<SplashScreen> {
     );
     String? nombreCiudad = await LocalizacionService().getNombreCiudadByCords(position.longitude, position.latitude);
     TiempoHoras? tiempoHoras = await TiempoService().getTiempoPorHoras(position.latitude, position.longitude);
-    tiempoUbi != null ? context.pushReplacement('/home', extra: [tiempoUbi, nombreCiudad, tiempoHoras, true]) : context.push('/error');
+
+    if (tiempoUbi != null && nombreCiudad != null && tiempoHoras != null) {
+      // CORRECCIÓN AQUÍ:
+      // Actualizamos el Provider AQUÍ, antes de cambiar de pantalla.
+      // Usamos listen: false porque estamos dentro de una función, no pintando.
+      final weatherProvider = Provider.of<WeatherProvider>(context, listen: false);
+      
+      weatherProvider.cambiarDatos(tiempoUbi, nombreCiudad, tiempoHoras, true);
+      weatherProvider.comprobarNocheDia();
+      if (mounted) context.pushReplacement('/home');
+    }else {
+      if (mounted) context.push('/error');
+    }
   }
 
   @override

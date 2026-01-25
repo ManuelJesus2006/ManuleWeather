@@ -1,73 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:manule_weather/models/tiempo_horas_model.dart';
-import 'package:manule_weather/models/tiempo_model.dart';
+import 'package:manule_weather/providers/navigation_provider.dart';
+import 'package:manule_weather/providers/weather_provider.dart';
+import 'package:provider/provider.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({
-    super.key,
-    required this.tiempoActual,
-    required this.localizacion,
-    required this.tiempoHoras,
-    required this.isUbicacionUser,
-  });
-
-  final bool isUbicacionUser;
-
-  final Tiempo tiempoActual;
-  final String localizacion;
-  final TiempoHoras tiempoHoras;
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  DateTime sunrise = DateTime.now();
-  DateTime sunset = DateTime.now();
-  DateTime ahoraCiudad = DateTime.now();
-
-  int _indiceActual = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    comprobarNocheDia();
-  }
-
-  void comprobarNocheDia() {
-    final int offsetSegundos = widget.tiempoActual.timezone;
-
-    sunrise = DateTime.fromMillisecondsSinceEpoch(
-      widget.tiempoActual.sys.sunrise * 1000,
-      isUtc: true,
-    ).add(Duration(seconds: offsetSegundos));
-
-    sunset = DateTime.fromMillisecondsSinceEpoch(
-      widget.tiempoActual.sys.sunset * 1000,
-      isUtc: true,
-    ).add(Duration(seconds: offsetSegundos));
-
-    ahoraCiudad = DateTime.now().toUtc().add(Duration(seconds: offsetSegundos));
-  }
-
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
   @override
   Widget build(BuildContext context) {
+    final navigationProvider = Provider.of<NavigationProvider>(context);
+    final weatherProvider = Provider.of<WeatherProvider>(context);
+    
     return Scaffold(
       body: IndexedStack(
-        index: _indiceActual,
+        index: navigationProvider.indiceActual,
         children: [
-          _buildInicio(context),
-          _buildTiempoPorHoras(widget.tiempoHoras),
+          _buildInicio(context, weatherProvider),
+          _buildTiempoPorHoras(context, weatherProvider),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _indiceActual,
+        currentIndex: navigationProvider.indiceActual,
         onTap: (index) {
-          setState(() {
-            _indiceActual = index;
-          });
+          navigationProvider.cambiarIndice(index);
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
@@ -77,11 +33,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildInicio(BuildContext context) {
+  Widget _buildInicio(BuildContext context, WeatherProvider weatherProvider){
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: ahoraCiudad.isAfter(sunrise) && ahoraCiudad.isBefore(sunset)
+          image: weatherProvider.isDeDia
               ? AssetImage('assets/images/fondo_dia.png')
               : AssetImage('assets/images/fondo_noche.jpg'),
           fit: BoxFit.cover,
@@ -102,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   IconButton(
                     onPressed: () =>
-                        context.push('/search', extra: widget.isUbicacionUser),
+                        context.push('/search'),
                     icon: Icon(Icons.search, color: Colors.blueGrey),
                   ),
                 ],
@@ -111,16 +67,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 //Texto de la ciudad actual
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (widget.isUbicacionUser)
+                  if (weatherProvider.isUbicacionUser!)
                     Icon(LucideIcons.navigation, color: Colors.white),
                   Flexible(
                     //Para que no sobresalga de la pantalla
                     child: Text(
-                      widget.localizacion,
+                      weatherProvider.localizacion!,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: widget.localizacion.length > 40 ? 18 : 20,
+                        fontSize: weatherProvider.localizacion!.length > 40 ? 18 : 20,
                       ),
                     ),
                   ),
@@ -128,47 +84,47 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               SizedBox(height: 30),
               Text(
-                'Hora local: ${formatearHora(ahoraCiudad)}',
+                'Hora local: ${formatearHora(weatherProvider.ahoraCiudad)}',
                 style: TextStyle(color: Colors.white, fontSize: 18),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    '${widget.tiempoActual.main.temp.round()}ºC',
+                    '${weatherProvider.tiempoActual!.main.temp.round()}ºC',
                     style: TextStyle(fontSize: 65, color: Colors.white),
                   ),
                   SizedBox(width: 10),
-                  if (widget.tiempoActual.weather[0].main.toLowerCase() ==
+                  if (weatherProvider.tiempoActual!.weather[0].main.toLowerCase() ==
                       'clouds')
                     Icon(Icons.cloud, size: 50, color: Colors.white)
-                  else if (widget.tiempoActual.weather[0].main.toLowerCase() ==
+                  else if (weatherProvider.tiempoActual!.weather[0].main.toLowerCase() ==
                       'snow')
                     Icon(Icons.snowing, size: 50, color: Colors.white)
-                  else if (widget.tiempoActual.weather[0].main.toLowerCase() ==
+                  else if (weatherProvider.tiempoActual!.weather[0].main.toLowerCase() ==
                       'clear')
                     Icon(Icons.wb_sunny, size: 50, color: Colors.white)
-                  else if (widget.tiempoActual.weather[0].main.toLowerCase() ==
+                  else if (weatherProvider.tiempoActual!.weather[0].main.toLowerCase() ==
                       'rain')
                     Icon(Icons.umbrella, size: 50, color: Colors.white)
-                  else if (widget.tiempoActual.weather[0].main.toLowerCase() ==
+                  else if (weatherProvider.tiempoActual!.weather[0].main.toLowerCase() ==
                       'drizzle')
                     Icon(Icons.grain, size: 50, color: Colors.white)
-                  else if (widget.tiempoActual.weather[0].main.toLowerCase() ==
+                  else if (weatherProvider.tiempoActual!.weather[0].main.toLowerCase() ==
                       'thunderstorm')
                     Icon(Icons.flash_on, size: 50, color: Colors.white)
                   else if ([
                     'mist',
                     'fog',
                     'haze',
-                  ].contains(widget.tiempoActual.weather[0].main.toLowerCase()))
+                  ].contains(weatherProvider.tiempoActual!.weather[0].main.toLowerCase()))
                     Icon(Icons.filter_drama, size: 50, color: Colors.white)
                   else
                     Icon(Icons.help_outline, size: 50, color: Colors.white),
                 ],
               ),
               Text(
-                widget.tiempoActual.weather[0].description.toUpperCase(),
+                weatherProvider.tiempoActual!.weather[0].description.toUpperCase(),
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -182,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               SizedBox(height: 10),
               Text(
-                '${widget.tiempoActual.main.feelsLike.round()}ºC',
+                '${weatherProvider.tiempoActual!.main.feelsLike.round()}ºC',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20,
@@ -214,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            '${widget.tiempoActual.main.tempMax.round()}ºC',
+                            '${weatherProvider.tiempoActual!.main.tempMax.round()}ºC',
                             style: TextStyle(fontSize: 20, color: Colors.white),
                           ),
                         ],
@@ -239,7 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            '${widget.tiempoActual.main.tempMin.round()}ºC',
+                            '${weatherProvider.tiempoActual!.main.tempMin.round()}ºC',
                             style: TextStyle(fontSize: 20, color: Colors.white),
                           ),
                         ],
@@ -276,7 +232,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            formatearHora(sunrise),
+                            formatearHora(weatherProvider.sunrise),
                             style: const TextStyle(
                               fontSize: 20,
                               color: Colors.white,
@@ -308,7 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            formatearHora(sunset),
+                            formatearHora(weatherProvider.sunset),
                             style: const TextStyle(
                               fontSize: 20,
                               color: Colors.white,
@@ -341,7 +297,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     SizedBox(height: 8),
                     Text(
-                      '${widget.tiempoActual.wind.speed.round()}km/h',
+                      '${weatherProvider.tiempoActual!.wind.speed.round()}km/h',
                       style: TextStyle(fontSize: 20, color: Colors.white),
                     ),
                   ],
@@ -368,8 +324,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     SizedBox(height: 8),
                     Text(
-                      widget.tiempoActual.wind.gust != null
-                          ? '${widget.tiempoActual.wind.gust!.round()} km/h'
+                     weatherProvider.tiempoActual!.wind.gust != null
+                          ? '${weatherProvider.tiempoActual!.wind.gust!.round()} km/h'
                           : 'Sin ráfagas',
                       style: TextStyle(fontSize: 20, color: Colors.white),
                     ),
@@ -397,7 +353,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     SizedBox(height: 8),
                     Text(
-                      '${widget.tiempoActual.wind.deg}º',
+                      '${weatherProvider.tiempoActual!.wind.deg}º',
                       style: TextStyle(fontSize: 20, color: Colors.white),
                     ),
                   ],
@@ -424,7 +380,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     SizedBox(height: 8),
                     Text(
-                      '${widget.tiempoActual.clouds.all}%',
+                      '${weatherProvider.tiempoActual!.clouds.all}%',
                       style: TextStyle(fontSize: 20, color: Colors.white),
                     ),
                   ],
@@ -451,7 +407,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     SizedBox(height: 8),
                     Text(
-                      '${widget.tiempoActual.main.humidity}%',
+                      '${weatherProvider.tiempoActual!.main.humidity}%',
                       style: TextStyle(fontSize: 20, color: Colors.white),
                     ),
                   ],
@@ -477,9 +433,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     SizedBox(height: 8),
-                    widget.tiempoActual.visibility != null ?
+                    weatherProvider.tiempoActual!.visibility != null ?
                     Text(
-                      '${(widget.tiempoActual.visibility)! / 1000}kms',
+                      '${(weatherProvider.tiempoActual!.visibility)! / 1000}kms',
                       style: TextStyle(fontSize: 20, color: Colors.white),
                     ) : Text(
                       'No disponible',
@@ -509,7 +465,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     SizedBox(height: 8),
                     Text(
-                      '${widget.tiempoActual.main.pressure}hPa',
+                      '${weatherProvider.tiempoActual!.main.pressure}hPa',
                       style: TextStyle(fontSize: 20, color: Colors.white),
                     ),
                   ],
@@ -522,32 +478,53 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildTiempoPorHoras(TiempoHoras tiempoHoras) {
-    String obtenerMes(String mesNum) {
+  Widget _buildTiempoPorHoras(BuildContext context, WeatherProvider weatherProvider) {
+
+    String obtenerDiaSemana(int weekday) {
+      switch(weekday){
+        case 1:
+          return 'Lunes';
+        case 2:
+          return 'Martes';
+        case 3:
+          return 'Miércoles';
+        case 4:
+          return 'Jueves';
+        case 5:
+          return 'Viernes';
+        case 6:
+          return 'Sábado';
+        case 7:
+          return 'Domingo';
+        default: return 'Desconocido';
+      }
+    }
+
+    String obtenerMes(int mesNum) {
       switch (mesNum) {
-        case '01':
+        case 1:
           return 'enero';
-        case '02':
+        case 2:
           return 'febrero';
-        case '03':
+        case 3:
           return 'marzo';
-        case '04':
+        case 4:
           return 'abril';
-        case '05':
+        case 5:
           return 'mayo';
-        case '06':
+        case 6:
           return 'junio';
-        case '07':
+        case 7:
           return 'julio';
-        case '08':
+        case 8:
           return 'agosto';
-        case '09':
+        case 9:
           return 'septiembre';
-        case '10':
+        case 10:
           return 'octubre';
-        case '11':
+        case 11:
           return 'noviembre';
-        case '12':
+        case 12:
           return 'diciembre';
         default:
           return 'desconocido';
@@ -572,9 +549,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     IconButton(
                       onPressed: () => context.push(
-                        '/search',
-                        extra: widget.isUbicacionUser,
-                      ),
+                        '/search',),
                       icon: Icon(Icons.search, color: Colors.blueGrey),
                     ),
                   ],
@@ -583,16 +558,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   //Texto de la ciudad actual
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    if (widget.isUbicacionUser)
+                    if (weatherProvider.isUbicacionUser!)
                       Icon(LucideIcons.navigation, color: Colors.white),
                     Flexible(
                       //Para que no sobresalga de la pantalla
                       child: Text(
-                        widget.localizacion,
+                        weatherProvider.localizacion!,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: widget.localizacion.length > 40 ? 18 : 20,
+                          fontSize: weatherProvider.localizacion!.length > 40 ? 18 : 20,
                         ),
                       ),
                     ),
@@ -603,11 +578,13 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: tiempoHoras.time.length,
+              itemCount: weatherProvider.tiempoHoras!.time.length,
               itemBuilder: (context, i) {
-                final hora = tiempoHoras.time[i];
-                final temperatura = tiempoHoras.temperature2M[i];
-                final weatherCode = tiempoHoras.weatherCode[i];
+                
+                final hora = weatherProvider.tiempoHoras!.time[i];
+                final fecha = DateTime.parse(hora);
+                final temperatura = weatherProvider.tiempoHoras!.temperature2M[i];
+                final weatherCode = weatherProvider.tiempoHoras!.weatherCode[i];
                 return Column(
                   children: [
                     SizedBox(height: 8),
@@ -621,8 +598,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           borderRadius: BorderRadius.all(Radius.circular(10)),
                         ),
                         child: Text(
-                          '${hora.substring(8, 10)} de ${obtenerMes(hora.substring(5, 7))} de ${hora.substring(0, 4)}',
-                          style: TextStyle(color: Colors.white, fontSize: 20),
+                          '${obtenerDiaSemana(fecha.weekday)} - ${fecha.day} de ${obtenerMes(fecha.month)} de ${fecha.year}',
+                          style: TextStyle(color: Colors.white, fontSize: 16),
                         ),
                       ),
 
@@ -808,4 +785,5 @@ class _HomeScreenState extends State<HomeScreen> {
     String minutos = fecha.minute < 10 ? '0${fecha.minute}' : '${fecha.minute}';
     return '${fecha.hour}:$minutos';
   }
+  
 }

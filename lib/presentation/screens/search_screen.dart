@@ -5,59 +5,31 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:manule_weather/models/localizacion_model.dart';
 import 'package:manule_weather/models/tiempo_horas_model.dart';
 import 'package:manule_weather/models/tiempo_model.dart';
+import 'package:manule_weather/providers/weather_provider.dart';
 import 'package:manule_weather/services/localizacion_service.dart';
 import 'package:manule_weather/services/tiempo_service.dart';
+import 'package:provider/provider.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key, required this.isUbicacionUser});
-
-  final bool isUbicacionUser;
+  final WeatherProvider weatherProvider;
+  const SearchScreen({super.key, required this.weatherProvider});
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  String nombreUbi = '';
-  double tempUbi = 0;
-  String estadoUbi = '';
-  Position? ubiActual;
-
   @override
   void initState() {
+    widget.weatherProvider.buscarUbicacionActual();
     super.initState();
-    buscarUbicacionActual();
-  }
-
-  void buscarUbicacionActual() async {
-    Position position = await Geolocator.getCurrentPosition();
-
-    //Verificamos si el widget sigue vivo antes de seguir para evitar el crasheo
-    if (!mounted) return;
-
-    Tiempo? tiempoUbi = await TiempoService().getTiempoLatLon(
-      position.latitude,
-      position.longitude,
-    );
-    String? nombreCiudad = await LocalizacionService().getNombreCiudadByCords(
-      position.longitude,
-      position.latitude,
-    );
-
-    //Verificamos si el widget sigue vivo antes de seguir para evitar el crasheo
-    if (!mounted) return;
-
-    setState(() {
-      nombreUbi = nombreCiudad!;
-      tempUbi = tiempoUbi!.main.temp;
-      estadoUbi = tiempoUbi.weather[0].main;
-      ubiActual = position;
-    });
   }
 
   final TextEditingController controladorBusqueda = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
+    final weatherProvider = widget.weatherProvider;
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -96,13 +68,7 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
             Column(
               children: [
-                _widgetUbicacion(
-                  nombreUbi: nombreUbi,
-                  tempUbi: tempUbi,
-                  estadoUbi: estadoUbi,
-                  isUbiActual: widget.isUbicacionUser,
-                  ubiActual: ubiActual,
-                ),
+                _widgetUbicacion(weatherProvider: weatherProvider),
                 Divider(thickness: 5, color: Colors.grey[300]),
               ],
             ),
@@ -119,7 +85,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       return snapshot.hasData
                           ? MostrarResultados(
                               lugares: snapshot.data!,
-                              isUbicacionUser: widget.isUbicacionUser,
+                              isUbicacionUser: weatherProvider.isUbicacionUser!,
                             )
                           : Center(child: CircularProgressIndicator());
                     },
@@ -163,20 +129,9 @@ class _MostrarResultadosState extends State<MostrarResultados> {
 }
 
 class _widgetUbicacion extends StatelessWidget {
-  const _widgetUbicacion({
-    super.key,
-    required this.nombreUbi,
-    required this.tempUbi,
-    required this.estadoUbi,
-    required this.isUbiActual,
-    required this.ubiActual,
-  });
+  const _widgetUbicacion({super.key, required this.weatherProvider});
 
-  final String nombreUbi;
-  final double tempUbi;
-  final String estadoUbi;
-  final bool isUbiActual;
-  final Position? ubiActual;
+  final WeatherProvider weatherProvider;
   void mostrarCargando(BuildContext context) {
     showDialog(
       context: context,
@@ -191,12 +146,16 @@ class _widgetUbicacion extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (nombreUbi != '' && tempUbi != 0 && estadoUbi != '') {
+    if (weatherProvider.nombreUbi != '' &&
+        weatherProvider.tempUbi != 0 &&
+        weatherProvider.estadoUbi != '') {
       return GestureDetector(
         onTap: () async {
-          if (!isUbiActual) {
+          weatherProvider.comprobarUbicacionUser(); //Comprueba que la ubicación encontrada sea diferente a
+                                                    //la localización actual
+          if (!weatherProvider.isUbicacionUser!) {
             mostrarCargando(context);
-            Position position = ubiActual!;
+            Position position = weatherProvider.ubiActual!;
 
             Tiempo? tiempoUbi = await TiempoService().getTiempoLatLon(
               position.latitude,
@@ -206,12 +165,14 @@ class _widgetUbicacion extends StatelessWidget {
               position.latitude,
               position.longitude,
             );
-            tiempoUbi != null
-                ? context.pushReplacement(
-                    '/home',
-                    extra: [tiempoUbi, nombreUbi, tiempoHoras, true],
-                  )
-                : context.push('/error');
+            weatherProvider.cambiarDatos(
+              tiempoUbi!,
+              weatherProvider.nombreUbi,
+              tiempoHoras!,
+              true,
+            );
+            weatherProvider.comprobarNocheDia();
+            context.pushReplacement('/home');
           } else {
             context.pop();
           }
@@ -241,23 +202,25 @@ class _widgetUbicacion extends StatelessWidget {
                 SizedBox(height: 8),
                 Row(
                   children: [
-                    if (estadoUbi.toLowerCase() == 'clouds')
+                    if (weatherProvider.estadoUbi.toLowerCase() == 'clouds')
                       const Icon(Icons.cloud, size: 30, color: Colors.white)
-                    else if (estadoUbi.toLowerCase() == 'snow')
+                    else if (weatherProvider.estadoUbi.toLowerCase() == 'snow')
                       const Icon(Icons.snowing, size: 30, color: Colors.white)
-                    else if (estadoUbi.toLowerCase() == 'clear')
+                    else if (weatherProvider.estadoUbi.toLowerCase() == 'clear')
                       const Icon(Icons.wb_sunny, size: 30, color: Colors.white)
-                    else if (estadoUbi.toLowerCase() == 'rain')
+                    else if (weatherProvider.estadoUbi.toLowerCase() == 'rain')
                       const Icon(Icons.umbrella, size: 30, color: Colors.white)
-                    else if (estadoUbi.toLowerCase() == 'drizzle')
+                    else if (weatherProvider.estadoUbi.toLowerCase() ==
+                        'drizzle')
                       const Icon(Icons.grain, size: 30, color: Colors.white)
-                    else if (estadoUbi.toLowerCase() == 'thunderstorm')
+                    else if (weatherProvider.estadoUbi.toLowerCase() ==
+                        'thunderstorm')
                       const Icon(Icons.flash_on, size: 30, color: Colors.white)
                     else if ([
                       'mist',
                       'fog',
                       'haze',
-                    ].contains(estadoUbi.toLowerCase()))
+                    ].contains(weatherProvider.estadoUbi.toLowerCase()))
                       const Icon(
                         Icons.filter_drama,
                         size: 30,
@@ -271,7 +234,7 @@ class _widgetUbicacion extends StatelessWidget {
                       ),
                     SizedBox(width: 8),
                     Text(
-                      tempUbi.round().toString(),
+                      weatherProvider.tempUbi.round().toString(),
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -280,7 +243,7 @@ class _widgetUbicacion extends StatelessWidget {
                     SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        nombreUbi,
+                        weatherProvider.nombreUbi,
                         style: TextStyle(color: Colors.black, fontSize: 17),
                       ),
                     ),
@@ -333,6 +296,7 @@ class _widgetLugarBusqueda extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final WeatherProvider weatherProvider = Provider.of<WeatherProvider>(context);
     return GestureDetector(
       onTap: () async {
         mostrarCargando(context);
@@ -344,12 +308,9 @@ class _widgetLugarBusqueda extends StatelessWidget {
           lugar.center![1],
           lugar.center![0],
         );
-        tiempoUbi != null
-            ? context.pushReplacement(
-                '/home',
-                extra: [tiempoUbi, lugar.placeNameEs, tiempoHoras, false],
-              )
-            : context.push('/error');
+        weatherProvider.cambiarDatos(tiempoUbi!, lugar.placeNameEs!, tiempoHoras!, false);
+        weatherProvider.comprobarNocheDia();
+        context.pushReplacement('/home');
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
