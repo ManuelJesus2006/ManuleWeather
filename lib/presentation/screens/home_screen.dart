@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:manule_weather/providers/navigation_provider.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
+import 'package:manule_weather/utils/Utils.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -84,7 +85,7 @@ class HomeScreen extends StatelessWidget {
               ),
               SizedBox(height: 30),
               Text(
-                'Hora local: ${formatearHora(weatherProvider.ahoraCiudad)}',
+                'Hora local: ${Utils.formatearHora(weatherProvider.ahoraCiudad)}',
                 style: TextStyle(color: Colors.white, fontSize: 18),
               ),
               Row(
@@ -232,7 +233,7 @@ class HomeScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            formatearHora(weatherProvider.sunrise),
+                            Utils.formatearHora(weatherProvider.sunrise),
                             style: const TextStyle(
                               fontSize: 20,
                               color: Colors.white,
@@ -264,7 +265,7 @@ class HomeScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            formatearHora(weatherProvider.sunset),
+                            Utils.formatearHora(weatherProvider.sunset),
                             style: const TextStyle(
                               fontSize: 20,
                               color: Colors.white,
@@ -480,57 +481,6 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildTiempoPorHoras(BuildContext context, WeatherProvider weatherProvider) {
 
-    String obtenerDiaSemana(int weekday) {
-      switch(weekday){
-        case 1:
-          return 'Lunes';
-        case 2:
-          return 'Martes';
-        case 3:
-          return 'Miércoles';
-        case 4:
-          return 'Jueves';
-        case 5:
-          return 'Viernes';
-        case 6:
-          return 'Sábado';
-        case 7:
-          return 'Domingo';
-        default: return 'Desconocido';
-      }
-    }
-
-    String obtenerMes(int mesNum) {
-      switch (mesNum) {
-        case 1:
-          return 'enero';
-        case 2:
-          return 'febrero';
-        case 3:
-          return 'marzo';
-        case 4:
-          return 'abril';
-        case 5:
-          return 'mayo';
-        case 6:
-          return 'junio';
-        case 7:
-          return 'julio';
-        case 8:
-          return 'agosto';
-        case 9:
-          return 'septiembre';
-        case 10:
-          return 'octubre';
-        case 11:
-          return 'noviembre';
-        case 12:
-          return 'diciembre';
-        default:
-          return 'desconocido';
-      }
-    }
-
     return SafeArea(
       child: Column(
         children: [
@@ -598,7 +548,7 @@ class HomeScreen extends StatelessWidget {
                           borderRadius: BorderRadius.all(Radius.circular(10)),
                         ),
                         child: Text(
-                          '${obtenerDiaSemana(fecha.weekday)} - ${fecha.day} de ${obtenerMes(fecha.month)} de ${fecha.year}',
+                          '${Utils.obtenerDiaSemana(fecha.weekday)} - ${fecha.day} de ${Utils.obtenerMes(fecha.month)} de ${fecha.year}',
                           style: TextStyle(color: Colors.white, fontSize: 16),
                         ),
                       ),
@@ -778,12 +728,6 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String formatearHora(DateTime fecha) {
-    // Añade un 0 a la izquierda si los minutos son menores de 10
-    String minutos = fecha.minute < 10 ? '0${fecha.minute}' : '${fecha.minute}';
-    return '${fecha.hour}:$minutos';
   }
   
 }

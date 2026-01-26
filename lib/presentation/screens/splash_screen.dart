@@ -69,7 +69,7 @@ class _SplashScreenState extends State<SplashScreen> {
       
       weatherProvider.cambiarDatos(tiempoUbi, nombreCiudad, tiempoHoras, true);
       weatherProvider.comprobarNocheDia();
-      if (mounted) context.pushReplacement('/home');
+      if (mounted) context.pushReplacement('/home'); //Usamos mounted para que no crashee la aplicación
     }else {
       if (mounted) context.push('/error');
     }
