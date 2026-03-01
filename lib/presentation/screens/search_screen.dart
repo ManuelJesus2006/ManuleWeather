@@ -151,8 +151,9 @@ class _widgetUbicacion extends StatelessWidget {
         weatherProvider.estadoUbi != '') {
       return GestureDetector(
         onTap: () async {
-          weatherProvider.comprobarUbicacionUser(); //Comprueba que la ubicación encontrada sea diferente a
-                                                    //la localización actual
+          weatherProvider
+              .comprobarUbicacionUser(); //Comprueba que la ubicación encontrada sea diferente a
+          //la localización actual
           if (!weatherProvider.isUbicacionUser!) {
             mostrarCargando(context);
             Position position = weatherProvider.ubiActual!;
@@ -172,6 +173,10 @@ class _widgetUbicacion extends StatelessWidget {
               true,
             );
             weatherProvider.comprobarNocheDia();
+            weatherProvider.inicializarTiempoDias();
+            DateTime horaActual = weatherProvider.ahoraCiudad;
+            int elementosAEliminar = horaActual.hour;
+            weatherProvider.eliminarHorasPasadas(elementosAEliminar);
             context.pushReplacement('/home');
           } else {
             context.pop();
@@ -296,7 +301,9 @@ class _widgetLugarBusqueda extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final WeatherProvider weatherProvider = Provider.of<WeatherProvider>(context);
+    final WeatherProvider weatherProvider = Provider.of<WeatherProvider>(
+      context,
+    );
     return GestureDetector(
       onTap: () async {
         mostrarCargando(context);
@@ -308,8 +315,17 @@ class _widgetLugarBusqueda extends StatelessWidget {
           lugar.center![1],
           lugar.center![0],
         );
-        weatherProvider.cambiarDatos(tiempoUbi!, lugar.placeNameEs!, tiempoHoras!, false);
+        weatherProvider.cambiarDatos(
+          tiempoUbi!,
+          lugar.placeNameEs!,
+          tiempoHoras!,
+          false,
+        );
         weatherProvider.comprobarNocheDia();
+        weatherProvider.inicializarTiempoDias();
+        DateTime horaActual = weatherProvider.ahoraCiudad;
+        int elementosAEliminar = horaActual.hour;
+        weatherProvider.eliminarHorasPasadas(elementosAEliminar);
         context.pushReplacement('/home');
       },
       child: Padding(

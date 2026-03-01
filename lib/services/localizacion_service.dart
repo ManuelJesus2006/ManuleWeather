@@ -1,21 +1,18 @@
 import 'package:http/http.dart';
+import 'package:manule_weather/environment.dart';
 import 'package:manule_weather/models/localizacion_model.dart';
 import 'package:manule_weather/models/localizacion_reverse_model.dart';
 
 class LocalizacionService {
   String _urlBase = 'https://api.mapbox.com/geocoding/v5/mapbox.places/';
-  String _apiKey =
-      'pk.eyJ1IjoibWFudWxlZGV2MzY3IiwiYSI6ImNtaWhteWVyejBqYm4zZHNmdDIzZnBib2EifQ.bkN4om1L6c0LcG6Fid-51Q';
   String lenguaje = '&language=es';
 
-  String _urlBase2 = 'https://api.mapbox.com/search/geocode/v6/reverse';
-  String _apiKey2YOtros =
-      '&types=place&access_token=pk.eyJ1IjoibWFudWxlZGV2MzY3IiwiYSI6ImNtaWhteWVyejBqYm4zZHNmdDIzZnBib2EifQ.bkN4om1L6c0LcG6Fid-51Q&language=es';
+  String _urlBaseReverse = 'https://api.mapbox.com/search/geocode/v6/reverse';
 
   Future<List<Localizacion>> getResultadosBusqueda(String ciudad) async {
   try {
     Uri uri = Uri.parse(
-      '$_urlBase$ciudad.json?access_token=$_apiKey$lenguaje',
+      '$_urlBase$ciudad.json?access_token=${Environment.apiKeyNormal}$lenguaje',
     );
     Response response = await get(uri);
 
@@ -36,7 +33,7 @@ class LocalizacionService {
 
   Future<String?> getNombreCiudadByCords(double lon, double lat) async {
     Uri uri = Uri.parse(
-      '$_urlBase2?longitude=$lon&latitude=$lat$_apiKey2YOtros',
+      '$_urlBaseReverse?longitude=$lon&latitude=$lat${Environment.apiKeyReverseYOtros}',
     );
     Response response = await get(uri);
 

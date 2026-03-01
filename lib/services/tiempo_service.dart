@@ -1,16 +1,17 @@
 import 'package:http/http.dart';
+import 'package:manule_weather/environment.dart';
 import 'package:manule_weather/models/tiempo_horas_model.dart';
 import 'package:manule_weather/models/tiempo_model.dart';
 
 class TiempoService {
   String _urlBase = 'https://api.openweathermap.org/data/2.5/weather';
-  String _apiKeyMetricLang = '&appid=133edf96422eadb34790ccd85cea81f9&units=metric&lang=es';
+
 
   String _urlTiempoHoras = 'https://api.open-meteo.com/v1/forecast?';
   String _otrosTiempoHoras = '&hourly=temperature_2m,weather_code';
 
   Future<Tiempo?> getTiempoLatLon(double lat, double lon) async{
-    Uri uri = Uri.parse('$_urlBase?lat=$lat&lon=$lon$_apiKeyMetricLang');
+    Uri uri = Uri.parse('$_urlBase?lat=$lat&lon=$lon${Environment.apiKeyMetricLang}');
     Response response = await get(uri);
 
     if (response.statusCode != 200) return null;

@@ -58,19 +58,34 @@ class _SplashScreenState extends State<SplashScreen> {
       position.latitude,
       position.longitude,
     );
-    String? nombreCiudad = await LocalizacionService().getNombreCiudadByCords(position.longitude, position.latitude);
-    TiempoHoras? tiempoHoras = await TiempoService().getTiempoPorHoras(position.latitude, position.longitude);
+    String? nombreCiudad = await LocalizacionService().getNombreCiudadByCords(
+      position.longitude,
+      position.latitude,
+    );
+    TiempoHoras? tiempoHoras = await TiempoService().getTiempoPorHoras(
+      position.latitude,
+      position.longitude,
+    );
 
     if (tiempoUbi != null && nombreCiudad != null && tiempoHoras != null) {
-      // CORRECCIÓN AQUÍ:
       // Actualizamos el Provider AQUÍ, antes de cambiar de pantalla.
       // Usamos listen: false porque estamos dentro de una función, no pintando.
-      final weatherProvider = Provider.of<WeatherProvider>(context, listen: false);
-      
+      final weatherProvider = Provider.of<WeatherProvider>(
+        context,
+        listen: false,
+      );
+
       weatherProvider.cambiarDatos(tiempoUbi, nombreCiudad, tiempoHoras, true);
       weatherProvider.comprobarNocheDia();
-      if (mounted) context.pushReplacement('/home'); //Usamos mounted para que no crashee la aplicación
-    }else {
+      weatherProvider.inicializarTiempoDias();
+      DateTime horaActual = weatherProvider.ahoraCiudad;
+      int elementosAEliminar = horaActual.hour;
+      weatherProvider.eliminarHorasPasadas(elementosAEliminar);
+      if (mounted)
+        context.pushReplacement(
+          '/home',
+        ); //Usamos mounted para que no crashee la aplicación
+    } else {
       if (mounted) context.push('/error');
     }
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:manule_weather/models/tiempo_dias_model.dart';
 import 'package:manule_weather/providers/navigation_provider.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
 import 'package:manule_weather/utils/Utils.dart';
@@ -12,12 +13,13 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final navigationProvider = Provider.of<NavigationProvider>(context);
     final weatherProvider = Provider.of<WeatherProvider>(context);
-    
+
     return Scaffold(
       body: IndexedStack(
         index: navigationProvider.indiceActual,
         children: [
           _buildInicio(context, weatherProvider),
+          _buildPantallaPorDias(context, weatherProvider),
           _buildTiempoPorHoras(context, weatherProvider),
         ],
       ),
@@ -28,13 +30,17 @@ class HomeScreen extends StatelessWidget {
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.date_range),
+            label: 'Por días',
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.timer), label: 'Por horas'),
         ],
       ),
     );
   }
 
-  Widget _buildInicio(BuildContext context, WeatherProvider weatherProvider){
+  Widget _buildInicio(BuildContext context, WeatherProvider weatherProvider) {
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
@@ -58,8 +64,7 @@ class HomeScreen extends StatelessWidget {
                     height: 80,
                   ),
                   IconButton(
-                    onPressed: () =>
-                        context.push('/search'),
+                    onPressed: () => context.push('/search'),
                     icon: Icon(Icons.search, color: Colors.blueGrey),
                   ),
                 ],
@@ -77,7 +82,9 @@ class HomeScreen extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: weatherProvider.localizacion!.length > 40 ? 18 : 20,
+                        fontSize: weatherProvider.localizacion!.length > 40
+                            ? 18
+                            : 20,
                       ),
                     ),
                   ),
@@ -96,36 +103,14 @@ class HomeScreen extends StatelessWidget {
                     style: TextStyle(fontSize: 65, color: Colors.white),
                   ),
                   SizedBox(width: 10),
-                  if (weatherProvider.tiempoActual!.weather[0].main.toLowerCase() ==
-                      'clouds')
-                    Icon(Icons.cloud, size: 50, color: Colors.white)
-                  else if (weatherProvider.tiempoActual!.weather[0].main.toLowerCase() ==
-                      'snow')
-                    Icon(Icons.snowing, size: 50, color: Colors.white)
-                  else if (weatherProvider.tiempoActual!.weather[0].main.toLowerCase() ==
-                      'clear')
-                    Icon(Icons.wb_sunny, size: 50, color: Colors.white)
-                  else if (weatherProvider.tiempoActual!.weather[0].main.toLowerCase() ==
-                      'rain')
-                    Icon(Icons.umbrella, size: 50, color: Colors.white)
-                  else if (weatherProvider.tiempoActual!.weather[0].main.toLowerCase() ==
-                      'drizzle')
-                    Icon(Icons.grain, size: 50, color: Colors.white)
-                  else if (weatherProvider.tiempoActual!.weather[0].main.toLowerCase() ==
-                      'thunderstorm')
-                    Icon(Icons.flash_on, size: 50, color: Colors.white)
-                  else if ([
-                    'mist',
-                    'fog',
-                    'haze',
-                  ].contains(weatherProvider.tiempoActual!.weather[0].main.toLowerCase()))
-                    Icon(Icons.filter_drama, size: 50, color: Colors.white)
-                  else
-                    Icon(Icons.help_outline, size: 50, color: Colors.white),
+                  Utils.obtenerSimboloTiempoActual(
+                    weatherProvider.tiempoActual!.weather[0].icon,
+                  ),
                 ],
               ),
               Text(
-                weatherProvider.tiempoActual!.weather[0].description.toUpperCase(),
+                weatherProvider.tiempoActual!.weather[0].description
+                    .toUpperCase(),
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -325,7 +310,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 8),
                     Text(
-                     weatherProvider.tiempoActual!.wind.gust != null
+                      weatherProvider.tiempoActual!.wind.gust != null
                           ? '${weatherProvider.tiempoActual!.wind.gust!.round()} km/h'
                           : 'Sin ráfagas',
                       style: TextStyle(fontSize: 20, color: Colors.white),
@@ -434,14 +419,15 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 8),
-                    weatherProvider.tiempoActual!.visibility != null ?
-                    Text(
-                      '${(weatherProvider.tiempoActual!.visibility)! / 1000}kms',
-                      style: TextStyle(fontSize: 20, color: Colors.white),
-                    ) : Text(
-                      'No disponible',
-                      style: TextStyle(fontSize: 20, color: Colors.white),
-                    ),
+                    weatherProvider.tiempoActual!.visibility != null
+                        ? Text(
+                            '${(weatherProvider.tiempoActual!.visibility)! / 1000}kms',
+                            style: TextStyle(fontSize: 20, color: Colors.white),
+                          )
+                        : Text(
+                            'No disponible',
+                            style: TextStyle(fontSize: 20, color: Colors.white),
+                          ),
                   ],
                 ),
               ),
@@ -479,8 +465,10 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTiempoPorHoras(BuildContext context, WeatherProvider weatherProvider) {
-
+  Widget _buildTiempoPorHoras(
+    BuildContext context,
+    WeatherProvider weatherProvider,
+  ) {
     return SafeArea(
       child: Column(
         children: [
@@ -498,9 +486,8 @@ class HomeScreen extends StatelessWidget {
                       height: 80,
                     ),
                     IconButton(
-                      onPressed: () => context.push(
-                        '/search',),
-                      icon: Icon(Icons.search, color: Colors.blueGrey),
+                      onPressed: () => context.push('/search'),
+                      icon: Icon(Icons.search, color: Colors.white),
                     ),
                   ],
                 ),
@@ -517,7 +504,9 @@ class HomeScreen extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: weatherProvider.localizacion!.length > 40 ? 18 : 20,
+                          fontSize: weatherProvider.localizacion!.length > 40
+                              ? 18
+                              : 20,
                         ),
                       ),
                     ),
@@ -530,28 +519,20 @@ class HomeScreen extends StatelessWidget {
             child: ListView.builder(
               itemCount: weatherProvider.tiempoHoras!.time.length,
               itemBuilder: (context, i) {
-                
                 final hora = weatherProvider.tiempoHoras!.time[i];
                 final fecha = DateTime.parse(hora);
-                final temperatura = weatherProvider.tiempoHoras!.temperature2M[i];
+                final temperatura =
+                    weatherProvider.tiempoHoras!.temperature2M[i];
                 final weatherCode = weatherProvider.tiempoHoras!.weatherCode[i];
                 return Column(
                   children: [
                     SizedBox(height: 8),
+                    if (i == 0) _fechaCompletaCard(fecha: fecha),
+                    SizedBox(height: 8),
                     if (hora.substring(11, 16) == '00:00')
                       Divider(thickness: 1, color: Colors.grey),
                     if (hora.substring(11, 16) == '00:00')
-                      Container(
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                        ),
-                        child: Text(
-                          '${Utils.obtenerDiaSemana(fecha.weekday)} - ${fecha.day} de ${Utils.obtenerMes(fecha.month)} de ${fecha.year}',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                      ),
+                      _fechaCompletaCard(fecha: fecha),
 
                     Divider(thickness: 1, color: Colors.grey),
                     SizedBox(height: 25),
@@ -568,63 +549,7 @@ class HomeScreen extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              if (weatherCode == 0)
-                                Icon(
-                                  LucideIcons.sun,
-                                  size: 30,
-                                  color: Colors.black,
-                                ) //Si está despejado
-                              else if (weatherCode == 1 ||
-                                  weatherCode == 2 ||
-                                  weatherCode == 3)
-                                Icon(
-                                  LucideIcons.cloudSun,
-                                  size: 30,
-                                  color: Colors.black,
-                                ) //Si esta algo nublado
-                              else if (weatherCode == 45 || weatherCode == 48)
-                                Icon(
-                                  LucideIcons.cloudFog,
-                                  size: 30,
-                                  color: Colors.black,
-                                ) //Si hay neblina
-                              else if (weatherCode >= 51 && weatherCode <= 65)
-                                Icon(
-                                  LucideIcons.cloudRain,
-                                  size: 30,
-                                  color: Colors.black,
-                                ) //Si esta lloviendo un poco
-                              else if ([
-                                71,
-                                73,
-                                75,
-                                77,
-                                85,
-                                86,
-                              ].contains(weatherCode))
-                                Icon(
-                                  LucideIcons.snowflake,
-                                  size: 30,
-                                  color: Colors.black,
-                                ) //Si esta nevando
-                              else if (weatherCode >= 80 && weatherCode <= 82)
-                                Icon(
-                                  LucideIcons.cloudRainWind,
-                                  size: 30,
-                                  color: Colors.black,
-                                ) //Si esta lloviendo fuerte
-                              else if (weatherCode >= 95 && weatherCode <= 99)
-                                Icon(
-                                  LucideIcons.cloudLightning,
-                                  size: 30,
-                                  color: Colors.black,
-                                ) //Si hay tormenta
-                              else
-                                Icon(
-                                  Icons.help_outline,
-                                  size: 30,
-                                  color: Colors.black,
-                                ),
+                              Utils.obtenerSimbolo(weatherCode),
                               SizedBox(width: 10),
                               Text(
                                 '${temperatura.round().toString()}ºC',
@@ -634,87 +559,15 @@ class HomeScreen extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(width: 10),
-                              if (weatherCode == 0)
-                                Text(
-                                  "Despejado",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                )
-                              else if (weatherCode == 1 ||
-                                  weatherCode == 2 ||
-                                  weatherCode == 3)
-                                Text(
-                                  "Nublado",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                )
-                              else if (weatherCode == 45 || weatherCode == 48)
-                                Text(
-                                  "Niebla",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                )
-                              else if (weatherCode >= 51 && weatherCode <= 65)
-                                Text(
-                                  "Lluvia",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                )
-                              else if ([
-                                71,
-                                73,
-                                75,
-                                77,
-                                85,
-                                86,
-                              ].contains(weatherCode))
-                                Text(
-                                  "Nevando",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                )
-                              else if (weatherCode >= 80 && weatherCode <= 82)
-                                Text(
-                                  "Lluvia fuerte",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                )
-                              else if (weatherCode >= 95 && weatherCode <= 99)
-                                Text(
-                                  "Tormenta",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                )
-                              else
-                                Text(
-                                  "Desconocido",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
+
+                              Text(
+                                Utils.obtenerTiempoText(weatherCode),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
                                 ),
+                              ),
                             ],
                           ),
                         ],
@@ -729,5 +582,94 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-  
+
+  Widget _buildPantallaPorDias(
+    BuildContext context,
+    WeatherProvider weatherProvider,
+  ) {
+    return SafeArea(
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset('assets/images/LogoApp.png', width: 80, height: 80),
+              IconButton(
+                onPressed: () => context.push('/search'),
+                icon: Icon(Icons.search, color: Colors.blueGrey),
+              ),
+            ],
+          ),
+          Row(
+            //Texto de la ciudad actual
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (weatherProvider.isUbicacionUser!)
+                Icon(LucideIcons.navigation, color: Colors.black),
+              Flexible(
+                //Para que no sobresalga de la pantalla
+                child: Text(
+                  weatherProvider.localizacion!,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: weatherProvider.localizacion!.length > 40
+                        ? 18
+                        : 20,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Expanded(
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: SizedBox(
+                height: 120,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: weatherProvider.tiempoDias!.length,
+                  itemBuilder: (context, index) {
+                    TiempoDias tiempoDiaActual = weatherProvider.tiempoDias![index];
+                    return Container(
+                      padding: EdgeInsets.all(8),
+                      child: Column(
+                        children: [
+                          Text('${Utils.obtenerDiaSemana(tiempoDiaActual.fecha.weekday)}'),
+                          Text('${tiempoDiaActual.fecha.day} de ${Utils.obtenerMes(tiempoDiaActual.fecha.month)}'),
+                          Text('MAX: ${tiempoDiaActual.tempMax}ºC'),
+                          Text('MIN ${tiempoDiaActual.tempMin}ºC'),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class _fechaCompletaCard extends StatelessWidget {
+  const _fechaCompletaCard({super.key, required this.fecha});
+
+  final DateTime fecha;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+      ),
+      child: Text(
+        '${Utils.obtenerDiaSemana(fecha.weekday)} - ${fecha.day} de ${Utils.obtenerMes(fecha.month)} de ${fecha.year}',
+        style: TextStyle(color: Colors.white, fontSize: 16),
+      ),
+    );
+  }
 }

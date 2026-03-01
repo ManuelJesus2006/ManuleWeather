@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+import 'package:manule_weather/models/tiempo_dias_model.dart';
 import 'package:manule_weather/models/tiempo_horas_model.dart';
 import 'package:manule_weather/models/tiempo_model.dart';
 import 'package:manule_weather/services/localizacion_service.dart';
 import 'package:manule_weather/services/tiempo_service.dart';
 
-class WeatherProvider with ChangeNotifier{
+class WeatherProvider with ChangeNotifier {
   Tiempo? tiempoActual;
   String? localizacion;
   TiempoHoras? tiempoHoras;
@@ -18,8 +20,14 @@ class WeatherProvider with ChangeNotifier{
   DateTime sunrise = DateTime.now();
   DateTime sunset = DateTime.now();
   DateTime ahoraCiudad = DateTime.now();
+  List<TiempoDias>? tiempoDias = [];
 
-  cambiarDatos(Tiempo tiempo, String localizacion, TiempoHoras tiempoHoras, bool isUbicacionUser){
+  cambiarDatos(
+    Tiempo tiempo,
+    String localizacion,
+    TiempoHoras tiempoHoras,
+    bool isUbicacionUser,
+  ) {
     this.tiempoActual = tiempo;
     this.localizacion = localizacion;
     this.tiempoHoras = tiempoHoras;
@@ -49,13 +57,12 @@ class WeatherProvider with ChangeNotifier{
     notifyListeners();
   }
 
-  void comprobarUbicacionUser(){
+  void comprobarUbicacionUser() {
     isUbicacionUser = localizacion == nombreUbi;
     notifyListeners();
   }
 
   void comprobarNocheDia() {
-    
     final int offsetSegundos = tiempoActual!.timezone;
 
     sunrise = DateTime.fromMillisecondsSinceEpoch(
@@ -72,5 +79,33 @@ class WeatherProvider with ChangeNotifier{
     isDeDia = ahoraCiudad.isAfter(sunrise) && ahoraCiudad.isBefore(sunset);
     notifyListeners();
   }
-  
+
+  void eliminarHorasPasadas(int elementosAEliminar) {
+    tiempoHoras!.time.removeRange(0, elementosAEliminar);
+    notifyListeners();
+  }
+
+  void inicializarTiempoDias() {
+    tiempoDias = []; //Reiniciamos el array
+    double tempMax = -1000;
+    double tempMin = 1000;
+    double lengthBucle = (tiempoHoras!.time.length / 24);
+    final hora = tiempoHoras!.time[0]; //Cogemos la primera hora que veamos porque solo mostraremos el día, no las horas
+    DateTime fecha = DateTime.parse(hora);
+    for (int i = 0; i < lengthBucle; i++) {
+
+      int multiplicacion = (i+1)*24;
+      int primerValor = i*24;
+      List<double> hrs24 = tiempoHoras!.temperature2M.sublist(primerValor, multiplicacion);
+      hrs24.forEach((temp){
+        if (temp > tempMax) tempMax = temp;
+        if (temp < tempMin) tempMin = temp;
+      });
+      TiempoDias tiempoDiasGenerado = TiempoDias(tempMax: tempMax, tempMin: tempMin, iconoGeneral: LucideIcons.sun, descripcionCorta: 'Esto es una prueba', fecha: fecha);
+      print(tiempoDiasGenerado.fecha);
+      tiempoDias!.add(tiempoDiasGenerado);
+      fecha = fecha.add(Duration(days: 1));
+    }
+    notifyListeners();
+  }
 }
