@@ -82,6 +82,8 @@ class WeatherProvider with ChangeNotifier {
 
   void eliminarHorasPasadas(int elementosAEliminar) {
     tiempoHoras!.time.removeRange(0, elementosAEliminar);
+    tiempoHoras!.temperature2M.removeRange(0, elementosAEliminar);
+    print(tiempoHoras!.time.toString());
     notifyListeners();
   }
 
@@ -92,8 +94,9 @@ class WeatherProvider with ChangeNotifier {
     double lengthBucle = (tiempoHoras!.time.length / 24);
     final hora = tiempoHoras!.time[0]; //Cogemos la primera hora que veamos porque solo mostraremos el día, no las horas
     DateTime fecha = DateTime.parse(hora);
-    for (int i = 0; i < lengthBucle; i++) {
-
+    for (int i = 0; i < lengthBucle; i++) {//Bucle inicial cada 24hrs (1 día) disponibles
+      tempMax = -1000;
+      tempMin = 1000;
       int multiplicacion = (i+1)*24;
       int primerValor = i*24;
       List<double> hrs24 = tiempoHoras!.temperature2M.sublist(primerValor, multiplicacion);
