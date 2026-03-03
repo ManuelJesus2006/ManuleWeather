@@ -156,7 +156,7 @@ class _widgetUbicacion extends StatelessWidget {
           //la localización actual
           if (!weatherProvider.isUbicacionUser!) {
             mostrarCargando(context);
-            Position position = weatherProvider.ubiActual!;
+            Position position = weatherProvider.geolocalizacion!;
 
             Tiempo? tiempoUbi = await TiempoService().getTiempoLatLon(
               position.latitude,
@@ -171,6 +171,8 @@ class _widgetUbicacion extends StatelessWidget {
               weatherProvider.nombreUbi,
               tiempoHoras!,
               true,
+              position.latitude,
+              position.longitude
             );
             weatherProvider.comprobarNocheDia();
             weatherProvider.inicializarTiempoDias();
@@ -320,6 +322,8 @@ class _widgetLugarBusqueda extends StatelessWidget {
           lugar.placeNameEs!,
           tiempoHoras!,
           false,
+          lugar.center![1],
+          lugar.center![0],
         );
         weatherProvider.comprobarNocheDia();
         weatherProvider.inicializarTiempoDias();

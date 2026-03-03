@@ -60,7 +60,7 @@ class Utils {
     }
   }
 
-  static Icon obtenerSimbolo(int weatherCode) {
+  static obtenerSimbolo(int weatherCode, bool isTiempoHora) {
     IconData iconData;
 
     if (weatherCode == 0 || weatherCode == 1)
@@ -92,7 +92,7 @@ class Utils {
     else
       iconData = LucideIcons.cloud;
 
-    return Icon(iconData, size: 30, color: Colors.black);
+    return isTiempoHora ? Icon(iconData, size: 30, color: Colors.black) : iconData;
   }
 
   static String obtenerTiempoText(int weatherCode) {

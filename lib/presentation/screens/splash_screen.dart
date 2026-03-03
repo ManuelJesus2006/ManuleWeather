@@ -75,7 +75,7 @@ class _SplashScreenState extends State<SplashScreen> {
         listen: false,
       );
 
-      weatherProvider.cambiarDatos(tiempoUbi, nombreCiudad, tiempoHoras, true);
+      weatherProvider.cambiarDatos(tiempoUbi, nombreCiudad, tiempoHoras, true,position.latitude,position.longitude);
       weatherProvider.comprobarNocheDia();
       weatherProvider.inicializarTiempoDias();
       DateTime horaActual = weatherProvider.ahoraCiudad;
