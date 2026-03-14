@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:manule_weather/models/tiempo_dias_model.dart';
+import 'package:manule_weather/models/tiempo_dias_response_model.dart';
 import 'package:manule_weather/models/tiempo_horas_model.dart';
 import 'package:manule_weather/models/tiempo_model.dart';
 import 'package:manule_weather/services/localizacion_service.dart';
@@ -22,7 +22,7 @@ class WeatherProvider with ChangeNotifier {
   DateTime sunrise = DateTime.now();
   DateTime sunset = DateTime.now();
   DateTime ahoraCiudad = DateTime.now();
-  List<TiempoDias>? tiempoDias = [];
+  TiempoDias? tiempoDias;
   double latitudActual = 0;
   double longitudActual = 0;
 
@@ -30,6 +30,7 @@ class WeatherProvider with ChangeNotifier {
     Tiempo tiempo,
     String localizacion,
     TiempoHoras tiempoHoras,
+    TiempoDias tiempoDias,
     bool isUbicacionUser,
     double latitude,
     double longitude,
@@ -38,6 +39,7 @@ class WeatherProvider with ChangeNotifier {
     this.localizacion = localizacion;
     this.tiempoHoras = tiempoHoras;
     this.isUbicacionUser = isUbicacionUser;
+    this.tiempoDias = tiempoDias;
     latitudActual = latitude;
     longitudActual = longitude;
     notifyListeners();
@@ -96,56 +98,10 @@ class WeatherProvider with ChangeNotifier {
   }
 
   void inicializarTiempoDias() {
-    tiempoDias = []; //Reiniciamos el array
-    double tempMax = -1000;
-    double tempMin = 1000;
-    double lengthBucle = (tiempoHoras!.time.length / 24);
-    final hora = tiempoHoras!
-        .time[0]; //Cogemos la primera hora que veamos porque solo mostraremos el día, no las horas
-    DateTime fecha = DateTime.parse(hora);
-    for (int i = 0; i < lengthBucle; i++) {
-      //Bucle inicial cada 24hrs (1 día) disponibles
-      tempMax = -1000;
-      tempMin = 1000;
-      int multiplicacion = (i + 1) * 24;
-      int primerValor = i * 24;
-      List<double> hrs24 = tiempoHoras!.temperature2M.sublist(
-        primerValor,
-        multiplicacion,
-      );
-      List<int> weatherCodes24hrs = tiempoHoras!.weatherCode.sublist(
-        primerValor,
-        multiplicacion,
-      );
-      hrs24.forEach((temp) {
-        if (temp > tempMax) tempMax = temp;
-        if (temp < tempMin) tempMin = temp;
-      });
-      Map<int, int> frecuencias = {};
-
-      weatherCodes24hrs.forEach((weatherCode) {
-        frecuencias[weatherCode] = (frecuencias[weatherCode] ?? 0) + 1;
-      });
-
-      int codeMasFrecuente = frecuencias.entries
-          .reduce((a, b) => a.value > b.value ? a : b)
-          .key;
-
-      IconData iconoMasRepetitivo = Utils.obtenerSimbolo(
-        codeMasFrecuente,
-        false,
-      );
-      TiempoDias tiempoDiasGenerado = TiempoDias(
-        tempMax: tempMax,
-        tempMin: tempMin,
-        iconoGeneral: iconoMasRepetitivo,
-        descripcionCorta: Utils.obtenerTiempoText(codeMasFrecuente),
-        fecha: fecha,
-      );
-      print(tiempoDiasGenerado.fecha);
-      tiempoDias!.add(tiempoDiasGenerado);
-      fecha = fecha.add(Duration(days: 1));
-    }
+    tiempoDias!.weatherCode.forEach((weatherCode) {
+      tiempoDias!.iconosGenerales.add(Utils.obtenerSimbolo(weatherCode, false));
+      tiempoDias!.descripcionesCortas.add(Utils.obtenerTiempoText(weatherCode));
+    });
     notifyListeners();
   }
 
@@ -165,12 +121,17 @@ class WeatherProvider with ChangeNotifier {
         position.latitude,
         position.longitude,
       );
+      TiempoDias? tiempoDias = await TiempoService().getTiempoPorDias(
+        position.latitude,
+        position.longitude,
+      );
 
       if (tiempoUbi != null && nombreCiudad != null && tiempoHoras != null) {
         cambiarDatos(
           tiempoUbi,
           nombreCiudad,
           tiempoHoras,
+          tiempoDias!,
           true,
           position.latitude,
           position.longitude,
@@ -194,6 +155,7 @@ class WeatherProvider with ChangeNotifier {
         tiempoUbi!,
         localizacion!,
         tiempoHoras!,
+        tiempoDias!,
         false,
         latitudActual,
         longitudActual,

@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:manule_weather/models/localizacion_model.dart';
+import 'package:manule_weather/models/tiempo_dias_response_model.dart';
 import 'package:manule_weather/models/tiempo_horas_model.dart';
 import 'package:manule_weather/models/tiempo_model.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
@@ -166,13 +167,18 @@ class _widgetUbicacion extends StatelessWidget {
               position.latitude,
               position.longitude,
             );
+            TiempoDias? tiempoDias = await TiempoService().getTiempoPorDias(
+              position.latitude,
+              position.longitude,
+            );
             weatherProvider.cambiarDatos(
               tiempoUbi!,
               weatherProvider.nombreUbi,
               tiempoHoras!,
+              tiempoDias!,
               true,
               position.latitude,
-              position.longitude
+              position.longitude,
             );
             weatherProvider.comprobarNocheDia();
             weatherProvider.inicializarTiempoDias();
@@ -317,10 +323,15 @@ class _widgetLugarBusqueda extends StatelessWidget {
           lugar.center![1],
           lugar.center![0],
         );
+        TiempoDias? tiempoDias = await TiempoService().getTiempoPorDias(
+          lugar.center![1],
+          lugar.center![0],
+        );
         weatherProvider.cambiarDatos(
           tiempoUbi!,
           lugar.placeNameEs!,
           tiempoHoras!,
+          tiempoDias!,
           false,
           lugar.center![1],
           lugar.center![0],

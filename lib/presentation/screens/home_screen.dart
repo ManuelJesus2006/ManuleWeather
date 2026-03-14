@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:manule_weather/models/tiempo_dias_model.dart';
+import 'package:manule_weather/models/tiempo_dias_response_model.dart';
 import 'package:manule_weather/providers/navigation_provider.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
 import 'package:manule_weather/utils/Utils.dart';
@@ -53,7 +53,6 @@ class HomeScreen extends StatelessWidget {
       child: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
-
             await weatherProvider.actualizarDatos();
           },
           child: SingleChildScrollView(
@@ -659,10 +658,16 @@ class HomeScreen extends StatelessWidget {
                     height: 140,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: weatherProvider.tiempoDias!.length,
+                      itemCount: weatherProvider.tiempoDias!.time.length,
                       itemBuilder: (context, index) {
-                        TiempoDias tiempoDiaActual =
-                            weatherProvider.tiempoDias![index];
+                        DateTime fecha =
+                            weatherProvider.tiempoDias!.time[index];
+                        double tempMax =
+                            weatherProvider.tiempoDias!.temperature2MMax[index];
+                        double tempMin =
+                            weatherProvider.tiempoDias!.temperature2MMin[index];
+                        IconData icono =
+                            weatherProvider.tiempoDias!.iconosGenerales[index];
                         return GestureDetector(
                           onTap: () {
                             navigationProvider.cambiarIndiceTiempoDias(index);
@@ -685,11 +690,11 @@ class HomeScreen extends StatelessWidget {
                             child: Column(
                               children: [
                                 Text(
-                                  '${Utils.obtenerDiaSemana(tiempoDiaActual.fecha.weekday).toUpperCase().substring(0, 3)}',
+                                  '${Utils.obtenerDiaSemana(fecha.weekday).toUpperCase().substring(0, 3)}',
                                   style: TextStyle(fontSize: 16),
                                 ),
                                 Text(
-                                  '${tiempoDiaActual.fecha.day} de ${Utils.obtenerMes(tiempoDiaActual.fecha.month)}',
+                                  '${fecha.day} de ${Utils.obtenerMes(fecha.month)}',
                                   style: TextStyle(fontSize: 18),
                                 ),
                                 Row(
@@ -699,22 +704,19 @@ class HomeScreen extends StatelessWidget {
                                     Column(
                                       children: [
                                         Text(
-                                          '${tiempoDiaActual.tempMax.round()}ºC',
+                                          '${tempMax.round()}ºC',
                                           style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
                                         Text(
-                                          '${tiempoDiaActual.tempMin.round()}ºC',
+                                          '${tempMin.round()}ºC',
                                           style: TextStyle(fontSize: 18),
                                         ),
                                       ],
                                     ),
-                                    Icon(
-                                      tiempoDiaActual.iconoGeneral,
-                                      size: 30,
-                                    ),
+                                    Icon(icono, size: 30),
                                   ],
                                 ),
                               ],
@@ -765,24 +767,37 @@ class _tiempoDiaIndividualCard extends StatelessWidget {
     final navigationProvider = Provider.of<NavigationProvider>(context);
     final weatherProvider = Provider.of<WeatherProvider>(context);
     IconData iconoActual = weatherProvider
-        .tiempoDias![navigationProvider.indiceTiempoDiasActual]
-        .iconoGeneral;
+        .tiempoDias!
+        .iconosGenerales[navigationProvider.indiceTiempoDiasActual];
     String tempMax = weatherProvider
-        .tiempoDias![navigationProvider.indiceTiempoDiasActual]
-        .tempMax
+        .tiempoDias!
+        .temperature2MMax[navigationProvider.indiceTiempoDiasActual]
         .round()
         .toString();
     String tempMin = weatherProvider
-        .tiempoDias![navigationProvider.indiceTiempoDiasActual]
-        .tempMin
+        .tiempoDias!
+        .temperature2MMin[navigationProvider.indiceTiempoDiasActual]
+        .round()
+        .toString();
+    String vientoMax = weatherProvider
+        .tiempoDias!
+        .windSpeed10MMax[navigationProvider.indiceTiempoDiasActual]
+        .round()
+        .toString();
+    String rachasMax = weatherProvider
+        .tiempoDias!
+        .windGusts10MMax[navigationProvider.indiceTiempoDiasActual]
         .round()
         .toString();
     String desc = weatherProvider
-        .tiempoDias![navigationProvider.indiceTiempoDiasActual]
-        .descripcionCorta;
+        .tiempoDias!
+        .descripcionesCortas[navigationProvider.indiceTiempoDiasActual];
     DateTime fecha = weatherProvider
-        .tiempoDias![navigationProvider.indiceTiempoDiasActual]
-        .fecha;
+        .tiempoDias!
+        .time[navigationProvider.indiceTiempoDiasActual];
+    double mmLluvia = weatherProvider
+        .tiempoDias!
+        .precipitationSum[navigationProvider.indiceTiempoDiasActual];
     return SizedBox(
       height: 550,
       child: Container(
@@ -798,17 +813,66 @@ class _tiempoDiaIndividualCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  weatherProvider
-                      .tiempoDias![navigationProvider.indiceTiempoDiasActual]
-                      .iconoGeneral,
-                  size: 70,
-                ),
+                Icon(iconoActual, size: 70),
                 Text('$tempMaxºC/$tempMinºC', style: TextStyle(fontSize: 30)),
               ],
             ),
             SizedBox(height: 30),
             Text(desc, style: TextStyle(fontSize: 20)),
+            SizedBox(height: 20),
+            Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                color: Colors.blue[600]?.withOpacity(0.6),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "🌧️❄️Cantidad de precipitación/nieve",
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  Text("$mmLluvia l/m²", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+                ],
+              ),
+            ),
+            SizedBox(height: 20),
+            Container(
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.teal.shade300.withOpacity(0.8)
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "🍃Vel viento máxima",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      Text("$vientoMax km/h", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20),
+                Container(
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.orange.shade300.withOpacity(0.8)
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "🪁Rachas viento máximas",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      Text("$rachasMax km/h", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+                    ],
+                  ),
+                ),
           ],
         ),
       ),

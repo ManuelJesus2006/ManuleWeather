@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:manule_weather/models/tiempo_dias_response_model.dart';
 import 'package:manule_weather/models/tiempo_horas_model.dart';
 import 'package:manule_weather/models/tiempo_model.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
@@ -66,6 +67,10 @@ class _SplashScreenState extends State<SplashScreen> {
       position.latitude,
       position.longitude,
     );
+    TiempoDias? tiempoDias = await TiempoService().getTiempoPorDias(
+      position.latitude,
+      position.longitude,
+    );
 
     if (tiempoUbi != null && nombreCiudad != null && tiempoHoras != null) {
       // Actualizamos el Provider AQUÍ, antes de cambiar de pantalla.
@@ -75,7 +80,15 @@ class _SplashScreenState extends State<SplashScreen> {
         listen: false,
       );
 
-      weatherProvider.cambiarDatos(tiempoUbi, nombreCiudad, tiempoHoras, true,position.latitude,position.longitude);
+      weatherProvider.cambiarDatos(
+        tiempoUbi,
+        nombreCiudad,
+        tiempoHoras,
+        tiempoDias!,
+        true,
+        position.latitude,
+        position.longitude,
+      );
       weatherProvider.comprobarNocheDia();
       weatherProvider.inicializarTiempoDias();
       DateTime horaActual = weatherProvider.ahoraCiudad;

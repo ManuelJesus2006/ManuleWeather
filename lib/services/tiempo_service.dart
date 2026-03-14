@@ -1,13 +1,16 @@
 import 'package:http/http.dart';
 import 'package:manule_weather/environment.dart';
+import 'package:manule_weather/models/tiempo_dias_response_model.dart';
 import 'package:manule_weather/models/tiempo_horas_model.dart';
 import 'package:manule_weather/models/tiempo_model.dart';
 
 class TiempoService {
   String _urlBase = 'https://api.openweathermap.org/data/2.5/weather';
 
-  String _urlTiempoHoras = 'https://api.open-meteo.com/v1/forecast?';
+  String _urlBaseOpenMeteo = 'https://api.open-meteo.com/v1/forecast?';
   String _otrosTiempoHoras = '&hourly=temperature_2m,weather_code';
+
+  String _otrosTiempoDias = '&daily=temperature_2m_max,temperature_2m_min,weather_code,wind_speed_10m_max,wind_gusts_10m_max,precipitation_sum';
 
   Future<Tiempo?> getTiempoLatLon(double lat, double lon) async {
     Uri uri = Uri.parse(
@@ -29,7 +32,7 @@ class TiempoService {
   // 95	Tormenta
   Future<TiempoHoras?> getTiempoPorHoras(double lat, double lon) async {
     Uri uri = Uri.parse(
-      '${_urlTiempoHoras}latitude=$lat&longitude=$lon&timezone=auto$_otrosTiempoHoras',
+      '${_urlBaseOpenMeteo}latitude=$lat&longitude=$lon&timezone=auto$_otrosTiempoHoras',
     );
     print(uri);
     Response response = await get(uri);
@@ -39,5 +42,19 @@ class TiempoService {
       response.body,
     );
     return tiempoHoraResponse.tiempoHoras;
+  }
+
+  Future<TiempoDias?> getTiempoPorDias(double lat, double lon)async{
+    Uri uri = Uri.parse(
+      '${_urlBaseOpenMeteo}latitude=$lat&longitude=$lon&timezone=auto$_otrosTiempoDias',
+    );
+    print(uri);
+    Response response = await get(uri);
+
+    if (response.statusCode != 200) return null;
+    TiempoDiasResponse tiempoDiasResponse = tiempoDiasResponseFromJson(
+      response.body,
+    );
+    return tiempoDiasResponse.tiempoDias;
   }
 }
