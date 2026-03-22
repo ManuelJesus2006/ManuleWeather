@@ -95,26 +95,22 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 30),
-                Text(
-                  'Hora local: ${Utils.formatearHora(weatherProvider.ahoraCiudad)}',
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      '${weatherProvider.tiempoActual!.main.temp.round()}ºC',
+                      '${weatherProvider.tiempoActual!.current.temperature2M.round()}ºC',
                       style: TextStyle(fontSize: 65, color: Colors.white),
                     ),
                     SizedBox(width: 10),
-                    Utils.obtenerSimboloTiempoActual(
-                      weatherProvider.tiempoActual!.weather[0].icon,
-                    ),
+                    Icon(Utils.obtenerSimbolo(
+                      weatherProvider.tiempoActual!.current.weatherCode, false, weatherProvider.isDeDia
+                    ), size: 50, color: Colors.white)
+                    
                   ],
                 ),
                 Text(
-                  weatherProvider.tiempoActual!.weather[0].description
-                      .toUpperCase(),
+                  Utils.obtenerTiempoText(weatherProvider.tiempoActual!.current.weatherCode).toUpperCase(),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -128,7 +124,7 @@ class HomeScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  '${weatherProvider.tiempoActual!.main.feelsLike.round()}ºC',
+                  '${weatherProvider.tiempoActual!.current.apparentTemperature.round()}ºC',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
@@ -160,7 +156,7 @@ class HomeScreen extends StatelessWidget {
                             ),
                             SizedBox(height: 8),
                             Text(
-                              '${weatherProvider.tiempoActual!.main.tempMax.round()}ºC',
+                              '${weatherProvider.tiempoDias!.temperature2MMax[0].round()}ºC',
                               style: TextStyle(
                                 fontSize: 20,
                                 color: Colors.white,
@@ -188,7 +184,7 @@ class HomeScreen extends StatelessWidget {
                             ),
                             SizedBox(height: 8),
                             Text(
-                              '${weatherProvider.tiempoActual!.main.tempMin.round()}ºC',
+                              '${weatherProvider.tiempoDias!.temperature2MMin[0].round()}ºC',
                               style: TextStyle(
                                 fontSize: 20,
                                 color: Colors.white,
@@ -293,7 +289,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        '${weatherProvider.tiempoActual!.wind.speed.round()}km/h',
+                        '${weatherProvider.tiempoActual!.current.windSpeed10M.round()}km/h',
                         style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
                     ],
@@ -320,8 +316,8 @@ class HomeScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        weatherProvider.tiempoActual!.wind.gust != null
-                            ? '${weatherProvider.tiempoActual!.wind.gust!.round()} km/h'
+                        weatherProvider.tiempoActual!.current.windGusts10M != null
+                            ? '${weatherProvider.tiempoActual!.current.windGusts10M.round()} km/h'
                             : 'Sin ráfagas',
                         style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
@@ -349,7 +345,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        '${weatherProvider.tiempoActual!.wind.deg}º',
+                        '${weatherProvider.tiempoActual!.current.windDirection10M}º',
                         style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
                     ],
@@ -376,7 +372,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        '${weatherProvider.tiempoActual!.clouds.all}%',
+                        '${weatherProvider.tiempoActual!.current.cloudCover}%',
                         style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
                     ],
@@ -403,7 +399,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        '${weatherProvider.tiempoActual!.main.humidity}%',
+                        '${weatherProvider.tiempoActual!.current.relativeHumidity2M}%',
                         style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
                     ],
@@ -429,9 +425,9 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 8),
-                      weatherProvider.tiempoActual!.visibility != null
+                      weatherProvider.tiempoActual!.current.visibility != null
                           ? Text(
-                              '${(weatherProvider.tiempoActual!.visibility)! / 1000}kms',
+                              '${(weatherProvider.tiempoActual!.current.visibility) / 1000}kms',
                               style: TextStyle(
                                 fontSize: 20,
                                 color: Colors.white,
@@ -468,7 +464,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        '${weatherProvider.tiempoActual!.main.pressure}hPa',
+                        '${weatherProvider.tiempoActual!.current.pressureMsl}hPa',
                         style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
                     ],
@@ -571,7 +567,7 @@ class HomeScreen extends StatelessWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Utils.obtenerSimbolo(weatherCode, true),
+                                Utils.obtenerSimbolo(weatherCode, true, weatherProvider.isDeDia),
                                 SizedBox(width: 10),
                                 Text(
                                   '${temperatura.round().toString()}ºC',

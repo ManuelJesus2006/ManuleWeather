@@ -9,6 +9,7 @@ import 'package:manule_weather/models/tiempo_model.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
 import 'package:manule_weather/services/localizacion_service.dart';
 import 'package:manule_weather/services/tiempo_service.dart';
+import 'package:manule_weather/utils/Utils.dart';
 import 'package:provider/provider.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -215,36 +216,11 @@ class _widgetUbicacion extends StatelessWidget {
                 SizedBox(height: 8),
                 Row(
                   children: [
-                    if (weatherProvider.estadoUbi.toLowerCase() == 'clouds')
-                      const Icon(Icons.cloud, size: 30, color: Colors.white)
-                    else if (weatherProvider.estadoUbi.toLowerCase() == 'snow')
-                      const Icon(Icons.snowing, size: 30, color: Colors.white)
-                    else if (weatherProvider.estadoUbi.toLowerCase() == 'clear')
-                      const Icon(Icons.wb_sunny, size: 30, color: Colors.white)
-                    else if (weatherProvider.estadoUbi.toLowerCase() == 'rain')
-                      const Icon(Icons.umbrella, size: 30, color: Colors.white)
-                    else if (weatherProvider.estadoUbi.toLowerCase() ==
-                        'drizzle')
-                      const Icon(Icons.grain, size: 30, color: Colors.white)
-                    else if (weatherProvider.estadoUbi.toLowerCase() ==
-                        'thunderstorm')
-                      const Icon(Icons.flash_on, size: 30, color: Colors.white)
-                    else if ([
-                      'mist',
-                      'fog',
-                      'haze',
-                    ].contains(weatherProvider.estadoUbi.toLowerCase()))
-                      const Icon(
-                        Icons.filter_drama,
-                        size: 30,
-                        color: Colors.white,
-                      )
-                    else
-                      const Icon(
-                        Icons.help_outline,
-                        size: 30,
-                        color: Colors.white,
-                      ),
+                    Icon(
+                      weatherProvider.iconoUbi,
+                      size: 30,
+                      color: Colors.white,
+                    ),
                     SizedBox(width: 8),
                     Text(
                       weatherProvider.tempUbi.round().toString(),
@@ -298,10 +274,10 @@ class _widgetLugarBusqueda extends StatelessWidget {
   void mostrarCargando(BuildContext context) {
     showDialog(
       context: context,
-      barrierDismissible: false, // No se puede quitar tocando fuera
+      barrierDismissible: false,
       builder: (context) => const Center(
         child: CircularProgressIndicator(
-          color: Colors.white, // O el color que prefieras
+          color: Colors.white,
         ),
       ),
     );
@@ -338,8 +314,10 @@ class _widgetLugarBusqueda extends StatelessWidget {
         );
         weatherProvider.comprobarNocheDia();
         weatherProvider.inicializarTiempoDias();
+        //Lógica previa para obtener el día actual y sobre esa hora limitar el array de tiempo horas
         DateTime horaActual = weatherProvider.ahoraCiudad;
         int elementosAEliminar = horaActual.hour;
+        //Eliminamos las horas pasadas del tiempoHoras
         weatherProvider.eliminarHorasPasadas(elementosAEliminar);
         context.pushReplacement('/home');
       },
@@ -363,70 +341,20 @@ class _widgetLugarBusqueda extends StatelessWidget {
                       ? Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            if (snapshot.data!.weather[0].main.toLowerCase() ==
-                                'clouds')
-                              const Icon(
-                                Icons.cloud,
-                                size: 30,
-                                color: Colors.white,
-                              )
-                            else if (snapshot.data!.weather[0].main
-                                    .toLowerCase() ==
-                                'snow')
-                              const Icon(
-                                Icons.snowing,
-                                size: 30,
-                                color: Colors.white,
-                              )
-                            else if (snapshot.data!.weather[0].main
-                                    .toLowerCase() ==
-                                'clear')
-                              const Icon(
-                                Icons.wb_sunny,
-                                size: 30,
-                                color: Colors.white,
-                              )
-                            else if (snapshot.data!.weather[0].main
-                                    .toLowerCase() ==
-                                'rain')
-                              const Icon(
-                                Icons.umbrella,
-                                size: 30,
-                                color: Colors.white,
-                              )
-                            else if (snapshot.data!.weather[0].main
-                                    .toLowerCase() ==
-                                'drizzle')
-                              const Icon(
-                                Icons.grain,
-                                size: 30,
-                                color: Colors.white,
-                              )
-                            else if (snapshot.data!.weather[0].main
-                                    .toLowerCase() ==
-                                'thunderstorm')
-                              const Icon(
-                                Icons.flash_on,
-                                size: 30,
-                                color: Colors.white,
-                              )
-                            else if (['mist', 'fog', 'haze'].contains(
-                              snapshot.data!.weather[0].main.toLowerCase(),
-                            ))
-                              const Icon(
-                                Icons.filter_drama,
-                                size: 30,
-                                color: Colors.white,
-                              )
-                            else
-                              const Icon(
-                                Icons.help_outline,
-                                size: 30,
-                                color: Colors.white,
+                            Icon(
+                              Utils.obtenerSimbolo(
+                                snapshot.data!.current.weatherCode,
+                                false,
+                                snapshot.data!.current.isDay == 1 ? true:false
                               ),
+                              size: 30,
+                              color: Colors.white,
+                            ),
                             SizedBox(width: 8),
                             Text(
-                              snapshot.data!.main.temp.round().toString(),
+                              snapshot.data!.current.temperature2M
+                                  .round()
+                                  .toString(),
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,

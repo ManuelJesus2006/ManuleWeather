@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 import 'package:manule_weather/models/tiempo_dias_response_model.dart';
 import 'package:manule_weather/models/tiempo_horas_model.dart';
 import 'package:manule_weather/models/tiempo_model.dart';
 import 'package:manule_weather/services/localizacion_service.dart';
 import 'package:manule_weather/services/tiempo_service.dart';
 import 'package:manule_weather/utils/Utils.dart';
-import 'package:provider/provider.dart';
 
 class WeatherProvider with ChangeNotifier {
   Tiempo? tiempoActual;
@@ -17,6 +15,7 @@ class WeatherProvider with ChangeNotifier {
   String nombreUbi = '';
   double tempUbi = 0;
   String estadoUbi = '';
+  IconData? iconoUbi;
   Position? geolocalizacion;
   bool isDeDia = false;
   DateTime sunrise = DateTime.now();
@@ -61,8 +60,9 @@ class WeatherProvider with ChangeNotifier {
       position.latitude,
     );
     nombreUbi = nombreCiudad!;
-    tempUbi = tiempoUbi!.main.temp;
-    estadoUbi = tiempoUbi.weather[0].main;
+    tempUbi = tiempoUbi!.current.temperature2M;
+    estadoUbi = Utils.obtenerTiempoText(tiempoUbi.current.weatherCode);
+    iconoUbi = Utils.obtenerSimbolo(tiempoUbi.current.weatherCode, false, tiempoUbi.current.isDay == 1 ? true:false);
     geolocalizacion = position;
     notifyListeners();
   }
@@ -73,33 +73,27 @@ class WeatherProvider with ChangeNotifier {
   }
 
   void comprobarNocheDia() {
-    final int offsetSegundos = tiempoActual!.timezone;
 
-    sunrise = DateTime.fromMillisecondsSinceEpoch(
-      tiempoActual!.sys.sunrise * 1000,
-      isUtc: true,
-    ).add(Duration(seconds: offsetSegundos));
+    sunrise = DateTime.parse(tiempoDias!.sunrise[0]);
 
-    sunset = DateTime.fromMillisecondsSinceEpoch(
-      tiempoActual!.sys.sunset * 1000,
-      isUtc: true,
-    ).add(Duration(seconds: offsetSegundos));
+    sunset = DateTime.parse(tiempoDias!.sunset[0]);
 
-    ahoraCiudad = DateTime.now().toUtc().add(Duration(seconds: offsetSegundos));
-    isDeDia = ahoraCiudad.isAfter(sunrise) && ahoraCiudad.isBefore(sunset);
+    ahoraCiudad = DateTime.parse(tiempoActual!.current.time);
+    isDeDia = tiempoActual!.current.isDay == 1 ? true : false;
     notifyListeners();
   }
 
   void eliminarHorasPasadas(int elementosAEliminar) {
     tiempoHoras!.time.removeRange(0, elementosAEliminar);
     tiempoHoras!.temperature2M.removeRange(0, elementosAEliminar);
+    tiempoHoras!.weatherCode.removeRange(0, elementosAEliminar);
     print(tiempoHoras!.time.toString());
     notifyListeners();
   }
 
   void inicializarTiempoDias() {
     tiempoDias!.weatherCode.forEach((weatherCode) {
-      tiempoDias!.iconosGenerales.add(Utils.obtenerSimbolo(weatherCode, false));
+      tiempoDias!.iconosGenerales.add(Utils.obtenerSimbolo(weatherCode, false, true));
       tiempoDias!.descripcionesCortas.add(Utils.obtenerTiempoText(weatherCode));
     });
     notifyListeners();

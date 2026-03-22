@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:manule_weather/providers/navigation_provider.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:manule_weather/routes/app_routes.dart';
+import 'package:manule_weather/routes/app_routes.dart';  
 
 void main() {
   // Asegura que los bindings estén listos

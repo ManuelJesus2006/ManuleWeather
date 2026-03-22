@@ -69,6 +69,8 @@ class TiempoDias {
   List<double> windSpeed10MMax;
   List<double> windGusts10MMax;
   List<double> precipitationSum;
+  List<String> sunrise;
+  List<String> sunset;
   List<IconData> iconosGenerales = [];
   List<String> descripcionesCortas = [];
 
@@ -80,6 +82,8 @@ class TiempoDias {
     required this.windSpeed10MMax,
     required this.windGusts10MMax,
     required this.precipitationSum,
+    required this.sunrise,
+    required this.sunset,
   });
 
   factory TiempoDias.fromJson(Map<String, dynamic> json) => TiempoDias(
@@ -97,9 +101,9 @@ class TiempoDias {
     windGusts10MMax: List<double>.from(
       json["wind_gusts_10m_max"].map((x) => x?.toDouble()),
     ),
-    precipitationSum: List<double>.from(
-      json["precipitation_sum"].map((x) => x?.toDouble()),
-    ),
+    precipitationSum: List<double>.from(json["precipitation_sum"].map((x) => x)),
+    sunrise: List<String>.from(json["sunrise"].map((x) => x)),
+    sunset: List<String>.from(json["sunset"].map((x) => x)),
   );
 
   Map<String, dynamic> toJson() => {
@@ -115,6 +119,8 @@ class TiempoDias {
     "wind_speed_10m_max": List<dynamic>.from(windSpeed10MMax.map((x) => x)),
     "wind_gusts_10m_max": List<dynamic>.from(windGusts10MMax.map((x) => x)),
     "precipitation_sum": List<dynamic>.from(precipitationSum.map((x) => x)),
+    "sunrise": List<dynamic>.from(sunrise.map((x) => x)),
+    "sunset": List<dynamic>.from(sunset.map((x) => x)),
   };
 }
 
@@ -126,6 +132,8 @@ class DailyUnits {
   String windSpeed10MMax;
   String windGusts10MMax;
   String precipitationSum;
+  String sunrise;
+  String sunset;
 
   DailyUnits({
     required this.time,
@@ -135,6 +143,8 @@ class DailyUnits {
     required this.windSpeed10MMax,
     required this.windGusts10MMax,
     required this.precipitationSum,
+    required this.sunrise,
+    required this.sunset,
   });
 
   factory DailyUnits.fromJson(Map<String, dynamic> json) => DailyUnits(
@@ -145,6 +155,8 @@ class DailyUnits {
     windSpeed10MMax: json["wind_speed_10m_max"],
     windGusts10MMax: json["wind_gusts_10m_max"],
     precipitationSum: json["precipitation_sum"],
+    sunrise: json["sunrise"],
+    sunset: json["sunset"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -155,5 +167,7 @@ class DailyUnits {
     "wind_speed_10m_max": windSpeed10MMax,
     "wind_gusts_10m_max": windGusts10MMax,
     "precipitation_sum": precipitationSum,
+    "sunrise": sunrise,
+    "sunset": sunset,
   };
 }
