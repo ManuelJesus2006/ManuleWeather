@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:manule_weather/models/tiempo_dias_response_model.dart';
 import 'package:manule_weather/providers/navigation_provider.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
 import 'package:manule_weather/utils/Utils.dart';
@@ -62,6 +61,10 @@ class HomeScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    IconButton(
+                      onPressed: () => context.push('/settings'),
+                      icon: Icon(Icons.settings, color: Colors.blueGrey),
+                    ),
                     Image.asset(
                       'assets/images/LogoApp.png',
                       width: 80,
@@ -114,7 +117,7 @@ class HomeScreen extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
-                    fontSize: 30,
+                    fontSize: 28,
                   ),
                 ),
                 SizedBox(height: 10),
@@ -493,6 +496,10 @@ class HomeScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    IconButton(
+                      onPressed: () => context.push('/settings'),
+                      icon: Icon(Icons.settings, color: Colors.blueGrey),
+                    ),
                     Image.asset(
                       'assets/images/LogoApp.png',
                       width: 80,
@@ -536,12 +543,14 @@ class HomeScreen extends StatelessWidget {
               child: ListView.builder(
                 itemCount: weatherProvider.tiempoHoras!.time.length,
                 itemBuilder: (context, i) {
+                  
                   final hora = weatherProvider.tiempoHoras!.time[i];
                   final fecha = DateTime.parse(hora);
                   final temperatura =
                       weatherProvider.tiempoHoras!.temperature2M[i];
                   final weatherCode =
                       weatherProvider.tiempoHoras!.weatherCode[i];
+                  bool isHoraDeDia = fecha.hour > weatherProvider.sunrise.hour && fecha.hour < weatherProvider.sunset.hour;
                   return Column(
                     children: [
                       SizedBox(height: 8),
@@ -567,7 +576,7 @@ class HomeScreen extends StatelessWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Utils.obtenerSimbolo(weatherCode, true, weatherProvider.isDeDia),
+                                Utils.obtenerSimbolo(weatherCode, true, isHoraDeDia),
                                 SizedBox(width: 10),
                                 Text(
                                   '${temperatura.round().toString()}ºC',
@@ -620,6 +629,10 @@ class HomeScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      IconButton(
+                      onPressed: () => context.push('/settings'),
+                      icon: Icon(Icons.settings, color: Colors.blueGrey),
+                    ),
                       Image.asset(
                         'assets/images/LogoApp.png',
                         width: 80,

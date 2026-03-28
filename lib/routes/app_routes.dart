@@ -1,7 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manule_weather/presentation/screens/error_screen.dart';
 import 'package:manule_weather/presentation/screens/home_screen.dart';
 import 'package:manule_weather/presentation/screens/search_screen.dart';
+import 'package:manule_weather/presentation/screens/settings_screen.dart';
 import 'package:manule_weather/presentation/screens/splash_screen.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
 import 'package:provider/provider.dart';
@@ -16,10 +18,17 @@ final appRouter = GoRouter(
         return HomeScreen();
       },
     ),
-    GoRoute(path: '/search', builder: (context, state){
-      final WeatherProvider weatherProvider = Provider.of<WeatherProvider>(context);
-      return SearchScreen(weatherProvider: weatherProvider,);
-    }),
+    GoRoute(
+      path: '/search',
+      builder: (context, state) {
+        final WeatherProvider weatherProvider = Provider.of<WeatherProvider>(
+          context,
+        );
+        return SearchScreen(weatherProvider: weatherProvider);
+      },
+    ),
+    GoRoute(path: '/licenses', builder: (context, state) => LicensePage()),
+    GoRoute(path: '/settings', builder: (context, state) => SettingsScreen()),
     GoRoute(path: '/error', builder: (context, state) => ErrorScreen()),
   ],
 );

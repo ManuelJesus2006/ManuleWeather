@@ -186,7 +186,7 @@ class _widgetUbicacion extends StatelessWidget {
             DateTime horaActual = weatherProvider.ahoraCiudad;
             int elementosAEliminar = horaActual.hour;
             weatherProvider.eliminarHorasPasadas(elementosAEliminar);
-            context.pushReplacement('/home');
+            context.go('/home');
           } else {
             context.pop();
           }
@@ -319,7 +319,7 @@ class _widgetLugarBusqueda extends StatelessWidget {
         int elementosAEliminar = horaActual.hour;
         //Eliminamos las horas pasadas del tiempoHoras
         weatherProvider.eliminarHorasPasadas(elementosAEliminar);
-        context.pushReplacement('/home');
+        context.go('/home');
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),

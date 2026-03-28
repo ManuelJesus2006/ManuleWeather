@@ -95,11 +95,11 @@ class _SplashScreenState extends State<SplashScreen> {
       int elementosAEliminar = horaActual.hour;
       weatherProvider.eliminarHorasPasadas(elementosAEliminar);
       if (mounted)
-        context.pushReplacement(
+        context.go(
           '/home',
         ); //Usamos mounted para que no crashee la aplicación
     } else {
-      if (mounted) context.push('/error');
+      if (mounted) context.go('/error');
     }
   }
 
