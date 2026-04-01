@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+//TODO: Traducir
 class ErrorScreen extends StatelessWidget {
   const ErrorScreen({super.key});
 

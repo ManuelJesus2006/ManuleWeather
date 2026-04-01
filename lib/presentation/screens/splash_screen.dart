@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:manule_weather/models/tiempo_dias_response_model.dart';
 import 'package:manule_weather/models/tiempo_horas_model.dart';
 import 'package:manule_weather/models/tiempo_model.dart';
+import 'package:manule_weather/providers/config_provider.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
 import 'package:manule_weather/services/localizacion_service.dart';
 import 'package:manule_weather/services/tiempo_service.dart';
@@ -52,6 +53,21 @@ class _SplashScreenState extends State<SplashScreen> {
       return;
     }
 
+    //Abrimos el configProvider
+    final configProvider = Provider.of<ConfigProvider>(
+        context,
+        listen: false,
+      );
+
+    await configProvider.comprobarIdiomaYPrimeraVez();
+
+    print(configProvider.primeraVez);
+
+      //Quiero hacer el await aquí y que luego siga con lo demás
+      if (configProvider.primeraVez) {
+        await context.push('/onboarding');
+      }
+
     // Tenemos permiso, ya podemos obtener la posición
     Position position = await Geolocator.getCurrentPosition();
     print("Latitud: ${position.latitude}, Longitud: ${position.longitude}");
@@ -62,6 +78,7 @@ class _SplashScreenState extends State<SplashScreen> {
     String? nombreCiudad = await LocalizacionService().getNombreCiudadByCords(
       position.longitude,
       position.latitude,
+      configProvider.idiomaActual
     );
     TiempoHoras? tiempoHoras = await TiempoService().getTiempoPorHoras(
       position.latitude,
@@ -79,6 +96,7 @@ class _SplashScreenState extends State<SplashScreen> {
         context,
         listen: false,
       );
+      
 
       weatherProvider.cambiarDatos(
         tiempoUbi,
@@ -89,15 +107,17 @@ class _SplashScreenState extends State<SplashScreen> {
         position.latitude,
         position.longitude,
       );
+
       weatherProvider.comprobarNocheDia();
-      weatherProvider.inicializarTiempoDias();
+      weatherProvider.inicializarTiempoDias(configProvider.idiomaActual);
       DateTime horaActual = weatherProvider.ahoraCiudad;
       int elementosAEliminar = horaActual.hour;
       weatherProvider.eliminarHorasPasadas(elementosAEliminar);
-      if (mounted)
-        context.go(
-          '/home',
-        ); //Usamos mounted para que no crashee la aplicación
+
+      if (mounted) {
+        context.go('/home');
+      }
+      //Usamos mounted para que no crashee la aplicación
     } else {
       if (mounted) context.go('/error');
     }

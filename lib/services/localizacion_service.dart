@@ -5,15 +5,16 @@ import 'package:manule_weather/models/localizacion_reverse_model.dart';
 
 class LocalizacionService {
   String _urlBase = 'https://api.mapbox.com/geocoding/v5/mapbox.places/';
-  String lenguaje = '&language=es';
+  String lenguaje = '&language=';
 
   String _urlBaseReverse = 'https://api.mapbox.com/search/geocode/v6/reverse';
 
-  Future<List<Localizacion>> getResultadosBusqueda(String ciudad) async {
+  Future<List<Localizacion>> getResultadosBusqueda(String ciudad, String idioma) async {
   try {
     Uri uri = Uri.parse(
-      '$_urlBase$ciudad.json?access_token=${Environment.apiKeyNormal}$lenguaje',
+      '$_urlBase$ciudad.json?access_token=${Environment.apiKeyNormal}$lenguaje$idioma',
     );
+    print(uri);
     Response response = await get(uri);
 
     if (response.statusCode != 200) return []; // Retorno directo si falla la red
@@ -31,9 +32,9 @@ class LocalizacionService {
   }
 }
 
-  Future<String?> getNombreCiudadByCords(double lon, double lat) async {
+  Future<String?> getNombreCiudadByCords(double lon, double lat, String idioma) async {
     Uri uri = Uri.parse(
-      '$_urlBaseReverse?longitude=$lon&latitude=$lat${Environment.apiKeyReverseYOtros}',
+      '$_urlBaseReverse?longitude=$lon&latitude=$lat${Environment.apiKeyReverse}$lenguaje$idioma',
     );
     Response response = await get(uri);
 

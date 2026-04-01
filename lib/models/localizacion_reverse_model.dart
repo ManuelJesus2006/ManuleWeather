@@ -131,7 +131,6 @@ class Country {
     String wikidataId;
     String countryCode;
     String countryCodeAlpha3;
-    Translations translations;
 
     Country({
         required this.mapboxId,
@@ -139,7 +138,6 @@ class Country {
         required this.wikidataId,
         required this.countryCode,
         required this.countryCodeAlpha3,
-        required this.translations,
     });
 
     factory Country.fromJson(Map<String, dynamic> json) => Country(
@@ -148,7 +146,6 @@ class Country {
         wikidataId: json["wikidata_id"],
         countryCode: json["country_code"],
         countryCodeAlpha3: json["country_code_alpha_3"],
-        translations: Translations.fromJson(json["translations"]),
     );
 
     Map<String, dynamic> toJson() => {
@@ -157,66 +154,26 @@ class Country {
         "wikidata_id": wikidataId,
         "country_code": countryCode,
         "country_code_alpha_3": countryCodeAlpha3,
-        "translations": translations.toJson(),
     };
 }
 
-class Translations {
-    Es es;
 
-    Translations({
-        required this.es,
-    });
-
-    factory Translations.fromJson(Map<String, dynamic> json) => Translations(
-        es: Es.fromJson(json["es"]),
-    );
-
-    Map<String, dynamic> toJson() => {
-        "es": es.toJson(),
-    };
-}
-
-class Es {
-    String language;
-    String name;
-
-    Es({
-        required this.language,
-        required this.name,
-    });
-
-    factory Es.fromJson(Map<String, dynamic> json) => Es(
-        language: json["language"],
-        name: json["name"],
-    );
-
-    Map<String, dynamic> toJson() => {
-        "language": language,
-        "name": name,
-    };
-}
 
 class District {
     String? mapboxId;
     String? name;
     String? wikidataId;
-    Translations? translations;
 
     District({
         required this.mapboxId,
         required this.name,
         required this.wikidataId,
-        required this.translations,
     });
 
     factory District.fromJson(Map<String, dynamic> json) => District(
   mapboxId: json["mapbox_id"] as String?, // puede ser null
   name: json["name"] as String?,          // puede ser null
-  wikidataId: json["wikidata_id"] as String?, // puede ser null
-  translations: json["translations"] != null
-      ? Translations.fromJson(json["translations"])
-      : null, // si no hay traducciones, se asigna null
+  wikidataId: json["wikidata_id"] as String?, // puede ser null // si no hay traducciones, se asigna null
 );
 
 }
@@ -227,7 +184,6 @@ class Region {
     String? wikidataId;
     String? regionCode;
     String? regionCodeFull;
-    Translations? translations;
 
     Region({
         required this.mapboxId,
@@ -235,7 +191,6 @@ class Region {
         required this.wikidataId,
         required this.regionCode,
         required this.regionCodeFull,
-        required this.translations,
     });
 
     factory Region.fromJson(Map<String, dynamic> json) => Region(
@@ -245,9 +200,6 @@ class Region {
         regionCode: json["region_code"],
         regionCodeFull: json["region_code_full"],
         // IMPORTANTE: Validación para que no pete si translations es null en el JSON
-        translations: json["translations"] == null 
-            ? null 
-            : Translations.fromJson(json["translations"]),
     );
 }
 

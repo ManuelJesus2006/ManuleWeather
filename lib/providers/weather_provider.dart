@@ -44,7 +44,7 @@ class WeatherProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void buscarUbicacionActual() async {
+  void buscarUbicacionActual(String idioma) async {
     //Reseteamos los valores para que muestre el CircularProgressIndicator en la ubicación
     nombreUbi = '';
     tempUbi = 0;
@@ -58,10 +58,11 @@ class WeatherProvider with ChangeNotifier {
     String? nombreCiudad = await LocalizacionService().getNombreCiudadByCords(
       position.longitude,
       position.latitude,
+      idioma
     );
     nombreUbi = nombreCiudad!;
     tempUbi = tiempoUbi!.current.temperature2M;
-    estadoUbi = Utils.obtenerTiempoText(tiempoUbi.current.weatherCode);
+    //estadoUbi = Utils.obtenerTiempoText(tiempoUbi.current.weatherCode);
     iconoUbi = Utils.obtenerSimbolo(tiempoUbi.current.weatherCode, false, tiempoUbi.current.isDay == 1 ? true:false);
     geolocalizacion = position;
     notifyListeners();
@@ -91,15 +92,15 @@ class WeatherProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void inicializarTiempoDias() {
+  void inicializarTiempoDias(String idioma) {
     tiempoDias!.weatherCode.forEach((weatherCode) {
       tiempoDias!.iconosGenerales.add(Utils.obtenerSimbolo(weatherCode, false, true));
-      tiempoDias!.descripcionesCortas.add(Utils.obtenerTiempoText(weatherCode));
+      tiempoDias!.descripcionesCortas.add(Utils.obtenerTiempoText(weatherCode, idioma));
     });
     notifyListeners();
   }
 
-  Future<void> actualizarDatos() async {
+  Future<void> actualizarDatos(String idioma) async {
     if (isUbicacionUser!) {
       Position position = await Geolocator.getCurrentPosition();
       print("Latitud: ${position.latitude}, Longitud: ${position.longitude}");
@@ -110,6 +111,7 @@ class WeatherProvider with ChangeNotifier {
       String? nombreCiudad = await LocalizacionService().getNombreCiudadByCords(
         position.longitude,
         position.latitude,
+        idioma
       );
       TiempoHoras? tiempoHoras = await TiempoService().getTiempoPorHoras(
         position.latitude,
@@ -131,7 +133,7 @@ class WeatherProvider with ChangeNotifier {
           position.longitude,
         );
         comprobarNocheDia();
-        inicializarTiempoDias();
+        inicializarTiempoDias(idioma);
         DateTime horaActual = ahoraCiudad;
         int elementosAEliminar = horaActual.hour;
         eliminarHorasPasadas(elementosAEliminar);
@@ -155,7 +157,7 @@ class WeatherProvider with ChangeNotifier {
         longitudActual,
       );
       comprobarNocheDia();
-      inicializarTiempoDias();
+      inicializarTiempoDias(idioma);
       DateTime horaActual = ahoraCiudad;
       int elementosAEliminar = horaActual.hour;
       eliminarHorasPasadas(elementosAEliminar);

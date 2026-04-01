@@ -38,11 +38,7 @@ class Localizacion {
     List<String>? placeType;
     int? relevance;
     Properties? properties;
-    String? textEs;
-    Language? languageEs;
-    String? placeNameEs;
     String? text;
-    Language? language;
     String? placeName;
     List<double>? bbox;
     List<double>? center;
@@ -55,11 +51,7 @@ class Localizacion {
         this.placeType,
         this.relevance,
         this.properties,
-        this.textEs,
-        this.languageEs,
-        this.placeNameEs,
         this.text,
-        this.language,
         this.placeName,
         this.bbox,
         this.center,
@@ -73,11 +65,7 @@ class Localizacion {
         placeType: json["place_type"] == null ? null : List<String>.from(json["place_type"].map((x) => x)),
         relevance: json["relevance"] is int ? json["relevance"] as int? : null,
         properties: json["properties"] == null ? null : Properties.fromJson(json["properties"]),
-        textEs: json["text_es"],
-        languageEs: json["language_es"] == null ? null : languageValues.map[json["language_es"]],
-        placeNameEs: json["place_name_es"],
         text: json["text"],
-        language: json["language"] == null ? null : languageValues.map[json["language"]],
         placeName: json["place_name"],
         bbox: json["bbox"] == null ? null : List<double>.from(json["bbox"].map((x) => x?.toDouble())),
         center: json["center"] == null ? null : List<double>.from(json["center"].map((x) => x?.toDouble())),
@@ -91,11 +79,7 @@ class Localizacion {
         "place_type": placeType == null ? null : List<dynamic>.from(placeType!.map((x) => x)),
         "relevance": relevance,
         "properties": properties?.toJson(),
-        "text_es": textEs,
-        "language_es": languageValues.reverse[languageEs],
-        "place_name_es": placeNameEs,
         "text": text,
-        "language": languageValues.reverse[language],
         "place_name": placeName,
         "bbox": bbox == null ? null : List<dynamic>.from(bbox!.map((x) => x)),
         "center": center == null ? null : List<dynamic>.from(center!.map((x) => x)),
@@ -109,20 +93,14 @@ class Context {
     String? mapboxId;
     String? wikidata;
     String? shortCode;
-    String? textEs;
-    Language? languageEs;
     String? text;
-    Language? language;
 
     Context({
         this.id,
         this.mapboxId,
         this.wikidata,
         this.shortCode,
-        this.textEs,
-        this.languageEs,
         this.text,
-        this.language,
     });
 
     factory Context.fromJson(Map<String, dynamic> json) => Context(
@@ -130,10 +108,7 @@ class Context {
         mapboxId: json["mapbox_id"],
         wikidata: json["wikidata"],
         shortCode: json["short_code"],
-        textEs: json["text_es"],
-        languageEs: json["language_es"] == null ? null : languageValues.map[json["language_es"]],
         text: json["text"],
-        language: json["language"] == null ? null : languageValues.map[json["language"]],
     );
 
     Map<String, dynamic> toJson() => {
@@ -141,18 +116,9 @@ class Context {
         "mapbox_id": mapboxId,
         "wikidata": wikidata,
         "short_code": shortCode,
-        "text_es": textEs,
-        "language_es": languageValues.reverse[languageEs],
         "text": text,
-        "language": languageValues.reverse[language],
     };
 }
-
-enum Language { ES }
-
-final languageValues = EnumValues({
-    "es": Language.ES
-});
 
 class Geometry {
     String? type;

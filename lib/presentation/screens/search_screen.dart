@@ -6,15 +6,18 @@ import 'package:manule_weather/models/localizacion_model.dart';
 import 'package:manule_weather/models/tiempo_dias_response_model.dart';
 import 'package:manule_weather/models/tiempo_horas_model.dart';
 import 'package:manule_weather/models/tiempo_model.dart';
+import 'package:manule_weather/providers/config_provider.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
 import 'package:manule_weather/services/localizacion_service.dart';
 import 'package:manule_weather/services/tiempo_service.dart';
 import 'package:manule_weather/utils/Utils.dart';
 import 'package:provider/provider.dart';
 
+//TODO: Traducir
 class SearchScreen extends StatefulWidget {
   final WeatherProvider weatherProvider;
-  const SearchScreen({super.key, required this.weatherProvider});
+  final ConfigProvider configProvider;
+  const SearchScreen({super.key, required this.weatherProvider, required this.configProvider});
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -23,7 +26,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
-    widget.weatherProvider.buscarUbicacionActual();
+    widget.weatherProvider.buscarUbicacionActual(widget.configProvider.idiomaActual);
     super.initState();
   }
 
@@ -31,6 +34,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final configProvider = Provider.of<ConfigProvider>(context);
     final weatherProvider = widget.weatherProvider;
     return Scaffold(
       body: SafeArea(
@@ -49,9 +53,9 @@ class _SearchScreenState extends State<SearchScreen> {
                   Expanded(
                     child: TextField(
                       controller: controladorBusqueda,
-                      style: const TextStyle(color: Colors.black),
-                      decoration: const InputDecoration(
-                        hintText: 'Busque un lugar',
+                      style: TextStyle(color: Colors.black),
+                      decoration: InputDecoration(
+                        hintText: Utils.stringInputSearch(configProvider.idiomaActual),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(30)),
                         ),
@@ -78,6 +82,7 @@ class _SearchScreenState extends State<SearchScreen> {
               FutureBuilder(
                 future: LocalizacionService().getResultadosBusqueda(
                   controladorBusqueda.text,
+                  configProvider.idiomaActual
                 ),
                 builder:
                     (
@@ -121,7 +126,7 @@ class _MostrarResultadosState extends State<MostrarResultados> {
         itemCount: widget.lugares.length,
         itemBuilder: (context, i) {
           final lugar = widget.lugares[i];
-          return !lugar.placeNameEs!.contains(RegExp(r'\d'))
+          return !lugar.placeName!.contains(RegExp(r'\d'))
               ? _widgetLugarBusqueda(lugar: lugar)
               : Container();
         },
@@ -148,9 +153,9 @@ class _widgetUbicacion extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final configProvider = Provider.of<ConfigProvider>(context);
     if (weatherProvider.nombreUbi != '' &&
-        weatherProvider.tempUbi != 0 &&
-        weatherProvider.estadoUbi != '') {
+        weatherProvider.tempUbi != 0) {
       return GestureDetector(
         onTap: () async {
           weatherProvider
@@ -182,7 +187,7 @@ class _widgetUbicacion extends StatelessWidget {
               position.longitude,
             );
             weatherProvider.comprobarNocheDia();
-            weatherProvider.inicializarTiempoDias();
+            weatherProvider.inicializarTiempoDias(configProvider.idiomaActual);
             DateTime horaActual = weatherProvider.ahoraCiudad;
             int elementosAEliminar = horaActual.hour;
             weatherProvider.eliminarHorasPasadas(elementosAEliminar);
@@ -205,7 +210,7 @@ class _widgetUbicacion extends StatelessWidget {
                   children: [
                     Icon(LucideIcons.navigation),
                     Text(
-                      'Ubicación actual',
+                      Utils.stringCurrentLocation(configProvider.idiomaActual),
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -255,7 +260,7 @@ class _widgetUbicacion extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text('Obteniendo ubicación...', style: TextStyle(fontSize: 18)),
+              Text(Utils.stringObtainingLocation(configProvider.idiomaActual), style: TextStyle(fontSize: 18)),
               SizedBox(width: 30),
               CircularProgressIndicator(),
             ],
@@ -288,6 +293,7 @@ class _widgetLugarBusqueda extends StatelessWidget {
     final WeatherProvider weatherProvider = Provider.of<WeatherProvider>(
       context,
     );
+    final configProvider = Provider.of<ConfigProvider>(context);
     return GestureDetector(
       onTap: () async {
         mostrarCargando(context);
@@ -305,7 +311,7 @@ class _widgetLugarBusqueda extends StatelessWidget {
         );
         weatherProvider.cambiarDatos(
           tiempoUbi!,
-          lugar.placeNameEs!,
+          lugar.placeName!,
           tiempoHoras!,
           tiempoDias!,
           false,
@@ -313,7 +319,7 @@ class _widgetLugarBusqueda extends StatelessWidget {
           lugar.center![0],
         );
         weatherProvider.comprobarNocheDia();
-        weatherProvider.inicializarTiempoDias();
+        weatherProvider.inicializarTiempoDias(configProvider.idiomaActual);
         //Lógica previa para obtener el día actual y sobre esa hora limitar el array de tiempo horas
         DateTime horaActual = weatherProvider.ahoraCiudad;
         int elementosAEliminar = horaActual.hour;
@@ -368,7 +374,7 @@ class _widgetLugarBusqueda extends StatelessWidget {
               SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  lugar.placeNameEs!,
+                  lugar.placeName!,
                   style: TextStyle(color: Colors.black, fontSize: 17),
                 ),
               ),
