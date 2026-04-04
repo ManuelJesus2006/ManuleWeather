@@ -569,13 +569,15 @@ class HomeScreen extends StatelessWidget {
                   return Column(
                     children: [
                       SizedBox(height: 8),
-                      if (i == 0) _fechaCompletaCard(fecha: fecha),
+                      if (i == 0 && hora.substring(11, 16) != '00:00') _fechaCompletaCard(fecha: fecha),
                       SizedBox(height: 8),
                       if (hora.substring(11, 16) == '00:00')
-                        Divider(thickness: 1, color: Colors.grey),
-                      if (hora.substring(11, 16) == '00:00')
-                        _fechaCompletaCard(fecha: fecha),
-
+                        Column(
+                          children: [
+                            Divider(thickness: 1, color: Colors.grey),
+                            _fechaCompletaCard(fecha: fecha),
+                          ],
+                        ),
                       Divider(thickness: 1, color: Colors.grey),
                       SizedBox(height: 25),
                       Padding(
