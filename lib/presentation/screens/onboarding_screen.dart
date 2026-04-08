@@ -4,7 +4,6 @@ import 'package:manule_weather/providers/config_provider.dart';
 import 'package:manule_weather/utils/Utils.dart';
 import 'package:provider/provider.dart';
 
-//TODO: Traducir
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
 

@@ -13,7 +13,6 @@ import 'package:manule_weather/services/tiempo_service.dart';
 import 'package:manule_weather/utils/Utils.dart';
 import 'package:provider/provider.dart';
 
-//TODO: Traducir
 class SearchScreen extends StatefulWidget {
   final WeatherProvider weatherProvider;
   final ConfigProvider configProvider;

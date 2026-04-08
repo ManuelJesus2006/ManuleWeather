@@ -380,4 +380,9 @@ class Utils {
     if (idioma == 'es') return 'Última actualización (hora local):';
     else return 'Last update (local time):';
   }
+
+  static String stringError(String idioma) {
+    if (idioma == 'es') return 'EL SERVICIO CLIMÁTICO SE ENCUENTRA CAIDO EN ESTOS MOMENTOS, SENTIMOS LAS MOLESTIAS';
+    else return 'THE CLIMATIC SERVICE IS CURRENTLY UNAVAIBLE RIGHT NOW, SORRY FOR INCONVENIENCE :(';
+  }
 }

@@ -7,7 +7,6 @@ import 'package:manule_weather/providers/weather_provider.dart';
 import 'package:manule_weather/utils/Utils.dart';
 import 'package:provider/provider.dart';
 
-//TODO: Traducir
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
   @override

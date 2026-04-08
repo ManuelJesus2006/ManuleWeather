@@ -89,7 +89,7 @@ class _SplashScreenState extends State<SplashScreen> {
       position.longitude,
     );
 
-    if (tiempoUbi != null && nombreCiudad != null && tiempoHoras != null) {
+    if (tiempoUbi != null && nombreCiudad != null && tiempoHoras != null && tiempoDias != null) {
       // Actualizamos el Provider AQUÍ, antes de cambiar de pantalla.
       // Usamos listen: false porque estamos dentro de una función, no pintando.
       final weatherProvider = Provider.of<WeatherProvider>(
