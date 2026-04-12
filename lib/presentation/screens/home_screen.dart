@@ -21,8 +21,19 @@ class HomeScreen extends StatelessWidget {
         index: navigationProvider.indiceActual,
         children: [
           _buildInicio(context, weatherProvider, screenWidth, configProvider),
-          _buildPantallaPorDias(context, weatherProvider, navigationProvider, screenWidth, configProvider),
-          _buildTiempoPorHoras(context, weatherProvider, screenWidth, configProvider),
+          _buildPantallaPorDias(
+            context,
+            weatherProvider,
+            navigationProvider,
+            screenWidth,
+            configProvider,
+          ),
+          _buildTiempoPorHoras(
+            context,
+            weatherProvider,
+            screenWidth,
+            configProvider,
+          ),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -31,25 +42,37 @@ class HomeScreen extends StatelessWidget {
           navigationProvider.cambiarIndice(index);
         },
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: Utils.stringHome(configProvider.idiomaActual)),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: Utils.stringHome(configProvider.idiomaActual),
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.date_range),
             label: Utils.stringDaily(configProvider.idiomaActual),
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.timer), label: Utils.stringHourly(configProvider.idiomaActual)),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.timer),
+            label: Utils.stringHourly(configProvider.idiomaActual),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildInicio(BuildContext context, WeatherProvider weatherProvider, double screenWidth, ConfigProvider configProvider) {
+  Widget _buildInicio(
+    BuildContext context,
+    WeatherProvider weatherProvider,
+    double screenWidth,
+    ConfigProvider configProvider,
+  ) {
     double screenWidth = MediaQuery.of(context).size.width;
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: weatherProvider.isDeDia
-              ? AssetImage('assets/images/fondo_dia.png')
-              : AssetImage('assets/images/fondo_noche.jpg'),
+          image: Utils.recibirFondoApp(
+            weatherProvider.isDeDia,
+            weatherProvider.tiempoActual!.current.weatherCode,
+          ),
           fit: BoxFit.cover,
         ),
       ),
@@ -97,7 +120,7 @@ class HomeScreen extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: screenWidth * 0.045
+                            fontSize: screenWidth * 0.045,
                           ),
                         ),
                       ),
@@ -105,8 +128,10 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 30),
-                Text('${Utils.stringUpdatedAt(configProvider.idiomaActual)} ${Utils.formatearHora(DateTime.parse(weatherProvider.tiempoActual!.current.time))}',
-                style: TextStyle(color: Colors.white, fontSize: 17),),
+                Text(
+                  '${Utils.stringUpdatedAt(configProvider.idiomaActual)} ${Utils.formatearHora(DateTime.parse(weatherProvider.tiempoActual!.current.time))}',
+                  style: TextStyle(color: Colors.white, fontSize: 17),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -115,14 +140,22 @@ class HomeScreen extends StatelessWidget {
                       style: TextStyle(fontSize: 65, color: Colors.white),
                     ),
                     SizedBox(width: 10),
-                    Icon(Utils.obtenerSimbolo(
-                      weatherProvider.tiempoActual!.current.weatherCode, false, weatherProvider.isDeDia
-                    ), size: 50, color: Colors.white)
-                    
+                    Icon(
+                      Utils.obtenerSimbolo(
+                        weatherProvider.tiempoActual!.current.weatherCode,
+                        false,
+                        weatherProvider.isDeDia,
+                      ),
+                      size: 50,
+                      color: Colors.white,
+                    ),
                   ],
                 ),
                 Text(
-                  Utils.obtenerTiempoText(weatherProvider.tiempoActual!.current.weatherCode, configProvider.idiomaActual).toUpperCase(),
+                  Utils.obtenerTiempoText(
+                    weatherProvider.tiempoActual!.current.weatherCode,
+                    configProvider.idiomaActual,
+                  ).toUpperCase(),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -328,7 +361,8 @@ class HomeScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        weatherProvider.tiempoActual!.current.windGusts10M != null
+                        weatherProvider.tiempoActual!.current.windGusts10M !=
+                                null
                             ? '${weatherProvider.tiempoActual!.current.windGusts10M.round()} km/h'
                             : 'Sin ráfagas',
                         style: TextStyle(fontSize: 20, color: Colors.white),
@@ -348,7 +382,9 @@ class HomeScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(
-                        Utils.stringWindOrientation(configProvider.idiomaActual),
+                        Utils.stringWindOrientation(
+                          configProvider.idiomaActual,
+                        ),
                         style: TextStyle(
                           fontSize: 20,
                           color: Colors.white,
@@ -494,7 +530,7 @@ class HomeScreen extends StatelessWidget {
     BuildContext context,
     WeatherProvider weatherProvider,
     double screenWidth,
-    ConfigProvider configProvider
+    ConfigProvider configProvider,
   ) {
     return SafeArea(
       child: Column(
@@ -539,7 +575,7 @@ class HomeScreen extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: screenWidth * 0.045
+                            fontSize: screenWidth * 0.045,
                           ),
                         ),
                       ),
@@ -552,23 +588,27 @@ class HomeScreen extends StatelessWidget {
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {
-                await weatherProvider.actualizarDatos(configProvider.idiomaActual);
+                await weatherProvider.actualizarDatos(
+                  configProvider.idiomaActual,
+                );
               },
               child: ListView.builder(
                 itemCount: weatherProvider.tiempoHoras!.time.length,
                 itemBuilder: (context, i) {
-                  
                   final hora = weatherProvider.tiempoHoras!.time[i];
                   final fecha = DateTime.parse(hora);
                   final temperatura =
                       weatherProvider.tiempoHoras!.temperature2M[i];
                   final weatherCode =
                       weatherProvider.tiempoHoras!.weatherCode[i];
-                  bool isHoraDeDia = fecha.hour > weatherProvider.sunrise.hour && fecha.hour < weatherProvider.sunset.hour;
+                  bool isHoraDeDia =
+                      fecha.hour > weatherProvider.sunrise.hour &&
+                      fecha.hour < weatherProvider.sunset.hour;
                   return Column(
                     children: [
                       SizedBox(height: 8),
-                      if (i == 0 && hora.substring(11, 16) != '00:00') _fechaCompletaCard(fecha: fecha),
+                      if (i == 0 && hora.substring(11, 16) != '00:00')
+                        _fechaCompletaCard(fecha: fecha),
                       SizedBox(height: 8),
                       if (hora.substring(11, 16) == '00:00')
                         Column(
@@ -592,7 +632,11 @@ class HomeScreen extends StatelessWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Utils.obtenerSimbolo(weatherCode, true, isHoraDeDia),
+                                Utils.obtenerSimbolo(
+                                  weatherCode,
+                                  true,
+                                  isHoraDeDia,
+                                ),
                                 SizedBox(width: 10),
                                 Text(
                                   '${temperatura.round().toString()}ºC',
@@ -604,7 +648,10 @@ class HomeScreen extends StatelessWidget {
                                 SizedBox(width: 10),
 
                                 Text(
-                                  Utils.obtenerTiempoText(weatherCode,configProvider.idiomaActual),
+                                  Utils.obtenerTiempoText(
+                                    weatherCode,
+                                    configProvider.idiomaActual,
+                                  ),
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
@@ -632,7 +679,7 @@ class HomeScreen extends StatelessWidget {
     WeatherProvider weatherProvider,
     NavigationProvider navigationProvider,
     double screenWidth,
-    ConfigProvider configProvider
+    ConfigProvider configProvider,
   ) {
     return SafeArea(
       child: RefreshIndicator(
@@ -648,9 +695,9 @@ class HomeScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       IconButton(
-                      onPressed: () => context.push('/settings'),
-                      icon: Icon(Icons.settings, color: Colors.blueGrey),
-                    ),
+                        onPressed: () => context.push('/settings'),
+                        icon: Icon(Icons.settings, color: Colors.blueGrey),
+                      ),
                       Image.asset(
                         'assets/images/LogoApp.png',
                         width: 80,
@@ -675,7 +722,7 @@ class HomeScreen extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.black,
-                              fontSize: screenWidth * 0.045
+                              fontSize: screenWidth * 0.045,
                             ),
                           ),
                         ),
@@ -718,11 +765,11 @@ class HomeScreen extends StatelessWidget {
                             child: Column(
                               children: [
                                 Text(
-                                  '${Utils.obtenerDiaSemana(fecha.weekday,configProvider.idiomaActual).toUpperCase().substring(0, 3)}',
+                                  '${Utils.obtenerDiaSemana(fecha.weekday, configProvider.idiomaActual).toUpperCase().substring(0, 3)}',
                                   style: TextStyle(fontSize: 16),
                                 ),
                                 Text(
-                                  '${fecha.day} ${Utils.stringOf(configProvider.idiomaActual)} ${Utils.obtenerMes(fecha.month,configProvider.idiomaActual)}',
+                                  '${fecha.day} ${Utils.stringOf(configProvider.idiomaActual)} ${Utils.obtenerMes(fecha.month, configProvider.idiomaActual)}',
                                   style: TextStyle(fontSize: 18),
                                 ),
                                 Row(
@@ -781,7 +828,7 @@ class _fechaCompletaCard extends StatelessWidget {
         borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
       child: Text(
-        '${Utils.obtenerDiaSemana(fecha.weekday,configProvider.idiomaActual)} - ${fecha.day} ${Utils.stringOf(configProvider.idiomaActual)} ${Utils.obtenerMes(fecha.month,configProvider.idiomaActual)} ${Utils.stringOf(configProvider.idiomaActual)} ${fecha.year}',
+        '${Utils.obtenerDiaSemana(fecha.weekday, configProvider.idiomaActual)} - ${fecha.day} ${Utils.stringOf(configProvider.idiomaActual)} ${Utils.obtenerMes(fecha.month, configProvider.idiomaActual)} ${Utils.stringOf(configProvider.idiomaActual)} ${fecha.year}',
         style: TextStyle(color: Colors.white, fontSize: 16),
       ),
     );
@@ -796,116 +843,153 @@ class _tiempoDiaIndividualCard extends StatelessWidget {
     final navigationProvider = Provider.of<NavigationProvider>(context);
     final weatherProvider = Provider.of<WeatherProvider>(context);
     final configProvider = Provider.of<ConfigProvider>(context);
-    IconData iconoActual = weatherProvider
-        .tiempoDias!
-        .iconosGenerales[navigationProvider.indiceTiempoDiasActual];
-    String tempMax = weatherProvider
-        .tiempoDias!
-        .temperature2MMax[navigationProvider.indiceTiempoDiasActual]
+    int indiceActual = navigationProvider.indiceTiempoDiasActual;
+    DateTime sunrise = DateTime.parse(
+      weatherProvider.tiempoDias!.sunrise[indiceActual],
+    );
+    DateTime sunset = DateTime.parse(
+      weatherProvider.tiempoDias!.sunset[indiceActual],
+    );
+    IconData iconoActual =
+        weatherProvider.tiempoDias!.iconosGenerales[indiceActual];
+    String tempMax = weatherProvider.tiempoDias!.temperature2MMax[indiceActual]
         .round()
         .toString();
-    String tempMin = weatherProvider
-        .tiempoDias!
-        .temperature2MMin[navigationProvider.indiceTiempoDiasActual]
+    String tempMin = weatherProvider.tiempoDias!.temperature2MMin[indiceActual]
         .round()
         .toString();
-    String vientoMax = weatherProvider
-        .tiempoDias!
-        .windSpeed10MMax[navigationProvider.indiceTiempoDiasActual]
+    String vientoMax = weatherProvider.tiempoDias!.windSpeed10MMax[indiceActual]
         .round()
         .toString();
-    String rachasMax = weatherProvider
-        .tiempoDias!
-        .windGusts10MMax[navigationProvider.indiceTiempoDiasActual]
+    String rachasMax = weatherProvider.tiempoDias!.windGusts10MMax[indiceActual]
         .round()
         .toString();
     String desc = Utils.obtenerTiempoText(
-      weatherProvider.tiempoDias!.weatherCode[navigationProvider.indiceTiempoDiasActual],
-      configProvider.idiomaActual);
-    DateTime fecha = weatherProvider
-        .tiempoDias!
-        .time[navigationProvider.indiceTiempoDiasActual];
-    double mmLluvia = weatherProvider
-        .tiempoDias!
-        .precipitationSum[navigationProvider.indiceTiempoDiasActual];
-    return SizedBox(
-      height: 550,
-      child: Container(
-        padding: EdgeInsets.all(20),
-
-        child: Column(
-          children: [
-            Text(
-              '${Utils.obtenerDiaSemana(fecha.weekday,configProvider.idiomaActual)} - ${fecha.day} ${Utils.stringOf(configProvider.idiomaActual)} ${Utils.obtenerMes(fecha.month,configProvider.idiomaActual)} ${Utils.stringOf(configProvider.idiomaActual)} ${fecha.year}',
-              style: TextStyle(color: Colors.black, fontSize: 16),
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(iconoActual, size: 70),
-                Text(' $tempMaxºC/$tempMinºC', style: TextStyle(fontSize: 30)),
-              ],
-            ),
-            SizedBox(height: 30),
-            Text(desc, style: TextStyle(fontSize: 20)),
-            SizedBox(height: 20),
-            Container(
-              padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                color: Colors.blue[600]?.withOpacity(0.6),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    Utils.stringAmountOfRainSnow(configProvider.idiomaActual),
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text("$mmLluvia l/m²", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
-                ],
-              ),
-            ),
-            SizedBox(height: 20),
-            Container(
-                  padding: EdgeInsets.all(10),
+      weatherProvider.tiempoDias!.weatherCode[indiceActual],
+      configProvider.idiomaActual,
+    );
+    DateTime fecha = weatherProvider.tiempoDias!.time[indiceActual];
+    double mmLluvia =
+        weatherProvider.tiempoDias!.precipitationSum[indiceActual];
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(20),
+      child: Column(
+        children: [
+          Text(
+            '${Utils.obtenerDiaSemana(fecha.weekday, configProvider.idiomaActual)} - ${fecha.day} ${Utils.stringOf(configProvider.idiomaActual)} ${Utils.obtenerMes(fecha.month, configProvider.idiomaActual)} ${fecha.year}',
+            style: TextStyle(color: Colors.black, fontSize: 16),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(iconoActual, size: 70),
+              Text(' $tempMaxºC/$tempMinºC', style: TextStyle(fontSize: 30)),
+            ],
+          ),
+          SizedBox(height: 10),
+          Text(desc, style: TextStyle(fontSize: 20)),
+          SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(
+                child: Container(
+                  margin: EdgeInsets.only(right: 8),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    color: Colors.teal.shade300.withOpacity(0.8)
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                    color: Colors.grey.withOpacity(0.8),
                   ),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                       Utils.stringMaxWindSpeed(configProvider.idiomaActual),
-                        style: TextStyle(fontSize: 20),
+                        Utils.stringSunrise(configProvider.idiomaActual),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      Text("$vientoMax km/h", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+                      SizedBox(height: 8),
+                      Text(
+                        Utils.formatearHora(sunrise),
+                        style: TextStyle(fontSize: 18, color: Colors.white),
+                      ),
                     ],
                   ),
                 ),
-                SizedBox(height: 20),
-                Container(
-                  padding: EdgeInsets.all(10),
+              ),
+              Expanded(
+                child: Container(
+                  margin: EdgeInsets.only(left: 8),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    color: Colors.orange.shade300.withOpacity(0.8)
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                    color: Colors.grey.withOpacity(0.8),
                   ),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        Utils.stringMaxGust(configProvider.idiomaActual),
-                        style: TextStyle(fontSize: 20),
+                        Utils.stringSunset(configProvider.idiomaActual),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      Text("$rachasMax km/h", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+                      SizedBox(height: 8),
+                      Text(
+                        Utils.formatearHora(sunset),
+                        style: TextStyle(fontSize: 18, color: Colors.white),
+                      ),
                     ],
                   ),
                 ),
-          ],
-        ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10),
+          _infoCard(
+            color: Colors.blue[600]!.withOpacity(0.6),
+            titulo: Utils.stringAmountOfRainSnow(configProvider.idiomaActual),
+            valor: "$mmLluvia l/m²",
+          ),
+          SizedBox(height: 10),
+          _infoCard(
+            color: Colors.teal.shade300.withOpacity(0.8),
+            titulo: Utils.stringMaxWindSpeed(configProvider.idiomaActual),
+            valor: "$vientoMax km/h",
+          ),
+          SizedBox(height: 10),
+          _infoCard(
+            color: Colors.orange.shade300.withOpacity(0.8),
+            titulo: Utils.stringMaxGust(configProvider.idiomaActual),
+            valor: "$rachasMax km/h",
+          ),
+        ],
       ),
     );
   }
+}
+
+Widget _infoCard({required Color color, required String titulo, required String valor}) {
+  return Container(
+    width: double.infinity,
+    padding: EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(15),
+      color: color,
+    ),
+    child: Column(
+      children: [
+        Text(titulo, style: TextStyle(fontSize: 18), textAlign: TextAlign.center),
+        SizedBox(height: 4),
+        Text(valor, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      ],
+    ),
+  );
 }

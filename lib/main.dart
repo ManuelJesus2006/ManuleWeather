@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:manule_weather/presentation/screens/error_screen.dart';
 import 'package:manule_weather/providers/config_provider.dart';
 import 'package:manule_weather/providers/navigation_provider.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
@@ -42,3 +43,17 @@ class MainApp extends StatelessWidget {
     );
   }
 }
+
+//Main mock para la pantalla de error
+/* class MainApp extends StatelessWidget {
+  const MainApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(textTheme: GoogleFonts.hedvigLettersSansTextTheme()),
+      home: ErrorScreen()
+    );
+  }
+} */

@@ -245,144 +245,235 @@ class Utils {
     return 'Desconocido';
   }
 
-  static String stringSunrise(String idioma){
-    if (idioma == 'es') return 'Amanecer🌅';
-    else return 'Sunrise🌅';
+  static AssetImage recibirFondoApp(bool isDeDia, int weatherCode) {
+    //Si hace tormenta comprobamos el weatherCode y nos da igual si es de día o de noche
+    if (weatherCode == 95 || weatherCode == 96 || weatherCode == 99)
+      return AssetImage("assets/images/fondo_tormenta");
+
+    //Si esta lloviendo comprobamos el weatherCode y nos da igual si es de día o de noche
+    const codigosLluvia = {51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82};
+
+    if (codigosLluvia.contains(weatherCode)) {
+      return AssetImage('assets/images/fondo_lluvia_dia.gif');
+    }
+
+    //Si esta nevando comprobamos el weatherCode y nos da igual si es de día o de noche
+    const codigosNieve = {71, 73, 75, 77, 85, 86};
+
+    if (codigosNieve.contains(weatherCode)){
+      return AssetImage('assets/images/fondo_nieve.gif');
+    }
+
+
+    if (isDeDia) {
+      if (weatherCode == 2)
+        return AssetImage('assets/images/fondo_parcialmente_nublado_dia.png');
+      else if (weatherCode == 3 || weatherCode == 45 || weatherCode == 48)
+        return AssetImage('assets/images/fondo_nublado_dia.png');
+      else
+        return AssetImage('assets/images/fondo_dia.png');
+    } else {
+      if (weatherCode == 3 || weatherCode == 45 || weatherCode == 48)
+        return AssetImage('assets/images/fondo_nublado_noche.jpg');
+      else
+        return AssetImage('assets/images/fondo_noche.png');
+    }
   }
 
-  static String stringSunset(String idioma){
-    if (idioma == 'es') return 'Anochecer🌄';
-    else return 'Sunset🌄';
+  static String stringSunrise(String idioma) {
+    if (idioma == 'es')
+      return 'Amanecer🌅';
+    else
+      return 'Sunrise🌅';
   }
 
-  static String stringWind(String idioma){
-    if (idioma == 'es') return 'Viento🍃';
-    else return 'Wind🍃';
+  static String stringSunset(String idioma) {
+    if (idioma == 'es')
+      return 'Anochecer🌄';
+    else
+      return 'Sunset🌄';
   }
 
-  static String stringMaxGust(String idioma){
-    if (idioma == 'es') return 'Rachas máximas de viento🪁';
-    else return 'Max wind gusts🪁';
+  static String stringWind(String idioma) {
+    if (idioma == 'es')
+      return 'Viento🍃';
+    else
+      return 'Wind🍃';
   }
 
-  static String stringWindOrientation(String idioma){
-    if (idioma == 'es') return 'Orientación del viento🧭';
-    else return 'Wind orientation🧭';
+  static String stringMaxGust(String idioma) {
+    if (idioma == 'es')
+      return 'Rachas máximas de viento🪁';
+    else
+      return 'Max wind gusts🪁';
   }
 
-  static String stringNubosity(String idioma){
-    if (idioma == 'es') return 'Nubosidad☁️';
-    else return 'Cloudiness☁️';
+  static String stringWindOrientation(String idioma) {
+    if (idioma == 'es')
+      return 'Orientación del viento🧭';
+    else
+      return 'Wind orientation🧭';
   }
 
-  static String stringHumidity(String idioma){
-    if (idioma == 'es') return 'Humedad💧';
-    else return 'Humidity💧';
+  static String stringNubosity(String idioma) {
+    if (idioma == 'es')
+      return 'Nubosidad☁️';
+    else
+      return 'Cloudiness☁️';
   }
 
-  static String stringVisibility(String idioma){
-    if (idioma == 'es') return 'Visibilidad👁️';
-    else return 'Visibility👁️';
+  static String stringHumidity(String idioma) {
+    if (idioma == 'es')
+      return 'Humedad💧';
+    else
+      return 'Humidity💧';
   }
 
-  static String stringPressure(String idioma){
-    if (idioma == 'es') return 'Presión atmosférica🌍';
-    else return 'Atmospheric pressure🌍';
+  static String stringVisibility(String idioma) {
+    if (idioma == 'es')
+      return 'Visibilidad👁️';
+    else
+      return 'Visibility👁️';
   }
 
-  static String stringFeelsLike(String idioma){
-    if (idioma == 'es') return 'Sensación térmica:';
-    else return 'Feels like:';
+  static String stringPressure(String idioma) {
+    if (idioma == 'es')
+      return 'Presión atmosférica🌍';
+    else
+      return 'Atmospheric pressure🌍';
   }
 
-  static String stringAmountOfRainSnow(String idioma){
-    if (idioma == 'es') return 'Cantidad de precipitación/nieve🌧️❄️';
-    else return 'Amount of rain/snow🌧️❄️';
+  static String stringFeelsLike(String idioma) {
+    if (idioma == 'es')
+      return 'Sensación térmica:';
+    else
+      return 'Feels like:';
   }
 
-  static String stringMaxWindSpeed(String idioma){
-    if (idioma == 'es') return 'Velocidad de viento máxima🍃';
-    else return 'Max wind speed🍃';
-  }
-  
-  static String stringOf(String idioma){
-    if (idioma == 'es') return 'de';
-    else return '';
+  static String stringAmountOfRainSnow(String idioma) {
+    if (idioma == 'es')
+      return 'Cantidad de precipitación/nieve🌧️❄️';
+    else
+      return 'Amount of rain/snow🌧️❄️';
   }
 
-  static String stringLicenses(String idioma){
-    if (idioma == 'es') return 'Licencias de software';
-    else return 'Software licenses';
+  static String stringMaxWindSpeed(String idioma) {
+    if (idioma == 'es')
+      return 'Velocidad de viento máxima🍃';
+    else
+      return 'Max wind speed🍃';
   }
 
-  static String stringWelcome(String idioma){
-    if (idioma == 'es') return '¡Bienvenido a ManuleWeather!';
-    else return 'Welcome to ManuleWeather!';
+  static String stringOf(String idioma) {
+    if (idioma == 'es')
+      return 'de';
+    else
+      return '';
+  }
+
+  static String stringLicenses(String idioma) {
+    if (idioma == 'es')
+      return 'Licencias de software';
+    else
+      return 'Software licenses';
+  }
+
+  static String stringWelcome(String idioma) {
+    if (idioma == 'es')
+      return '¡Bienvenido a ManuleWeather!';
+    else
+      return 'Welcome to ManuleWeather!';
   }
 
   static String stringConfiguration(String idioma) {
-    if (idioma == 'es') return 'Configuración';
-    else return 'Settings';
+    if (idioma == 'es')
+      return 'Configuración';
+    else
+      return 'Settings';
   }
 
   //Bottom navigation bar
-  static String stringHome(String idioma){
-    if (idioma == 'es') return 'Inicio';
-    else return 'Home';
+  static String stringHome(String idioma) {
+    if (idioma == 'es')
+      return 'Inicio';
+    else
+      return 'Home';
   }
 
-  static String stringDaily(String idioma){
-    if (idioma == 'es') return 'Por días';
-    else return 'Daily';
+  static String stringDaily(String idioma) {
+    if (idioma == 'es')
+      return 'Por días';
+    else
+      return 'Daily';
   }
 
-  static String stringHourly(String idioma){
-    if (idioma == 'es') return 'Por horas';
-    else return 'Hourly';
+  static String stringHourly(String idioma) {
+    if (idioma == 'es')
+      return 'Por horas';
+    else
+      return 'Hourly';
   }
 
   static String? stringInputSearch(String idioma) {
-    if (idioma == 'es') return 'Busque un lugar';
-    else return 'Search for a place';
+    if (idioma == 'es')
+      return 'Busque un lugar';
+    else
+      return 'Search for a place';
   }
 
   static String stringCurrentLocation(String idioma) {
-    if (idioma == 'es') return 'Ubicación actual';
-    else return 'Current location';
+    if (idioma == 'es')
+      return 'Ubicación actual';
+    else
+      return 'Current location';
   }
 
   static String stringObtainingLocation(String idioma) {
-    if (idioma == 'es') return 'Obteniendo ubicación...';
-    else return 'Obtaining location...';
+    if (idioma == 'es')
+      return 'Obteniendo ubicación...';
+    else
+      return 'Obtaining location...';
   }
 
   static String stringChooseLanguageOnboardingText(String idioma) {
-    if (idioma == 'es') return 'Elige tu idioma para continuar';
-    else return 'Choose your language to proceed';
+    if (idioma == 'es')
+      return 'Elige tu idioma para continuar';
+    else
+      return 'Choose your language to proceed';
   }
 
   static String obtenerIdiomaText(String idioma) {
-    if (idioma == 'es') return 'Español';
-    else return 'English';
+    if (idioma == 'es')
+      return 'Español';
+    else
+      return 'English';
   }
 
   static String stringLanguagesSettings(String idioma) {
-    if (idioma == 'es') return 'Idioma de la app';
-    else return 'App language';
+    if (idioma == 'es')
+      return 'Idioma de la app';
+    else
+      return 'App language';
   }
 
   static String stringChooseLanguageText(String idioma) {
-    if (idioma == 'es') return 'Elige el idioma';
-    else return 'Choose the language';
+    if (idioma == 'es')
+      return 'Elige el idioma';
+    else
+      return 'Choose the language';
   }
 
   static String stringUpdatedAt(String idioma) {
-    if (idioma == 'es') return 'Última actualización (hora local):';
-    else return 'Last update (local time):';
+    if (idioma == 'es')
+      return 'Última actualización (hora local):';
+    else
+      return 'Last update (local time):';
   }
 
   static String stringError(String idioma) {
-    if (idioma == 'es') return 'EL SERVICIO CLIMÁTICO SE ENCUENTRA CAIDO EN ESTOS MOMENTOS, SENTIMOS LAS MOLESTIAS';
-    else return 'THE CLIMATIC SERVICE IS CURRENTLY UNAVAIBLE RIGHT NOW, SORRY FOR INCONVENIENCE :(';
+    if (idioma == 'es')
+      return 'EL SERVICIO CLIMÁTICO SE ENCUENTRA CAIDO EN ESTOS MOMENTOS, SENTIMOS LAS MOLESTIAS';
+    else
+      return 'THE CLIMATIC SERVICE IS CURRENTLY UNAVAIBLE RIGHT NOW, SORRY FOR INCONVENIENCE :(';
   }
 }
