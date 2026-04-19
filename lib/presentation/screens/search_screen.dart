@@ -34,7 +34,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final configProvider = Provider.of<ConfigProvider>(context);
-    final weatherProvider = widget.weatherProvider;
+    final weatherProvider = Provider.of<WeatherProvider>(context);
     return Scaffold(
       body: SafeArea(
         child: Column(

@@ -88,6 +88,10 @@ class WeatherProvider with ChangeNotifier {
     tiempoHoras!.time.removeRange(0, elementosAEliminar);
     tiempoHoras!.temperature2M.removeRange(0, elementosAEliminar);
     tiempoHoras!.weatherCode.removeRange(0, elementosAEliminar);
+    tiempoHoras!.precipitationProbability.removeRange(0, elementosAEliminar);
+    tiempoHoras!.uvIndex.removeRange(0, elementosAEliminar);
+    tiempoHoras!.windSpeed10M.removeRange(0, elementosAEliminar);
+    tiempoHoras!.cloudCover.removeRange(0, elementosAEliminar);
     print(tiempoHoras!.time.toString());
     notifyListeners();
   }

@@ -7,6 +7,7 @@ import 'package:manule_weather/presentation/screens/onboarding_screen.dart';
 import 'package:manule_weather/presentation/screens/search_screen.dart';
 import 'package:manule_weather/presentation/screens/settings_screen.dart';
 import 'package:manule_weather/presentation/screens/splash_screen.dart';
+import 'package:manule_weather/presentation/screens/weather_hour_detail.dart';
 import 'package:manule_weather/providers/config_provider.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
 import 'package:provider/provider.dart';
@@ -17,24 +18,94 @@ final appRouter = GoRouter(
     GoRoute(path: '/', builder: (context, state) => SplashScreen()),
     GoRoute(
       path: '/home',
-      builder: (context, state) {
-        return HomeScreen();
+      pageBuilder: (context, state) {
+        return _buildPageConTransicion(HomeScreen(), state);
+      },
+    ),
+    GoRoute(
+      path: '/hourDetail',
+      pageBuilder: (context, state) {
+        int indexTiempoHoras = state.extra as int;
+        return _buildPageConTransicion(
+          WeatherHourDetail(indexTiempoHoras: indexTiempoHoras),
+          state,
+        );
       },
     ),
     GoRoute(
       path: '/search',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final WeatherProvider weatherProvider = Provider.of<WeatherProvider>(
           context,
         );
-        final ConfigProvider configProvider = Provider.of<ConfigProvider>(context);
-        return SearchScreen(weatherProvider: weatherProvider, configProvider: configProvider,);
+        final ConfigProvider configProvider = Provider.of<ConfigProvider>(
+          context,
+        );
+        return _buildPageConTransicion(
+          //Le pasamos el weatherProvider y el configProvider para poder hacer initState a la hora de buscar 
+          //la ubicación actual
+          SearchScreen(
+            weatherProvider: weatherProvider,
+            configProvider: configProvider,
+          ),
+          state,
+        );
       },
     ),
-    GoRoute(path: '/licenses', builder: (context, state) => LicensePage()),
-    GoRoute(path: '/settings', builder: (context, state) => SettingsScreen()),
-    GoRoute(path: '/languageSettings', builder: (context, state) => LanguageSelectorScreen()),
-    GoRoute(path: '/onboarding', builder: (context, state) => OnboardingScreen()),
-    GoRoute(path: '/error', builder: (context, state) => ErrorScreen()),
+    GoRoute(path: '/licenses', pageBuilder: (context, state) => _buildPageConTransicion(LicensePage(), state)),
+    GoRoute(path: '/settings', pageBuilder: (context, state) => _buildPageConTransicion(SettingsScreen(), state)),
+    GoRoute(
+      path: '/languageSettings',
+      pageBuilder: (context, state) => _buildPageConTransicion(LanguageSelectorScreen(), state)
+    ),
+    GoRoute(
+      path: '/onboarding',
+      pageBuilder: (context, state) => _buildPageConTransicion(OnboardingScreen(), state),
+    ),
+    GoRoute(path: '/error', pageBuilder: (context, state) => _buildPageConTransicion(ErrorScreen(), state)),
   ],
 );
+
+Page _buildPageConTransicion(Widget child, GoRouterState state) {
+  return CustomTransitionPage(
+    key: state.pageKey,
+    child: child,
+    transitionDuration: Duration(milliseconds: 300),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final slideAnimation = Tween<Offset>(
+        begin: Offset(1.0, 0.0),
+        end: Offset.zero,
+      ).animate(CurvedAnimation(
+        parent: animation,
+        curve: Curves.fastOutSlowIn, // 👈 curva más natural
+      ));
+
+      final fadeAnimation = Tween<double>(
+        begin: 0.0,
+        end: 1.0,
+      ).animate(CurvedAnimation(
+        parent: animation,
+        curve: Interval(0.0, 0.5, curve: Curves.easeIn), // 👈 fade solo al principio
+      ));
+
+      final scaleAnimation = Tween<double>(
+        begin: 0.95, // 👈 pequeño zoom al entrar
+        end: 1.0,
+      ).animate(CurvedAnimation(
+        parent: animation,
+        curve: Curves.fastOutSlowIn,
+      ));
+
+      return SlideTransition(
+        position: slideAnimation,
+        child: FadeTransition(
+          opacity: fadeAnimation,
+          child: ScaleTransition(
+            scale: scaleAnimation,
+            child: child,
+          ),
+        ),
+      );
+    },
+  );
+}

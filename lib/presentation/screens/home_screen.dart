@@ -604,6 +604,8 @@ class HomeScreen extends StatelessWidget {
                   bool isHoraDeDia =
                       fecha.hour > weatherProvider.sunrise.hour &&
                       fecha.hour < weatherProvider.sunset.hour;
+                  final probLluvia =
+                      weatherProvider.tiempoHoras!.precipitationProbability[i];
                   return Column(
                     children: [
                       SizedBox(height: 8),
@@ -629,36 +631,56 @@ class HomeScreen extends StatelessWidget {
                               style: TextStyle(fontSize: 17),
                             ),
                             SizedBox(width: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Utils.obtenerSimbolo(
-                                  weatherCode,
-                                  true,
-                                  isHoraDeDia,
-                                ),
-                                SizedBox(width: 10),
-                                Text(
-                                  '${temperatura.round().toString()}ºC',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(width: 10),
-
-                                Text(
-                                  Utils.obtenerTiempoText(
+                            Expanded(
+                              // 👈 aquí
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Utils.obtenerSimbolo(
                                     weatherCode,
-                                    configProvider.idiomaActual,
+                                    true,
+                                    isHoraDeDia,
                                   ),
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                                  SizedBox(width: 5),
+                                  Text(
+                                    '${temperatura.round().toString()}ºC',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                  SizedBox(width: 5),
+                                  Expanded(
+                                    // 👈 y aquí para el texto largo
+                                    child: Text(
+                                      Utils.obtenerTiempoText(
+                                        weatherCode,
+                                        configProvider.idiomaActual,
+                                      ),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                                  ),
+                                  SizedBox(width: 5),
+                                  Text(
+                                    "💧${probLluvia}%",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      context.push('/hourDetail', extra: i);
+                                    },
+                                    child: Text(Utils.stringShowDetails(configProvider.idiomaActual)),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -976,7 +998,11 @@ class _tiempoDiaIndividualCard extends StatelessWidget {
   }
 }
 
-Widget _infoCard({required Color color, required String titulo, required String valor}) {
+Widget _infoCard({
+  required Color color,
+  required String titulo,
+  required String valor,
+}) {
   return Container(
     width: double.infinity,
     padding: EdgeInsets.all(12),
@@ -986,9 +1012,16 @@ Widget _infoCard({required Color color, required String titulo, required String 
     ),
     child: Column(
       children: [
-        Text(titulo, style: TextStyle(fontSize: 18), textAlign: TextAlign.center),
+        Text(
+          titulo,
+          style: TextStyle(fontSize: 18),
+          textAlign: TextAlign.center,
+        ),
         SizedBox(height: 4),
-        Text(valor, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(
+          valor,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
       ],
     ),
   );

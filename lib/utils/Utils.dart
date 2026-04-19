@@ -177,7 +177,7 @@ class Utils {
     }
 
     return isTiempoHora
-        ? Icon(iconData, size: 30, color: Colors.black)
+        ? Icon(iconData, size: 26, color: Colors.black)
         : iconData;
   }
 
@@ -260,10 +260,9 @@ class Utils {
     //Si esta nevando comprobamos el weatherCode y nos da igual si es de día o de noche
     const codigosNieve = {71, 73, 75, 77, 85, 86};
 
-    if (codigosNieve.contains(weatherCode)){
+    if (codigosNieve.contains(weatherCode)) {
       return AssetImage('assets/images/fondo_nieve.gif');
     }
-
 
     if (isDeDia) {
       if (weatherCode == 2)
@@ -276,7 +275,7 @@ class Utils {
       if (weatherCode == 3 || weatherCode == 45 || weatherCode == 48)
         return AssetImage('assets/images/fondo_nublado_noche.jpg');
       else
-        return AssetImage('assets/images/fondo_noche.png');
+        return AssetImage('assets/images/fondo_noche.jpg');
     }
   }
 
@@ -475,5 +474,57 @@ class Utils {
       return 'EL SERVICIO CLIMÁTICO SE ENCUENTRA CAIDO EN ESTOS MOMENTOS, SENTIMOS LAS MOLESTIAS';
     else
       return 'THE CLIMATIC SERVICE IS CURRENTLY UNAVAIBLE RIGHT NOW, SORRY FOR INCONVENIENCE :(';
+  }
+
+  static String stringShowDetails(String idioma) {
+    if (idioma == 'es')
+      return 'Ver detalles';
+    else
+      return 'Show details';
+  }
+
+  static stringAt(String idioma) {
+    if (idioma == 'es')
+      return 'a las';
+    else
+      return 'at';
+  }
+
+  static String stringUVRays(String idioma) {
+    if (idioma == 'es')
+      return 'Índice de rayos uva☀️';
+    else
+      return 'UV Level☀️';
+  }
+
+  static String stringUvLevel(int uv, String idioma) {
+    if (idioma == 'es') {
+      if (uv <= 2) return 'Bajo';
+      if (uv <= 5) return 'Moderado';
+      if (uv <= 7) return 'Alto';
+      if (uv <= 10) return 'Muy alto';
+      return 'Extremo';
+    } else {
+      if (uv <= 2) return 'Low';
+      if (uv <= 5) return 'Moderate';
+      if (uv <= 7) return 'High';
+      if (uv <= 10) return 'Very high';
+      return 'Extreme';
+    }
+  }
+
+  static Color obtenerColorUV(int uv) {
+    if (uv <= 2) return Colors.green;
+    if (uv <= 5) return Colors.yellow.shade700;
+    if (uv <= 7) return Colors.orange;
+    if (uv <= 10) return Colors.red;
+    return Colors.purple;
+  }
+
+  static String stringRainProbability(String idioma) {
+    if (idioma == 'es')
+      return 'Probabilidad de lluvia💧';
+    else
+      return 'Precipitation probability💧';
   }
 }
