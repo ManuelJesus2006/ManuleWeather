@@ -70,40 +70,30 @@ Page _buildPageConTransicion(Widget child, GoRouterState state) {
   return CustomTransitionPage(
     key: state.pageKey,
     child: child,
-    transitionDuration: Duration(milliseconds: 300),
+    transitionDuration: Duration(milliseconds: 350),
+    reverseTransitionDuration: Duration(milliseconds: 350),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      final slideAnimation = Tween<Offset>(
+      final slideIn = Tween<Offset>(
         begin: Offset(1.0, 0.0),
         end: Offset.zero,
       ).animate(CurvedAnimation(
         parent: animation,
-        curve: Curves.fastOutSlowIn, // 👈 curva más natural
+        curve: Curves.easeOutCubic,
       ));
 
-      final fadeAnimation = Tween<double>(
-        begin: 0.0,
-        end: 1.0,
+      final slideOut = Tween<Offset>(
+        begin: Offset.zero,
+        end: Offset(-0.25, 0.0),
       ).animate(CurvedAnimation(
-        parent: animation,
-        curve: Interval(0.0, 0.5, curve: Curves.easeIn), // 👈 fade solo al principio
-      ));
-
-      final scaleAnimation = Tween<double>(
-        begin: 0.95, // 👈 pequeño zoom al entrar
-        end: 1.0,
-      ).animate(CurvedAnimation(
-        parent: animation,
-        curve: Curves.fastOutSlowIn,
+        parent: secondaryAnimation,
+        curve: Curves.easeOutCubic,
       ));
 
       return SlideTransition(
-        position: slideAnimation,
-        child: FadeTransition(
-          opacity: fadeAnimation,
-          child: ScaleTransition(
-            scale: scaleAnimation,
-            child: child,
-          ),
+        position: slideOut,
+        child: SlideTransition(
+          position: slideIn,
+          child: child,
         ),
       );
     },

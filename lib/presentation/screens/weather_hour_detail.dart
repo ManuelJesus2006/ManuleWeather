@@ -22,13 +22,18 @@ class WeatherHourDetail extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text(
-          '${fechaFormatted.day} ${Utils.stringOf(configProvider.idiomaActual)} ${Utils.obtenerMes(fechaFormatted.month, configProvider.idiomaActual)} ${Utils.stringOf(configProvider.idiomaActual)} ${fechaFormatted.year} ${Utils.stringAt(configProvider.idiomaActual)} ${Utils.formatearHora(fechaFormatted)}',
-        ),
+        title: Text(weatherProvider.localizacion!),
       ),
       body: Center(
         child: Column(
           children: [
+            Text(
+              '${fechaFormatted.day} ${Utils.stringOf(configProvider.idiomaActual)} ${Utils.obtenerMes(fechaFormatted.month, configProvider.idiomaActual)} ${Utils.stringOf(configProvider.idiomaActual)} ${fechaFormatted.year} ${Utils.stringAt(configProvider.idiomaActual)} ${Utils.formatearHora(fechaFormatted)}',
+              style: TextStyle(
+                fontSize: mediaQuery.size.width * 0.04,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -47,7 +52,13 @@ class WeatherHourDetail extends StatelessWidget {
                 ),
               ],
             ),
-            Text(Utils.obtenerTiempoText(tiempoHoras.weatherCode[indexTiempoHoras], configProvider.idiomaActual), style: TextStyle(fontSize: mediaQuery.size.width * 0.05),),
+            Text(
+              Utils.obtenerTiempoText(
+                tiempoHoras.weatherCode[indexTiempoHoras],
+                configProvider.idiomaActual,
+              ),
+              style: TextStyle(fontSize: mediaQuery.size.width * 0.05),
+            ),
             SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -106,9 +117,7 @@ class WeatherHourDetail extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '${tiempoHoras.cloudCover[indexTiempoHoras]
-                            .round()
-                            .toString()}%',
+                        '${tiempoHoras.cloudCover[indexTiempoHoras].round().toString()}%',
                         style: TextStyle(
                           fontSize: mediaQuery.size.width * 0.06,
                           fontWeight: FontWeight.bold,
@@ -119,63 +128,115 @@ class WeatherHourDetail extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 10,),
+            SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: Colors.grey.withOpacity(0.5),
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.grey.withOpacity(0.5),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        Utils.stringWind(configProvider.idiomaActual),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: mediaQuery.size.width * 0.045,
+                        ),
                       ),
-                      child: Column(
-                        children: [
-                          Text(
-                            Utils.stringWind(configProvider.idiomaActual),
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: mediaQuery.size.width * 0.045,
-                            ),
-                          ),
-                          Text(
-                            '${tiempoHoras.windSpeed10M[indexTiempoHoras]
-                                .round()
-                                .toString()}km/h',
-                            style: TextStyle(
-                              fontSize: mediaQuery.size.width * 0.06,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                      Text(
+                        '${tiempoHoras.windSpeed10M[indexTiempoHoras].round().toString()}km/h',
+                        style: TextStyle(
+                          fontSize: mediaQuery.size.width * 0.06,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: Colors.lightBlueAccent,
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.lightBlueAccent,
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        Utils.stringRainProbability(
+                          configProvider.idiomaActual,
+                        ),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: mediaQuery.size.width * 0.045,
+                        ),
                       ),
-                      child: Column(
-                        children: [
-                          Text(
-                            Utils.stringRainProbability(configProvider.idiomaActual),
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: mediaQuery.size.width * 0.045,
-                            ),
-                          ),
-                          Text(
-                            '${tiempoHoras.precipitationProbability[indexTiempoHoras]}%',
-                            style: TextStyle(
-                              fontSize: mediaQuery.size.width * 0.06,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                      Text(
+                        '${tiempoHoras.precipitationProbability[indexTiempoHoras]}%',
+                        style: TextStyle(
+                          fontSize: mediaQuery.size.width * 0.06,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
+                    ],
+                  ),
+                ),
               ],
+            ),
+            SizedBox(height: 10),
+            Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Colors.blue,
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    Utils.stringAmountOfRainSnow(configProvider.idiomaActual),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: mediaQuery.size.width * 0.045,
+                    ),
+                  ),
+                  Text(
+                    '${tiempoHoras.precipitation[indexTiempoHoras].round().toString()}l/m²',
+                    style: TextStyle(
+                      fontSize: mediaQuery.size.width * 0.06,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 10),
+            Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Colors.blueGrey[300],
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    Utils.stringHumidity(configProvider.idiomaActual),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: mediaQuery.size.width * 0.045,
+                    ),
+                  ),
+                  Text(
+                    '${tiempoHoras.relativeHumidity2M[indexTiempoHoras]}%',
+                    style: TextStyle(
+                      fontSize: mediaQuery.size.width * 0.06,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

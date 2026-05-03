@@ -58,23 +58,23 @@ class ErrorScreen extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 30),
-              ElevatedButton.icon(
-                //TODO: Lógica botón pantalla error
-                onPressed: (){} /* => context.go('/') */,
-                icon: Icon(LucideIcons.refreshCw),
-                label: Text(
-                  configProvider.idiomaActual == 'es' ? 'Reintentar' : 'Retry',
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red.shade400,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                ),
-              ),
+              // SizedBox(height: 30),
+              // ElevatedButton.icon(
+              //   //TODO: Lógica botón pantalla error
+              //   onPressed: (){} /* => context.go('/') */,
+              //   icon: Icon(LucideIcons.refreshCw),
+              //   label: Text(
+              //     configProvider.idiomaActual == 'es' ? 'Reintentar' : 'Retry',
+              //   ),
+              //   style: ElevatedButton.styleFrom(
+              //     backgroundColor: Colors.red.shade400,
+              //     foregroundColor: Colors.white,
+              //     padding: EdgeInsets.symmetric(horizontal: 30, vertical: 14),
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(15),
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),

@@ -16,7 +16,6 @@ class TiempoHoraResponse {
     String timezone;
     String timezoneAbbreviation;
     double elevation;
-    HourlyUnits hourlyUnits;
     TiempoHoras tiempoHoras;
 
     TiempoHoraResponse({
@@ -27,7 +26,6 @@ class TiempoHoraResponse {
         required this.timezone,
         required this.timezoneAbbreviation,
         required this.elevation,
-        required this.hourlyUnits,
         required this.tiempoHoras,
     });
 
@@ -39,7 +37,6 @@ class TiempoHoraResponse {
         timezone: json["timezone"],
         timezoneAbbreviation: json["timezone_abbreviation"],
         elevation: json["elevation"],
-        hourlyUnits: HourlyUnits.fromJson(json["hourly_units"]),
         tiempoHoras: TiempoHoras.fromJson(json["hourly"]),
     );
 
@@ -51,7 +48,6 @@ class TiempoHoraResponse {
         "timezone": timezone,
         "timezone_abbreviation": timezoneAbbreviation,
         "elevation": elevation,
-        "hourly_units": hourlyUnits.toJson(),
         "hourly": tiempoHoras.toJson(),
     };
 }
@@ -64,6 +60,8 @@ class TiempoHoras {
     List<double> uvIndex;
     List<double> windSpeed10M;
     List<int> cloudCover;
+    List<double> precipitation;
+    List<int> relativeHumidity2M;
 
     TiempoHoras({
         required this.time,
@@ -73,6 +71,8 @@ class TiempoHoras {
         required this.uvIndex,
         required this.windSpeed10M,
         required this.cloudCover,
+        required this.precipitation,
+        required this.relativeHumidity2M,
     });
 
     factory TiempoHoras.fromJson(Map<String, dynamic> json) => TiempoHoras(
@@ -83,6 +83,8 @@ class TiempoHoras {
         uvIndex: List<double>.from(json["uv_index"].map((x) => x?.toDouble())),
         windSpeed10M: List<double>.from(json["wind_speed_10m"].map((x) => x?.toDouble())),
         cloudCover: List<int>.from(json["cloud_cover"].map((x) => x)),
+        precipitation: List<double>.from(json["precipitation"].map((x) => x?.toDouble())),
+        relativeHumidity2M: List<int>.from(json["relative_humidity_2m"].map((x) => x)),
     );
 
     Map<String, dynamic> toJson() => {
@@ -93,45 +95,7 @@ class TiempoHoras {
         "uv_index": List<dynamic>.from(uvIndex.map((x) => x)),
         "wind_speed_10m": List<dynamic>.from(windSpeed10M.map((x) => x)),
         "cloud_cover": List<dynamic>.from(cloudCover.map((x) => x)),
-    };
-}
-
-class HourlyUnits {
-    String time;
-    String temperature2M;
-    String weatherCode;
-    String precipitationProbability;
-    String uvIndex;
-    String windSpeed10M;
-    String cloudCover;
-
-    HourlyUnits({
-        required this.time,
-        required this.temperature2M,
-        required this.weatherCode,
-        required this.precipitationProbability,
-        required this.uvIndex,
-        required this.windSpeed10M,
-        required this.cloudCover,
-    });
-
-    factory HourlyUnits.fromJson(Map<String, dynamic> json) => HourlyUnits(
-        time: json["time"],
-        temperature2M: json["temperature_2m"],
-        weatherCode: json["weather_code"],
-        precipitationProbability: json["precipitation_probability"],
-        uvIndex: json["uv_index"],
-        windSpeed10M: json["wind_speed_10m"],
-        cloudCover: json["cloud_cover"],
-    );
-
-    Map<String, dynamic> toJson() => {
-        "time": time,
-        "temperature_2m": temperature2M,
-        "weather_code": weatherCode,
-        "precipitation_probability": precipitationProbability,
-        "uv_index": uvIndex,
-        "wind_speed_10m": windSpeed10M,
-        "cloud_cover": cloudCover,
+        "precipitation": List<dynamic>.from(precipitation.map((x) => x)),
+        "relative_humidity_2m": List<dynamic>.from(relativeHumidity2M.map((x) => x)),
     };
 }

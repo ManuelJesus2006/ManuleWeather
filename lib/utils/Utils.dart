@@ -8,6 +8,18 @@ class Utils {
     return '${fecha.hour}:$minutos';
   }
 
+  static String getFlagEmoji(String idioma) {
+    switch (idioma) {
+      case 'es': return '🇪🇸';
+      case 'en': return '🇬🇧';
+      case 'fr': return '🇫🇷';
+      case 'de': return '🇩🇪';
+      case 'it': return '🇮🇹';
+      case 'pt': return '🇵🇹';
+      default: return '🌐';
+    }
+  }
+
   static String obtenerDiaSemana(int weekday, String idioma) {
     if (idioma == 'es') {
       switch (weekday) {
@@ -526,5 +538,20 @@ class Utils {
       return 'Probabilidad de lluvia💧';
     else
       return 'Precipitation probability💧';
+  }
+
+  static stringNewUpdate(String idioma, dynamic versionServer) {
+    if (idioma == 'es')
+      return '¡Nueva actualización $versionServer!';
+    else
+      return '¡New update $versionServer!';
+    
+  }
+
+  static stringUpdateWarningContent(String idioma) {
+    if (idioma == 'es')
+      return 'ManuleWeather tiene una nueva actualización, descárgala para recibir nuevas funciones y arreglos';
+    else
+      return 'ManuleWeather has updated! Download this new version in order to receive new function and improvements';
   }
 }

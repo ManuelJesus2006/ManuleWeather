@@ -8,6 +8,7 @@ import 'package:manule_weather/providers/config_provider.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
 import 'package:manule_weather/services/localizacion_service.dart';
 import 'package:manule_weather/services/tiempo_service.dart';
+import 'package:manule_weather/services/version_service.dart';
 import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -25,8 +26,16 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   _getLocalizacionActual() async {
+    //Abrimos el configProvider
+    final configProvider = Provider.of<ConfigProvider>(
+        context,
+        listen: false,
+      );
     bool serviceEnabled;
     LocationPermission permission;
+
+    //Antes de hacer toda la logica principal avisamos al usuario en el caso de que haya actualizacion
+    await VersionService().comprobarActualizacion(configProvider.idiomaActual, context);
 
     // Verifica si los servicios de ubicación están activados en el dispositivo
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -52,12 +61,6 @@ class _SplashScreenState extends State<SplashScreen> {
       print('Permisos denegados permanentemente.');
       return;
     }
-
-    //Abrimos el configProvider
-    final configProvider = Provider.of<ConfigProvider>(
-        context,
-        listen: false,
-      );
 
     await configProvider.comprobarIdiomaYPrimeraVez();
 
@@ -102,7 +105,7 @@ class _SplashScreenState extends State<SplashScreen> {
         tiempoUbi,
         nombreCiudad,
         tiempoHoras,
-        tiempoDias!,
+        tiempoDias,
         true,
         position.latitude,
         position.longitude,

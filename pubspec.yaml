@@ -1,7 +1,7 @@
 name: manule_weather
-description: "A new Flutter project."
+description: "A basic weather made my Manule :D"
 publish_to: 'none'
-version: 0.1.0
+version: 0.8.5
 
 environment:
   sdk: ^3.9.2
