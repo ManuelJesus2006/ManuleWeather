@@ -248,7 +248,7 @@ class Utils {
   static AssetImage recibirFondoApp(bool isDeDia, int weatherCode) {
     //Si hace tormenta comprobamos el weatherCode y nos da igual si es de día o de noche
     if (weatherCode == 95 || weatherCode == 96 || weatherCode == 99)
-      return AssetImage("assets/images/fondo_tormenta");
+      return AssetImage("assets/images/fondo_tormenta.gif");
 
     //Si esta lloviendo comprobamos el weatherCode y nos da igual si es de día o de noche
     const codigosLluvia = {51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82};
@@ -273,7 +273,7 @@ class Utils {
         return AssetImage('assets/images/fondo_dia.png');
     } else {
       if (weatherCode == 3 || weatherCode == 45 || weatherCode == 48)
-        return AssetImage('assets/images/fondo_nublado_noche.jpg');
+        return AssetImage('assets/images/fondo_nublado_noche.png');
       else
         return AssetImage('assets/images/fondo_noche.jpg');
     }
