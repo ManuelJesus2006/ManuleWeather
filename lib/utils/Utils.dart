@@ -554,4 +554,19 @@ class Utils {
     else
       return 'ManuleWeather has updated! Download this new version in order to receive new function and improvements';
   }
+
+  static String stringNotYet(String idioma) {
+    if (idioma == 'es')
+      return "Mejor no";
+    else
+      return 'Maybe later';
+  }
+
+  static String stringUpdate(String idioma){
+    if (idioma == 'es'){
+      return "Actualizar";
+    }else{
+      return "Update";
+    }
+  }
 }

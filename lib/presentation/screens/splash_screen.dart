@@ -24,6 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     _getLocalizacionActual();
   }
+  
 
   _getLocalizacionActual() async {
     //Abrimos el configProvider
@@ -31,11 +32,14 @@ class _SplashScreenState extends State<SplashScreen> {
         context,
         listen: false,
       );
-    bool serviceEnabled;
-    LocationPermission permission;
+
+      await configProvider.comprobarIdiomaYPrimeraVez();
 
     //Antes de hacer toda la logica principal avisamos al usuario en el caso de que haya actualizacion
     await VersionService().comprobarActualizacion(configProvider.idiomaActual, context);
+
+    bool serviceEnabled;
+    LocationPermission permission;
 
     // Verifica si los servicios de ubicación están activados en el dispositivo
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -61,8 +65,6 @@ class _SplashScreenState extends State<SplashScreen> {
       print('Permisos denegados permanentemente.');
       return;
     }
-
-    await configProvider.comprobarIdiomaYPrimeraVez();
 
     print(configProvider.primeraVez);
 

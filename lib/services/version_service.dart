@@ -27,7 +27,7 @@ class VersionService {
           title: Text(Utils.stringNewUpdate(idiomaActual, versionServer)),
           content: Text(Utils.stringUpdateWarningContent(idiomaActual)),
           actions: [
-            TextButton(onPressed: () {Navigator.pop(context);}, child: Text("Mejor no")),
+            TextButton(onPressed: () {Navigator.pop(context);}, child: Text(Utils.stringNotYet(idiomaActual))),
             TextButton(
               onPressed: () async {
                 await launchUrl(
@@ -35,7 +35,7 @@ class VersionService {
                   mode: LaunchMode.externalApplication,
                 );
               },
-              child: Text("Actualizar"),
+              child: Text(Utils.stringUpdate(idiomaActual)),
             ),
           ],
         ));
