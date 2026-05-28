@@ -602,7 +602,7 @@ class HomeScreen extends StatelessWidget {
                                   child: Row(
                                     children: [
                                       Utils.obtenerSimbolo(
-                                        weatherCode,
+                                        i == 0 ? weatherProvider.tiempoActual!.current.weatherCode : weatherCode,
                                         true,
                                         isHoraDeDia,
                                       ),
@@ -618,7 +618,7 @@ class HomeScreen extends StatelessWidget {
                                       Expanded(
                                         child: Text(
                                           Utils.obtenerTiempoText(
-                                            weatherCode,
+                                            i == 0 ? weatherProvider.tiempoActual!.current.weatherCode : weatherCode,
                                             configProvider.idiomaActual,
                                           ),
                                           style: TextStyle(

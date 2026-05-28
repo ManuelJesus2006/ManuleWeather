@@ -590,15 +590,9 @@ class Utils {
     WeatherProvider weatherProvider,
     String idioma
   ) {
-    //Primero buscamos los del día de hoy (esto lo hago porque en el endpoint por horas no está el uv)
-    List<double> uvData = [];
-    List<double> amountRainData = [];
-    for (var i = 0; i < weatherProvider.tiempoHoras!.time.length; i++) {
-      if (DateTime.parse(weatherProvider.tiempoHoras!.time[i]).day == DateTime.now().day){
-        uvData.add(weatherProvider.tiempoHoras!.uvIndex[i]);
-        amountRainData.add(weatherProvider.tiempoHoras!.precipitation[i]);
-      }
-    }
+    //Primero buscamos las primeras 24 horas disponibles (esto lo hago porque en el endpoint por horas no está el uv)
+    List<double> uvData = weatherProvider.tiempoHoras!.uvIndex.take(24).toList();
+    List<double> amountRainData = weatherProvider.tiempoHoras!.precipitation.take(24).toList();
     return Column(
       children: [
         if (uvData.any((element) => element >= 8))
@@ -705,33 +699,33 @@ class Utils {
   
   static String stringAlertUV8(String idioma) {
   if (idioma == 'es') {
-    return "Se estiman valores de UV de 8 o más durante el día de hoy, no se exponga demasiado al sol y protéjase";
+    return "Se estiman valores de UV de 8 o más en las próximas 24 horas, no se exponga demasiado al sol y protéjase";
   } else {
-    return "UV index levels of 8 or higher are expected today. Avoid prolonged sun exposure and protect yourself.";
+    return "UV index levels of 8 or higher are expected in the next 24 hours. Avoid prolonged sun exposure and protect yourself.";
   }
 }
 
 static String stringAlertRainAmount15or30(String idioma) {
   if (idioma == 'es') {
-    return "Se estima probabilidad de lluvias de entre 15 y 30 l/m² en una hora durante el día de hoy, tenga cuidado";
+    return "Se estima probabilidad de lluvias de entre 15 y 30 l/m² en una hora durante las próximas 24 horas, tenga cuidado";
   } else {
-    return "Heavy rain between 15 and 30 l/m² per hour is expected today. Please be careful.";
+    return "Heavy rain between 15 and 30 l/m² per hour is expected in the next 24 hours. Please be careful.";
   }
 }
 
 static String stringAlertRainAmount30or60(String idioma) {
   if (idioma == 'es') {
-    return "Se estima probabilidad de lluvias de entre 30 y 60 l/m² en una hora durante el día de hoy, tenga mucho cuidado";
+    return "Se estima probabilidad de lluvias de entre 30 y 60 l/m² en una hora durante las próximas 24 horas, tenga mucho cuidado";
   } else {
-    return "Torrential rain between 30 and 60 l/m² per hour is expected today. Take extra precautions.";
+    return "Torrential rain between 30 and 60 l/m² per hour is expected in the next 24 hours. Take extra precautions.";
   }
 }
 
 static String stringAlertRainAmount60ormore(String idioma) {
   if (idioma == 'es') {
-    return "Se estima probabilidad de lluvias de 60 l/m² o más en una hora durante el día de hoy, procure no salir de casa y protéjase";
+    return "Se estima probabilidad de lluvias de 60 l/m² o más en una hora durante las próximas 24 horas, procure no salir de casa y protéjase";
   } else {
-    return "Severe rain of 60 l/m² or more per hour is expected today. Stay indoors if possible and stay safe.";
+    return "Severe rain of 60 l/m² or more per hour is expected in the next 24 hours. Stay indoors if possible and stay safe.";
   }
 }
 }

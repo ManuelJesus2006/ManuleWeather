@@ -1,7 +1,7 @@
 name: manule_weather
 description: "A selfmade weather app by ManuleDev :D"
 publish_to: 'none'
-version: 0.8.6
+version: 0.8.7
 
 environment:
   sdk: ^3.9.2
