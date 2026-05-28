@@ -33,6 +33,7 @@ class HomeScreen extends StatelessWidget {
             weatherProvider,
             screenWidth,
             configProvider,
+            navigationProvider
           ),
         ],
       ),
@@ -59,7 +60,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-Widget _buildInicio(
+  Widget _buildInicio(
     BuildContext context,
     WeatherProvider weatherProvider,
     double screenWidth,
@@ -119,7 +120,11 @@ Widget _buildInicio(
                       onPressed: () => context.push('/settings'),
                       icon: Icon(Icons.settings, color: Colors.blueGrey),
                     ),
-                    Image.asset('assets/images/LogoApp.png', width: 80, height: 80),
+                    Image.asset(
+                      'assets/images/LogoApp.png',
+                      width: 80,
+                      height: 80,
+                    ),
                     IconButton(
                       onPressed: () => context.push('/search'),
                       icon: Icon(Icons.search, color: Colors.blueGrey),
@@ -132,30 +137,44 @@ Widget _buildInicio(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (weatherProvider.isUbicacionUser!)
-                        Icon(LucideIcons.navigation, color: Colors.white, size: screenWidth * 0.04),
+                        Icon(
+                          LucideIcons.navigation,
+                          color: Colors.white,
+                          size: screenWidth * 0.04,
+                        ),
                       Flexible(
                         child: Text(
                           weatherProvider.localizacion!,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.045),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: screenWidth * 0.045,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                SizedBox(height: screenHeight * 0.03),
+                SizedBox(height: screenHeight * 0.01),
+                Utils.devolverCardAvisos(screenWidth, weatherProvider, configProvider.idiomaActual),
                 Text(
                   '${Utils.stringUpdatedAt(configProvider.idiomaActual)} ${Utils.formatearHora(DateTime.parse(weatherProvider.tiempoActual!.current.time))}',
-                  style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.04),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: screenWidth * 0.04,
+                  ),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       '${weatherProvider.tiempoActual!.current.temperature2M.round()}ºC',
-                      style: TextStyle(fontSize: screenWidth * 0.18, color: Colors.white),
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.18,
+                        color: Colors.white,
+                      ),
                     ),
                     SizedBox(width: screenWidth * 0.03),
                     Icon(
@@ -184,12 +203,19 @@ Widget _buildInicio(
                 SizedBox(height: screenHeight * 0.01),
                 Text(
                   Utils.stringFeelsLike(configProvider.idiomaActual),
-                  style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.045),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: screenWidth * 0.045,
+                  ),
                 ),
                 SizedBox(height: screenHeight * 0.01),
                 Text(
                   '${weatherProvider.tiempoActual!.current.apparentTemperature.round()}ºC',
-                  style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.05, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: screenWidth * 0.05,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 SizedBox(height: screenHeight * 0.03),
                 Padding(
@@ -206,9 +232,22 @@ Widget _buildInicio(
                         ),
                         child: Column(
                           children: [
-                            Text('MAX☀️', style: TextStyle(fontSize: screenWidth * 0.05, fontWeight: FontWeight.bold, color: Colors.white)),
+                            Text(
+                              'MAX☀️',
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.05,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                             SizedBox(height: screenHeight * 0.01),
-                            Text('${weatherProvider.tiempoDias!.temperature2MMax[0].round()}ºC', style: TextStyle(fontSize: screenWidth * 0.05, color: Colors.white)),
+                            Text(
+                              '${weatherProvider.tiempoDias!.temperature2MMax[0].round()}ºC',
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.05,
+                                color: Colors.white,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -221,9 +260,22 @@ Widget _buildInicio(
                         ),
                         child: Column(
                           children: [
-                            Text('MIN❄️', style: TextStyle(fontSize: screenWidth * 0.05, fontWeight: FontWeight.bold, color: Colors.white)),
+                            Text(
+                              'MIN❄️',
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.05,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                             SizedBox(height: screenHeight * 0.01),
-                            Text('${weatherProvider.tiempoDias!.temperature2MMin[0].round()}ºC', style: TextStyle(fontSize: screenWidth * 0.05, color: Colors.white)),
+                            Text(
+                              '${weatherProvider.tiempoDias!.temperature2MMin[0].round()}ºC',
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.05,
+                                color: Colors.white,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -245,9 +297,22 @@ Widget _buildInicio(
                         ),
                         child: Column(
                           children: [
-                            Text(Utils.stringSunrise(configProvider.idiomaActual), style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold, color: Colors.white)),
+                            Text(
+                              Utils.stringSunrise(configProvider.idiomaActual),
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.045,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                             SizedBox(height: screenHeight * 0.01),
-                            Text(Utils.formatearHora(weatherProvider.sunrise), style: TextStyle(fontSize: screenWidth * 0.05, color: Colors.white)),
+                            Text(
+                              Utils.formatearHora(weatherProvider.sunrise),
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.05,
+                                color: Colors.white,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -260,9 +325,22 @@ Widget _buildInicio(
                         ),
                         child: Column(
                           children: [
-                            Text(Utils.stringSunset(configProvider.idiomaActual), style: TextStyle(fontSize: screenWidth * 0.045, fontWeight: FontWeight.bold, color: Colors.white)),
+                            Text(
+                              Utils.stringSunset(configProvider.idiomaActual),
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.045,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                             SizedBox(height: screenHeight * 0.01),
-                            Text(Utils.formatearHora(weatherProvider.sunset), style: TextStyle(fontSize: screenWidth * 0.05, color: Colors.white)),
+                            Text(
+                              Utils.formatearHora(weatherProvider.sunset),
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.05,
+                                color: Colors.white,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -270,9 +348,53 @@ Widget _buildInicio(
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.02),
+                Container(
+                  padding: EdgeInsets.all(screenWidth * 0.03),
+                  width: screenWidth * 0.9,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Utils.obtenerColorUV(
+                      weatherProvider.tiempoActual!.current.uvIndex.round(),
+                    ).withOpacity(0.8),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        Utils.stringUVRays(configProvider.idiomaActual),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: screenWidth * 0.045,
+                        ),
+                      ),
+                      Text(
+                        weatherProvider.tiempoActual!.current.uvIndex
+                            .round()
+                            .toString(),
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.06,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        Utils.stringUvLevel(
+                          weatherProvider.tiempoActual!.current.uvIndex.round(),
+                          configProvider.idiomaActual,
+                        ),
+                        style: TextStyle(fontSize: screenWidth * 0.035),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: screenHeight * 0.02),
                 _infoCard(
                   titulo: Utils.stringWind(configProvider.idiomaActual),
-                  valor: Text('${weatherProvider.tiempoActual!.current.windSpeed10M.round()}km/h', style: TextStyle(fontSize: screenWidth * 0.05, color: Colors.white)),
+                  valor: Text(
+                    '${weatherProvider.tiempoActual!.current.windSpeed10M.round()}km/h',
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.05,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
                 SizedBox(height: screenHeight * 0.02),
                 _infoCard(
@@ -281,23 +403,46 @@ Widget _buildInicio(
                     weatherProvider.tiempoActual!.current.windGusts10M != null
                         ? '${weatherProvider.tiempoActual!.current.windGusts10M.round()} km/h'
                         : 'Sin ráfagas',
-                    style: TextStyle(fontSize: screenWidth * 0.05, color: Colors.white),
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.05,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.02),
                 _infoCard(
-                  titulo: Utils.stringWindOrientation(configProvider.idiomaActual),
-                  valor: Text('${weatherProvider.tiempoActual!.current.windDirection10M}º', style: TextStyle(fontSize: screenWidth * 0.05, color: Colors.white)),
+                  titulo: Utils.stringWindOrientation(
+                    configProvider.idiomaActual,
+                  ),
+                  valor: Text(
+                    '${weatherProvider.tiempoActual!.current.windDirection10M}º',
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.05,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
                 SizedBox(height: screenHeight * 0.02),
                 _infoCard(
                   titulo: Utils.stringNubosity(configProvider.idiomaActual),
-                  valor: Text('${weatherProvider.tiempoActual!.current.cloudCover}%', style: TextStyle(fontSize: screenWidth * 0.05, color: Colors.white)),
+                  valor: Text(
+                    '${weatherProvider.tiempoActual!.current.cloudCover}%',
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.05,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
                 SizedBox(height: screenHeight * 0.02),
                 _infoCard(
                   titulo: Utils.stringHumidity(configProvider.idiomaActual),
-                  valor: Text('${weatherProvider.tiempoActual!.current.relativeHumidity2M}%', style: TextStyle(fontSize: screenWidth * 0.05, color: Colors.white)),
+                  valor: Text(
+                    '${weatherProvider.tiempoActual!.current.relativeHumidity2M}%',
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.05,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
                 SizedBox(height: screenHeight * 0.02),
                 _infoCard(
@@ -306,13 +451,22 @@ Widget _buildInicio(
                     weatherProvider.tiempoActual!.current.visibility != null
                         ? '${(weatherProvider.tiempoActual!.current.visibility) / 1000}kms'
                         : 'No disponible',
-                    style: TextStyle(fontSize: screenWidth * 0.05, color: Colors.white),
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.05,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.02),
                 _infoCard(
                   titulo: Utils.stringPressure(configProvider.idiomaActual),
-                  valor: Text('${weatherProvider.tiempoActual!.current.pressureMsl}hPa', style: TextStyle(fontSize: screenWidth * 0.05, color: Colors.white)),
+                  valor: Text(
+                    '${weatherProvider.tiempoActual!.current.pressureMsl}hPa',
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.05,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
                 SizedBox(height: screenHeight * 0.03),
               ],
@@ -328,9 +482,10 @@ Widget _buildInicio(
     WeatherProvider weatherProvider,
     double screenWidth,
     ConfigProvider configProvider,
+    NavigationProvider navigationProvider
   ) {
     final screenHeight = MediaQuery.of(context).size.height;
-    
+
     return SafeArea(
       child: Column(
         children: [
@@ -385,19 +540,24 @@ Widget _buildInicio(
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {
-                await weatherProvider.actualizarDatos(configProvider.idiomaActual);
+                await weatherProvider.actualizarDatos(
+                  configProvider.idiomaActual,
+                );
               },
               child: ListView.builder(
                 itemCount: weatherProvider.tiempoHoras!.time.length,
                 itemBuilder: (context, i) {
                   final hora = weatherProvider.tiempoHoras!.time[i];
                   final fecha = DateTime.parse(hora);
-                  final temperatura = weatherProvider.tiempoHoras!.temperature2M[i];
-                  final weatherCode = weatherProvider.tiempoHoras!.weatherCode[i];
+                  final temperatura =
+                      weatherProvider.tiempoHoras!.temperature2M[i];
+                  final weatherCode =
+                      weatherProvider.tiempoHoras!.weatherCode[i];
                   bool isHoraDeDia =
                       fecha.hour > weatherProvider.sunrise.hour &&
                       fecha.hour < weatherProvider.sunset.hour;
-                  final probLluvia = weatherProvider.tiempoHoras!.precipitationProbability[i];
+                  final probLluvia =
+                      weatherProvider.tiempoHoras!.precipitationProbability[i];
 
                   return Column(
                     children: [
@@ -409,9 +569,11 @@ Widget _buildInicio(
                         _fechaCompletaCard(fecha: fecha),
                       SizedBox(height: screenHeight * 0.015),
                       GestureDetector(
-                        onTap: () => context.push('/hourDetail', extra: i),
+                        onTap: () => i == 0 ? navigationProvider.cambiarIndice(0) : context.push('/hourDetail', extra: i),
                         child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.03,
+                          ),
                           child: Container(
                             padding: EdgeInsets.all(screenWidth * 0.04),
                             decoration: BoxDecoration(
@@ -421,17 +583,32 @@ Widget _buildInicio(
                             child: Row(
                               children: [
                                 Text(
-                                  hora.substring(11, 16),
-                                  style: TextStyle(fontSize: screenWidth * 0.04),
+                                  i == 0
+                                      ? Utils.formatearHora(
+                                          DateTime.parse(
+                                            weatherProvider
+                                                .tiempoActual!
+                                                .current
+                                                .time,
+                                          ),
+                                        )
+                                      : hora.substring(11, 16),
+                                  style: TextStyle(
+                                    fontSize: screenWidth * 0.04,
+                                  ),
                                 ),
                                 SizedBox(width: screenWidth * 0.02),
                                 Expanded(
                                   child: Row(
                                     children: [
-                                      Utils.obtenerSimbolo(weatherCode, true, isHoraDeDia),
+                                      Utils.obtenerSimbolo(
+                                        weatherCode,
+                                        true,
+                                        isHoraDeDia,
+                                      ),
                                       SizedBox(width: screenWidth * 0.02),
                                       Text(
-                                        '${temperatura.round()}ºC',
+                                        '${i == 0 ? weatherProvider.tiempoActual!.current.temperature2M.round() : temperatura.round()}ºC',
                                         style: TextStyle(
                                           fontSize: screenWidth * 0.045,
                                           fontWeight: FontWeight.bold,
@@ -440,7 +617,10 @@ Widget _buildInicio(
                                       SizedBox(width: screenWidth * 0.02),
                                       Expanded(
                                         child: Text(
-                                          Utils.obtenerTiempoText(weatherCode, configProvider.idiomaActual),
+                                          Utils.obtenerTiempoText(
+                                            weatherCode,
+                                            configProvider.idiomaActual,
+                                          ),
                                           style: TextStyle(
                                             fontSize: screenWidth * 0.035,
                                             fontWeight: FontWeight.bold,
@@ -512,7 +692,6 @@ Widget _buildInicio(
                       ),
                     ],
                   ),
-                  
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Row(
@@ -533,11 +712,11 @@ Widget _buildInicio(
                       ],
                     ),
                   ),
-                  SizedBox(height: 10,),
+                  SizedBox(height: 10),
                   SizedBox(
                     height: 140,
                     child: ListView.separated(
-                      separatorBuilder: (context, index) => SizedBox(width: 10,),
+                      separatorBuilder: (context, index) => SizedBox(width: 10),
                       scrollDirection: Axis.horizontal,
                       itemCount: weatherProvider.tiempoDias!.time.length,
                       itemBuilder: (context, index) {
@@ -558,11 +737,10 @@ Widget _buildInicio(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(18),
                               color:
-                                      navigationProvider
-                                              .indiceTiempoDiasActual ==
-                                          index
-                                      ? Colors.blue[100]
-                                      :Colors.grey[100],
+                                  navigationProvider.indiceTiempoDiasActual ==
+                                      index
+                                  ? Colors.blue[100]
+                                  : Colors.grey[100],
                             ),
                             child: Column(
                               children: [
@@ -600,7 +778,6 @@ Widget _buildInicio(
                             ),
                           ),
                         );
-                        
                       },
                     ),
                   ),

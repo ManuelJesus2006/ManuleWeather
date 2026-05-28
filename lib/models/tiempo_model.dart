@@ -67,7 +67,7 @@ class Current {
     double pressureMsl;
     int isDay;
     double visibility;
-    double temperature;
+    double uvIndex;
 
     Current({
         required this.time,
@@ -84,7 +84,7 @@ class Current {
         required this.pressureMsl,
         required this.isDay,
         required this.visibility,
-        required this.temperature,
+        required this.uvIndex,
     });
 
     factory Current.fromJson(Map<String, dynamic> json) => Current(
@@ -102,7 +102,7 @@ class Current {
         pressureMsl: json["pressure_msl"]?.toDouble(),
         isDay: json["is_day"],
         visibility: json["visibility"],
-        temperature: json["temperature"]?.toDouble(),
+        uvIndex: json["uv_index"]?.toDouble(),
     );
 
     Map<String, dynamic> toJson() => {
@@ -120,6 +120,78 @@ class Current {
         "pressure_msl": pressureMsl,
         "is_day": isDay,
         "visibility": visibility,
-        "temperature": temperature,
+        "uv_index": uvIndex,
+    };
+}
+
+class CurrentUnits {
+    String time;
+    String interval;
+    String temperature2M;
+    String apparentTemperature;
+    String weatherCode;
+    String windSpeed10M;
+    String windDirection10M;
+    String windGusts10M;
+    String relativeHumidity2M;
+    String precipitation;
+    String cloudCover;
+    String pressureMsl;
+    String isDay;
+    String visibility;
+    String uvIndex;
+
+    CurrentUnits({
+        required this.time,
+        required this.interval,
+        required this.temperature2M,
+        required this.apparentTemperature,
+        required this.weatherCode,
+        required this.windSpeed10M,
+        required this.windDirection10M,
+        required this.windGusts10M,
+        required this.relativeHumidity2M,
+        required this.precipitation,
+        required this.cloudCover,
+        required this.pressureMsl,
+        required this.isDay,
+        required this.visibility,
+        required this.uvIndex,
+    });
+
+    factory CurrentUnits.fromJson(Map<String, dynamic> json) => CurrentUnits(
+        time: json["time"],
+        interval: json["interval"],
+        temperature2M: json["temperature_2m"],
+        apparentTemperature: json["apparent_temperature"],
+        weatherCode: json["weather_code"],
+        windSpeed10M: json["wind_speed_10m"],
+        windDirection10M: json["wind_direction_10m"],
+        windGusts10M: json["wind_gusts_10m"],
+        relativeHumidity2M: json["relative_humidity_2m"],
+        precipitation: json["precipitation"],
+        cloudCover: json["cloud_cover"],
+        pressureMsl: json["pressure_msl"],
+        isDay: json["is_day"],
+        visibility: json["visibility"],
+        uvIndex: json["uv_index"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "time": time,
+        "interval": interval,
+        "temperature_2m": temperature2M,
+        "apparent_temperature": apparentTemperature,
+        "weather_code": weatherCode,
+        "wind_speed_10m": windSpeed10M,
+        "wind_direction_10m": windDirection10M,
+        "wind_gusts_10m": windGusts10M,
+        "relative_humidity_2m": relativeHumidity2M,
+        "precipitation": precipitation,
+        "cloud_cover": cloudCover,
+        "pressure_msl": pressureMsl,
+        "is_day": isDay,
+        "visibility": visibility,
+        "uv_index": uvIndex,
     };
 }

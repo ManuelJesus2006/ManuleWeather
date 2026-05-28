@@ -203,7 +203,7 @@ class WeatherHourDetail extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '${tiempoHoras.precipitation[indexTiempoHoras].round().toString()}l/m²',
+                    '${tiempoHoras.precipitation[indexTiempoHoras].toString()}l/m²',
                     style: TextStyle(
                       fontSize: mediaQuery.size.width * 0.06,
                       fontWeight: FontWeight.bold,

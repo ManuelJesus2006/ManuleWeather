@@ -18,6 +18,7 @@ class VersionService {
       final data = jsonDecode(response.body);
       final versionServer = data['version'];
       final urlDescarga = data['url'];
+      final whatisnew = data['whatisnew']
 
       final info = await PackageInfo.fromPlatform();
       final versionActual = info.version;

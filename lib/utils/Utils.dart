@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:manule_weather/providers/weather_provider.dart';
 
 class Utils {
   static String formatearHora(DateTime fecha) {
@@ -10,13 +11,20 @@ class Utils {
 
   static String getFlagEmoji(String idioma) {
     switch (idioma) {
-      case 'es': return '🇪🇸';
-      case 'en': return '🇬🇧';
-      case 'fr': return '🇫🇷';
-      case 'de': return '🇩🇪';
-      case 'it': return '🇮🇹';
-      case 'pt': return '🇵🇹';
-      default: return '🌐';
+      case 'es':
+        return '🇪🇸';
+      case 'en':
+        return '🇬🇧';
+      case 'fr':
+        return '🇫🇷';
+      case 'de':
+        return '🇩🇪';
+      case 'it':
+        return '🇮🇹';
+      case 'pt':
+        return '🇵🇹';
+      default:
+        return '🌐';
     }
   }
 
@@ -545,7 +553,6 @@ class Utils {
       return '¡Nueva actualización $versionServer!';
     else
       return '¡New update $versionServer!';
-    
   }
 
   static stringUpdateWarningContent(String idioma) {
@@ -562,11 +569,169 @@ class Utils {
       return 'Maybe later';
   }
 
-  static String stringUpdate(String idioma){
-    if (idioma == 'es'){
+  static String stringUpdate(String idioma) {
+    if (idioma == 'es') {
       return "Actualizar";
-    }else{
+    } else {
       return "Update";
     }
   }
+
+  static String stringDanger(String idioma) {
+    if (idioma == 'es') {
+      return "Atención";
+    } else {
+      return "Warning";
+    }
+  }
+
+  static devolverCardAvisos(
+    double screenWidth,
+    WeatherProvider weatherProvider,
+    String idioma
+  ) {
+    //Primero buscamos los del día de hoy (esto lo hago porque en el endpoint por horas no está el uv)
+    List<double> uvData = [];
+    List<double> amountRainData = [];
+    for (var i = 0; i < weatherProvider.tiempoHoras!.time.length; i++) {
+      if (DateTime.parse(weatherProvider.tiempoHoras!.time[i]).day == DateTime.now().day){
+        uvData.add(weatherProvider.tiempoHoras!.uvIndex[i]);
+        amountRainData.add(weatherProvider.tiempoHoras!.precipitation[i]);
+      }
+    }
+    return Column(
+      children: [
+        if (uvData.any((element) => element >= 8))
+          Container(
+            padding: EdgeInsets.all(screenWidth * 0.03),
+            width: screenWidth * 0.9,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Colors.redAccent,
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.warning, color: Colors.white,),
+                    Text(Utils.stringDanger(idioma), style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),)
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(Utils.stringAlertUV8(idioma), style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),)
+              ],
+            ),
+          ),
+          SizedBox(height: 10,),
+          
+        if (amountRainData.any((element) => element >= 15 && element < 30))
+          Container(
+            padding: EdgeInsets.all(screenWidth * 0.03),
+            width: screenWidth * 0.9,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Colors.yellow[600],
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.warning, color: Colors.white,),
+                    Text(Utils.stringDanger(idioma), style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),)
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(Utils.stringAlertRainAmount15or30(idioma), style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),)
+              ],
+            ),
+          ),
+          SizedBox(height: 10,),
+          
+        if (amountRainData.any((element) => element >= 30 && element < 60))
+          Container(
+            padding: EdgeInsets.all(screenWidth * 0.03),
+            width: screenWidth * 0.9,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Colors.orange,
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.warning, color: Colors.white,),
+                    Text(Utils.stringDanger(idioma), style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),)
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(Utils.stringAlertRainAmount30or60(idioma), style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),)
+              ],
+            ),
+          ),
+          SizedBox(height: 10,),
+          
+        if (amountRainData.any((element) => element >= 60))
+          Container(
+            padding: EdgeInsets.all(screenWidth * 0.03),
+            width: screenWidth * 0.9,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Colors.redAccent,
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.warning, color: Colors.white,),
+                    Text(Utils.stringDanger(idioma), style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),)
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(Utils.stringAlertRainAmount60ormore(idioma), style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),)
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+  
+  static String stringAlertUV8(String idioma) {
+  if (idioma == 'es') {
+    return "Se estiman valores de UV de 8 o más durante el día de hoy, no se exponga demasiado al sol y protéjase";
+  } else {
+    return "UV index levels of 8 or higher are expected today. Avoid prolonged sun exposure and protect yourself.";
+  }
+}
+
+static String stringAlertRainAmount15or30(String idioma) {
+  if (idioma == 'es') {
+    return "Se estima probabilidad de lluvias de entre 15 y 30 l/m² en una hora durante el día de hoy, tenga cuidado";
+  } else {
+    return "Heavy rain between 15 and 30 l/m² per hour is expected today. Please be careful.";
+  }
+}
+
+static String stringAlertRainAmount30or60(String idioma) {
+  if (idioma == 'es') {
+    return "Se estima probabilidad de lluvias de entre 30 y 60 l/m² en una hora durante el día de hoy, tenga mucho cuidado";
+  } else {
+    return "Torrential rain between 30 and 60 l/m² per hour is expected today. Take extra precautions.";
+  }
+}
+
+static String stringAlertRainAmount60ormore(String idioma) {
+  if (idioma == 'es') {
+    return "Se estima probabilidad de lluvias de 60 l/m² o más en una hora durante el día de hoy, procure no salir de casa y protéjase";
+  } else {
+    return "Severe rain of 60 l/m² or more per hour is expected today. Stay indoors if possible and stay safe.";
+  }
+}
 }
