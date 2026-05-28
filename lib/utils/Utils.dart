@@ -557,9 +557,9 @@ class Utils {
 
   static stringUpdateWarningContent(String idioma) {
     if (idioma == 'es')
-      return 'ManuleWeather tiene una nueva actualización, descárgala para recibir nuevas funciones y arreglos';
+      return 'ManuleWeather tiene una nueva actualización, mejoras: ';
     else
-      return 'ManuleWeather has updated! Download this new version in order to receive new function and improvements';
+      return 'ManuleWeather has updated! Improvements (only spanish yet): ';
   }
 
   static String stringNotYet(String idioma) {

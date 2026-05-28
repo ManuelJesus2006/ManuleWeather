@@ -18,7 +18,7 @@ class VersionService {
       final data = jsonDecode(response.body);
       final versionServer = data['version'];
       final urlDescarga = data['url'];
-      final whatisnew = data['whatisnew']
+      final whatisnew = data['whatisnew'];
 
       final info = await PackageInfo.fromPlatform();
       final versionActual = info.version;
@@ -26,7 +26,7 @@ class VersionService {
       if (versionServer != versionActual) {
         await showDialog(context: context, builder: (context) => AlertDialog(
           title: Text(Utils.stringNewUpdate(idiomaActual, versionServer)),
-          content: Text(Utils.stringUpdateWarningContent(idiomaActual)),
+          content: Text("${Utils.stringUpdateWarningContent(idiomaActual)}$whatisnew"),
           actions: [
             TextButton(onPressed: () {Navigator.pop(context);}, child: Text(Utils.stringNotYet(idiomaActual))),
             TextButton(
