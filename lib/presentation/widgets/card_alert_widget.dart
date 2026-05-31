@@ -40,7 +40,7 @@ class CardAlertWidget extends StatelessWidget {
             text,
             style: TextStyle(fontWeight: FontWeight.bold, color: componentsColor),
           ),
-          SizedBox(height: 10),
+          //SizedBox(height: 10),
         ],
       ),
     );
