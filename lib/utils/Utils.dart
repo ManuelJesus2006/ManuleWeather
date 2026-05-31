@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:manule_weather/presentation/widgets/card_alert_widget.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
 
 class Utils {
@@ -588,144 +589,155 @@ class Utils {
   static devolverCardAvisos(
     double screenWidth,
     WeatherProvider weatherProvider,
-    String idioma
+    String idioma,
   ) {
     //Primero buscamos las primeras 24 horas disponibles (esto lo hago porque en el endpoint por horas no está el uv)
-    List<double> uvData = weatherProvider.tiempoHoras!.uvIndex.take(24).toList();
-    List<double> amountRainData = weatherProvider.tiempoHoras!.precipitation.take(24).toList();
+    List<double> uvData = weatherProvider.tiempoHoras!.uvIndex
+        .take(24)
+        .toList();
+    List<double> amountRainData = weatherProvider.tiempoHoras!.precipitation
+        .take(24)
+        .toList();
+    List<double> temperatureData = weatherProvider.tiempoHoras!.temperature2M
+        .take(24)
+        .toList();
     return Column(
       children: [
         if (uvData.any((element) => element >= 8))
-          Container(
-            padding: EdgeInsets.all(screenWidth * 0.03),
-            width: screenWidth * 0.9,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              color: Colors.redAccent,
-            ),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.warning, color: Colors.white,),
-                    Text(Utils.stringDanger(idioma), style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),)
-                  ],
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Text(Utils.stringAlertUV8(idioma), style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),)
-              ],
-            ),
+          CardAlertWidget(
+            text: Utils.stringAlertUV8(idioma),
+            color: Colors.redAccent,
           ),
-          SizedBox(height: 10,),
-          
         if (amountRainData.any((element) => element >= 15 && element < 30))
-          Container(
-            padding: EdgeInsets.all(screenWidth * 0.03),
-            width: screenWidth * 0.9,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              color: Colors.yellow[600],
-            ),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.warning, color: Colors.white,),
-                    Text(Utils.stringDanger(idioma), style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),)
-                  ],
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Text(Utils.stringAlertRainAmount15or30(idioma), style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),)
-              ],
-            ),
+          CardAlertWidget(
+            text: Utils.stringAlertRainAmount15to30(idioma),
+            color: Colors.yellow,
+            componentsColor: Colors.black87,
           ),
-          SizedBox(height: 10,),
-          
+        SizedBox(height: 10),
         if (amountRainData.any((element) => element >= 30 && element < 60))
-          Container(
-            padding: EdgeInsets.all(screenWidth * 0.03),
-            width: screenWidth * 0.9,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              color: Colors.orange,
-            ),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.warning, color: Colors.white,),
-                    Text(Utils.stringDanger(idioma), style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),)
-                  ],
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Text(Utils.stringAlertRainAmount30or60(idioma), style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),)
-              ],
-            ),
+          CardAlertWidget(
+            text: Utils.stringAlertRainAmount30to60(idioma),
+            color: Colors.orange,
           ),
-          SizedBox(height: 10,),
-          
         if (amountRainData.any((element) => element >= 60))
-          Container(
-            padding: EdgeInsets.all(screenWidth * 0.03),
-            width: screenWidth * 0.9,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              color: Colors.redAccent,
-            ),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.warning, color: Colors.white,),
-                    Text(Utils.stringDanger(idioma), style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),)
-                  ],
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Text(Utils.stringAlertRainAmount60ormore(idioma), style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),)
-              ],
-            ),
+          CardAlertWidget(
+            text: Utils.stringAlertRainAmount60ormore(idioma),
+            color: Colors.redAccent,
+          ),
+        if (temperatureData.any((element) => element >= 36 && element <= 40))
+          CardAlertWidget(
+            text: Utils.stringAlertTemperature36to40(idioma),
+            color: Colors.yellow,
+            componentsColor: Colors.black87,
+          ),
+        if (temperatureData.any((element) => element > 40 && element <= 44))
+          CardAlertWidget(
+            text: Utils.stringAlertTemperature40to44(idioma),
+            color: Colors.orange,
+          ),
+        if (temperatureData.any((element) => element > 44))
+          CardAlertWidget(
+            text: Utils.stringAlertTemperature44ormore(idioma),
+            color: Colors.redAccent,
+          ),
+        if (temperatureData.any((element) => element < -5 && element >= -10))
+          CardAlertWidget(
+            text: Utils.stringAlertLowTemperature5to10(idioma),
+            color: Colors.yellow,
+            componentsColor: Colors.black87,
+          ),
+        if (temperatureData.any((element) => element < -10 && element >= -15))
+          CardAlertWidget(
+            text: Utils.stringAlertLowTemperature10to15(idioma),
+            color: Colors.orange,
+          ),
+        if (temperatureData.any((element) => element < -15))
+          CardAlertWidget(
+            text: Utils.stringAlertLowTemperature15ormore(idioma),
+            color: Colors.redAccent,
           ),
       ],
     );
   }
-  
+
   static String stringAlertUV8(String idioma) {
-  if (idioma == 'es') {
-    return "Se estiman valores de UV de 8 o más en las próximas 24 horas, no se exponga demasiado al sol y protéjase";
-  } else {
-    return "UV index levels of 8 or higher are expected in the next 24 hours. Avoid prolonged sun exposure and protect yourself.";
+    if (idioma == 'es') {
+      return "Se estiman valores de UV de 8 o más en las próximas 24 horas, no se exponga demasiado al sol y protéjase";
+    } else {
+      return "UV index levels of 8 or higher are expected in the next 24 hours. Avoid prolonged sun exposure and protect yourself.";
+    }
   }
-}
 
-static String stringAlertRainAmount15or30(String idioma) {
-  if (idioma == 'es') {
-    return "Se estima probabilidad de lluvias de entre 15 y 30 l/m² en una hora durante las próximas 24 horas, tenga cuidado";
-  } else {
-    return "Heavy rain between 15 and 30 l/m² per hour is expected in the next 24 hours. Please be careful.";
+  static String stringAlertTemperature36to40(String idioma) {
+    if (idioma == 'es') {
+      return "Se esperan temperaturas de entre 36 y 40°C en las próximas 24 horas. Lleva agua y evita el sol en las horas más calurosas.";
+    } else {
+      return "Temperatures between 36 and 40°C are expected in the next 24 hours. Carry water and avoid sun exposure during the hottest hours.";
+    }
   }
-}
 
-static String stringAlertRainAmount30or60(String idioma) {
-  if (idioma == 'es') {
-    return "Se estima probabilidad de lluvias de entre 30 y 60 l/m² en una hora durante las próximas 24 horas, tenga mucho cuidado";
-  } else {
-    return "Torrential rain between 30 and 60 l/m² per hour is expected in the next 24 hours. Take extra precautions.";
+  static String stringAlertTemperature40to44(String idioma) {
+    if (idioma == 'es') {
+      return "Se esperan temperaturas de entre 40 y 44°C en las próximas 24 horas. Intenta estar en lugares frescos y bebe mucha agua.";
+    } else {
+      return "Temperatures between 40 and 44°C are expected in the next 24 hours. Try to stay in cool places and drink plenty of water.";
+    }
   }
-}
 
-static String stringAlertRainAmount60ormore(String idioma) {
-  if (idioma == 'es') {
-    return "Se estima probabilidad de lluvias de 60 l/m² o más en una hora durante las próximas 24 horas, procure no salir de casa y protéjase";
-  } else {
-    return "Severe rain of 60 l/m² or more per hour is expected in the next 24 hours. Stay indoors if possible and stay safe.";
+  static String stringAlertTemperature44ormore(String idioma) {
+    if (idioma == 'es') {
+      return "Se esperan temperaturas superiores a 44°C en las próximas 24 horas. Ten especial cuidado si sales, hidrátate bien y evita el esfuerzo físico.";
+    } else {
+      return "Temperatures above 44°C are expected in the next 24 hours. Take extra care if you go out, stay well hydrated and avoid physical exercise.";
+    }
   }
-}
+
+  static String stringAlertLowTemperature5to10(String idioma) {
+    if (idioma == 'es') {
+      return "Se esperan temperaturas de entre -5 y -10°C en las próximas 24 horas. Abrígate bien si sales a la calle.";
+    } else {
+      return "Temperatures between -5 and -10°C are expected in the next 24 hours. Dress warmly if you go outside.";
+    }
+  }
+
+  static String stringAlertLowTemperature10to15(String idioma) {
+    if (idioma == 'es') {
+      return "Se esperan temperaturas de entre -10 y -15°C en las próximas 24 horas. Lleva ropa de abrigo y limita el tiempo en el exterior.";
+    } else {
+      return "Temperatures between -10 and -15°C are expected in the next 24 hours. Wear warm clothing and limit time outdoors.";
+    }
+  }
+
+  static String stringAlertLowTemperature15ormore(String idioma) {
+    if (idioma == 'es') {
+      return "Se esperan temperaturas inferiores a -15°C en las próximas 24 horas. Ten especial cuidado si sales, el frío extremo puede ser peligroso.";
+    } else {
+      return "Temperatures below -15°C are expected in the next 24 hours. Take extra care if you go out, extreme cold can be dangerous.";
+    }
+  }
+
+  static String stringAlertRainAmount15to30(String idioma) {
+    if (idioma == 'es') {
+      return "Se estima probabilidad de lluvias de entre 15 y 30 l/m² en una hora durante las próximas 24 horas, tenga cuidado";
+    } else {
+      return "Heavy rain between 15 and 30 l/m² per hour is expected in the next 24 hours. Please be careful.";
+    }
+  }
+
+  static String stringAlertRainAmount30to60(String idioma) {
+    if (idioma == 'es') {
+      return "Se estima probabilidad de lluvias de entre 30 y 60 l/m² en una hora durante las próximas 24 horas, tenga mucho cuidado";
+    } else {
+      return "Torrential rain between 30 and 60 l/m² per hour is expected in the next 24 hours. Take extra precautions.";
+    }
+  }
+
+  static String stringAlertRainAmount60ormore(String idioma) {
+    if (idioma == 'es') {
+      return "Se estima probabilidad de lluvias de 60 l/m² o más en una hora durante las próximas 24 horas, procure no salir de casa y protéjase";
+    } else {
+      return "Severe rain of 60 l/m² or more per hour is expected in the next 24 hours. Stay indoors if possible and stay safe.";
+    }
+  }
 }

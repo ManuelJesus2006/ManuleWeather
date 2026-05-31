@@ -1,5 +1,5 @@
 {
-    "version": "0.8.7",
+    "version": "0.8.8",
   "url": "https://drive.google.com/file/d/1B1Ojsb_gF4Tw8oFm28FiFDGhux1T0b1H/view?usp=sharing",
-  "whatisnew": "Cambio en algo de lógica de la muestra de la card de avisos y arreglos en la primera card de tiempo horas"
+  "whatisnew": "Nuevas advertencias de climas adversos, eliminación de bugs visuales y pequeña animación al cambiar entre pantallas principales"
 }

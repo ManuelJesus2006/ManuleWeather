@@ -17,25 +17,29 @@ class HomeScreen extends StatelessWidget {
     final configProvider = Provider.of<ConfigProvider>(context);
 
     return Scaffold(
-      body: IndexedStack(
-        index: navigationProvider.indiceActual,
-        children: [
-          _buildInicio(context, weatherProvider, screenWidth, configProvider),
-          _buildPantallaPorDias(
-            context,
-            weatherProvider,
-            navigationProvider,
-            screenWidth,
-            configProvider,
-          ),
-          _buildTiempoPorHoras(
-            context,
-            weatherProvider,
-            screenWidth,
-            configProvider,
-            navigationProvider
-          ),
-        ],
+      body: AnimatedSwitcher(
+        duration: Duration(milliseconds: 300),
+        child: IndexedStack(
+          key: ValueKey(navigationProvider.indiceActual),
+          index: navigationProvider.indiceActual,
+          children: [
+            _buildInicio(context, weatherProvider, screenWidth, configProvider),
+            _buildPantallaPorDias(
+              context,
+              weatherProvider,
+              navigationProvider,
+              screenWidth,
+              configProvider,
+            ),
+            _buildTiempoPorHoras(
+              context,
+              weatherProvider,
+              screenWidth,
+              configProvider,
+              navigationProvider
+            ),
+          ],
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: navigationProvider.indiceActual,
@@ -159,6 +163,7 @@ class HomeScreen extends StatelessWidget {
                 ),
                 SizedBox(height: screenHeight * 0.01),
                 Utils.devolverCardAvisos(screenWidth, weatherProvider, configProvider.idiomaActual),
+                SizedBox(height: screenHeight * 0.01),
                 Text(
                   '${Utils.stringUpdatedAt(configProvider.idiomaActual)} ${Utils.formatearHora(DateTime.parse(weatherProvider.tiempoActual!.current.time))}',
                   style: TextStyle(
