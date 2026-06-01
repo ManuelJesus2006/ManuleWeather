@@ -26,7 +26,7 @@ class VersionService {
       if (versionServer != versionActual) {
         await showDialog(context: context, builder: (context) => AlertDialog(
           title: Text(Utils.stringNewUpdate(idiomaActual, versionServer)),
-          content: Text("${Utils.stringUpdateWarningContent(idiomaActual)}$whatisnew"),
+          content: Text(whatisnew),
           actions: [
             TextButton(onPressed: () {Navigator.pop(context);}, child: Text(Utils.stringNotYet(idiomaActual))),
             TextButton(

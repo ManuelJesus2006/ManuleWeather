@@ -591,72 +591,49 @@ class Utils {
     WeatherProvider weatherProvider,
     String idioma,
   ) {
-    //Primero buscamos las primeras 24 horas disponibles (esto lo hago porque en el endpoint por horas no está el uv)
-    List<double> uvData = weatherProvider.tiempoHoras!.uvIndex
-        .take(24)
-        .toList();
-    List<double> amountRainData = weatherProvider.tiempoHoras!.precipitation
-        .take(24)
-        .toList();
-    List<double> temperatureData = weatherProvider.tiempoHoras!.temperature2M
-        .take(24)
-        .toList();
+    List<double> uvData = weatherProvider.tiempoHoras!.uvIndex.take(24).toList();
+    List<double> amountRainData = weatherProvider.tiempoHoras!.precipitation.take(24).toList();
+    List<double> temperatureData = weatherProvider.tiempoHoras!.temperature2M.take(24).toList();
+
+    // Calculamos el nivel más alto de cada categoría
+    int nivelLluvia = 0;
+    if (amountRainData.any((e) => e >= 60)) nivelLluvia = 3;
+    else if (amountRainData.any((e) => e >= 30)) nivelLluvia = 2;
+    else if (amountRainData.any((e) => e >= 15)) nivelLluvia = 1;
+
+    int nivelTempAlta = 0;
+    if (temperatureData.any((e) => e > 44)) nivelTempAlta = 3;
+    else if (temperatureData.any((e) => e > 40)) nivelTempAlta = 2;
+    else if (temperatureData.any((e) => e >= 36)) nivelTempAlta = 1;
+
+    int nivelTempBaja = 0;
+    if (temperatureData.any((e) => e < -15)) nivelTempBaja = 3;
+    else if (temperatureData.any((e) => e < -10)) nivelTempBaja = 2;
+    else if (temperatureData.any((e) => e < -5)) nivelTempBaja = 1;
+
     return Column(
+      spacing: 10, //Nuevo de flutter, da espaciado entre elementos
       children: [
-        if (uvData.any((element) => element >= 8))
-          CardAlertWidget(
-            text: Utils.stringAlertUV8(idioma),
-            color: Colors.redAccent,
-          ),
-        if (amountRainData.any((element) => element >= 15 && element < 30))
-          CardAlertWidget(
-            text: Utils.stringAlertRainAmount15to30(idioma),
-            color: Colors.yellow,
-            componentsColor: Colors.black87,
-          ),
-        SizedBox(height: 10),
-        if (amountRainData.any((element) => element >= 30 && element < 60))
-          CardAlertWidget(
-            text: Utils.stringAlertRainAmount30to60(idioma),
-            color: Colors.orange,
-          ),
-        if (amountRainData.any((element) => element >= 60))
-          CardAlertWidget(
-            text: Utils.stringAlertRainAmount60ormore(idioma),
-            color: Colors.redAccent,
-          ),
-        if (temperatureData.any((element) => element >= 36 && element <= 40))
-          CardAlertWidget(
-            text: Utils.stringAlertTemperature36to40(idioma),
-            color: Colors.yellow,
-            componentsColor: Colors.black87,
-          ),
-        if (temperatureData.any((element) => element > 40 && element <= 44))
-          CardAlertWidget(
-            text: Utils.stringAlertTemperature40to44(idioma),
-            color: Colors.orange,
-          ),
-        if (temperatureData.any((element) => element > 44))
-          CardAlertWidget(
-            text: Utils.stringAlertTemperature44ormore(idioma),
-            color: Colors.redAccent,
-          ),
-        if (temperatureData.any((element) => element < -5 && element >= -10))
-          CardAlertWidget(
-            text: Utils.stringAlertLowTemperature5to10(idioma),
-            color: Colors.yellow,
-            componentsColor: Colors.black87,
-          ),
-        if (temperatureData.any((element) => element < -10 && element >= -15))
-          CardAlertWidget(
-            text: Utils.stringAlertLowTemperature10to15(idioma),
-            color: Colors.orange,
-          ),
-        if (temperatureData.any((element) => element < -15))
-          CardAlertWidget(
-            text: Utils.stringAlertLowTemperature15ormore(idioma),
-            color: Colors.redAccent,
-          ),
+        if (uvData.any((e) => e >= 8))
+          CardAlertWidget(text: Utils.stringAlertUV8(idioma), color: Colors.redAccent),
+        if (nivelLluvia == 1)
+          CardAlertWidget(text: Utils.stringAlertRainAmount15to30(idioma), color: Colors.yellow, componentsColor: Colors.black87),
+        if (nivelLluvia == 2)
+          CardAlertWidget(text: Utils.stringAlertRainAmount30to60(idioma), color: Colors.orange),
+        if (nivelLluvia == 3)
+          CardAlertWidget(text: Utils.stringAlertRainAmount60ormore(idioma), color: Colors.redAccent),
+        if (nivelTempAlta == 1)
+          CardAlertWidget(text: Utils.stringAlertTemperature36to40(idioma), color: Colors.yellow, componentsColor: Colors.black87),
+        if (nivelTempAlta == 2)
+          CardAlertWidget(text: Utils.stringAlertTemperature40to44(idioma), color: Colors.orange),
+        if (nivelTempAlta == 3)
+          CardAlertWidget(text: Utils.stringAlertTemperature44ormore(idioma), color: Colors.redAccent),
+        if (nivelTempBaja == 1)
+          CardAlertWidget(text: Utils.stringAlertLowTemperature5to10(idioma), color: Colors.yellow, componentsColor: Colors.black87),
+        if (nivelTempBaja == 2)
+          CardAlertWidget(text: Utils.stringAlertLowTemperature10to15(idioma), color: Colors.orange),
+        if (nivelTempBaja == 3)
+          CardAlertWidget(text: Utils.stringAlertLowTemperature15ormore(idioma), color: Colors.redAccent),
       ],
     );
   }
