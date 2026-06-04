@@ -5,7 +5,9 @@ import 'package:manule_weather/utils/Utils.dart';
 import 'package:provider/provider.dart';
 
 class ErrorScreen extends StatelessWidget {
-  const ErrorScreen({super.key});
+  const ErrorScreen({super.key, required this.message});
+
+  final String message;
 
   @override
   Widget build(BuildContext context) {
@@ -18,11 +20,7 @@ class ErrorScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                'assets/images/LogoApp.png',
-                width: 100,
-                height: 100,
-              ),
+              Image.asset('assets/images/LogoApp.png', width: 100, height: 100),
               SizedBox(height: 30),
               Container(
                 padding: EdgeInsets.all(16),
@@ -39,7 +37,7 @@ class ErrorScreen extends StatelessWidget {
               ),
               SizedBox(height: 20),
               Text(
-                Utils.stringError(configProvider.idiomaActual),
+                Utils.stringErrorServerDown(configProvider.idiomaActual),
                 style: TextStyle(
                   fontSize: 22,
                   color: Colors.red.shade700,
@@ -48,14 +46,9 @@ class ErrorScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 10),
-              Text(
-                configProvider.idiomaActual == 'es'
-                    ? 'Comprueba tu conexión a internet e inténtalo de nuevo'
-                    : 'Check your internet connection and try again',
-                style: TextStyle(
-                  fontSize: 15,
-                  color: Colors.grey.shade600,
-                ),
+              if (message == Utils.stringErrorServerDown(configProvider.idiomaActual)) Text(
+                Utils.stringCheckYourConextion(configProvider.idiomaActual),
+                style: TextStyle(fontSize: 15, color: Colors.grey.shade600),
                 textAlign: TextAlign.center,
               ),
               // SizedBox(height: 30),

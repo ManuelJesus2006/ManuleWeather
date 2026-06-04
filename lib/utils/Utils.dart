@@ -490,11 +490,18 @@ class Utils {
       return 'Last update (local time):';
   }
 
-  static String stringError(String idioma) {
+  static String stringErrorServerDown(String idioma) {
     if (idioma == 'es')
-      return 'EL SERVICIO CLIMÁTICO SE ENCUENTRA CAIDO EN ESTOS MOMENTOS, SENTIMOS LAS MOLESTIAS';
+      return 'EL SERVICIO CLIMÁTICO SE ENCUENTRA CAIDO EN ESTOS MOMENTOS, SENTIMOS LAS MOLESTIAS :(';
     else
       return 'THE CLIMATIC SERVICE IS CURRENTLY UNAVAIBLE RIGHT NOW, SORRY FOR INCONVENIENCE :(';
+  }
+
+  static String stringErrorNoUbiPermission(String idioma) {
+    if (idioma == 'es')
+      return 'NO PUEDES UTILIZAR LA APP SIN EL PERMISO DE UBICACIÓN ACTIVADO, SENTIMOS LAS MOLESTIAS :(';
+    else
+      return 'YOU CANNOT USE THE APP WITHOUT THE LOCATION PERMISSION ENABLED, SORRY FOR INCONVENIENCE :(';
   }
 
   static String stringShowDetails(String idioma) {
@@ -591,49 +598,97 @@ class Utils {
     WeatherProvider weatherProvider,
     String idioma,
   ) {
-    List<double> uvData = weatherProvider.tiempoHoras!.uvIndex.take(24).toList();
-    List<double> amountRainData = weatherProvider.tiempoHoras!.precipitation.take(24).toList();
-    List<double> temperatureData = weatherProvider.tiempoHoras!.temperature2M.take(24).toList();
+    List<double> uvData = weatherProvider.tiempoHoras!.uvIndex
+        .take(24)
+        .toList();
+    List<double> amountRainData = weatherProvider.tiempoHoras!.precipitation
+        .take(24)
+        .toList();
+    List<double> temperatureData = weatherProvider.tiempoHoras!.temperature2M
+        .take(24)
+        .toList();
 
     // Calculamos el nivel más alto de cada categoría
     int nivelLluvia = 0;
-    if (amountRainData.any((e) => e >= 60)) nivelLluvia = 3;
-    else if (amountRainData.any((e) => e >= 30)) nivelLluvia = 2;
-    else if (amountRainData.any((e) => e >= 15)) nivelLluvia = 1;
+    if (amountRainData.any((e) => e >= 60))
+      nivelLluvia = 3;
+    else if (amountRainData.any((e) => e >= 30))
+      nivelLluvia = 2;
+    else if (amountRainData.any((e) => e >= 15))
+      nivelLluvia = 1;
 
     int nivelTempAlta = 0;
-    if (temperatureData.any((e) => e > 44)) nivelTempAlta = 3;
-    else if (temperatureData.any((e) => e > 40)) nivelTempAlta = 2;
-    else if (temperatureData.any((e) => e >= 36)) nivelTempAlta = 1;
+    if (temperatureData.any((e) => e > 44))
+      nivelTempAlta = 3;
+    else if (temperatureData.any((e) => e > 40))
+      nivelTempAlta = 2;
+    else if (temperatureData.any((e) => e >= 36))
+      nivelTempAlta = 1;
 
     int nivelTempBaja = 0;
-    if (temperatureData.any((e) => e < -15)) nivelTempBaja = 3;
-    else if (temperatureData.any((e) => e < -10)) nivelTempBaja = 2;
-    else if (temperatureData.any((e) => e < -5)) nivelTempBaja = 1;
+    if (temperatureData.any((e) => e < -15))
+      nivelTempBaja = 3;
+    else if (temperatureData.any((e) => e < -10))
+      nivelTempBaja = 2;
+    else if (temperatureData.any((e) => e < -5))
+      nivelTempBaja = 1;
 
     return Column(
       spacing: 10, //Nuevo de flutter, da espaciado entre elementos
       children: [
         if (uvData.any((e) => e >= 8))
-          CardAlertWidget(text: Utils.stringAlertUV8(idioma), color: Colors.redAccent),
+          CardAlertWidget(
+            text: Utils.stringAlertUV8(idioma),
+            color: Colors.redAccent,
+          ),
         if (nivelLluvia == 1)
-          CardAlertWidget(text: Utils.stringAlertRainAmount15to30(idioma), color: Colors.yellow, componentsColor: Colors.black87),
+          CardAlertWidget(
+            text: Utils.stringAlertRainAmount15to30(idioma),
+            color: Colors.yellow,
+            componentsColor: Colors.black87,
+          ),
         if (nivelLluvia == 2)
-          CardAlertWidget(text: Utils.stringAlertRainAmount30to60(idioma), color: Colors.orange),
+          CardAlertWidget(
+            text: Utils.stringAlertRainAmount30to60(idioma),
+            color: Colors.orange,
+          ),
         if (nivelLluvia == 3)
-          CardAlertWidget(text: Utils.stringAlertRainAmount60ormore(idioma), color: Colors.redAccent),
+          CardAlertWidget(
+            text: Utils.stringAlertRainAmount60ormore(idioma),
+            color: Colors.redAccent,
+          ),
         if (nivelTempAlta == 1)
-          CardAlertWidget(text: Utils.stringAlertTemperature36to40(idioma), color: Colors.yellow, componentsColor: Colors.black87),
+          CardAlertWidget(
+            text: Utils.stringAlertTemperature36to40(idioma),
+            color: Colors.yellow,
+            componentsColor: Colors.black87,
+          ),
         if (nivelTempAlta == 2)
-          CardAlertWidget(text: Utils.stringAlertTemperature40to44(idioma), color: Colors.orange),
+          CardAlertWidget(
+            text: Utils.stringAlertTemperature40to44(idioma),
+            color: Colors.orange,
+          ),
         if (nivelTempAlta == 3)
-          CardAlertWidget(text: Utils.stringAlertTemperature44ormore(idioma), color: Colors.redAccent),
+          CardAlertWidget(
+            text: Utils.stringAlertTemperature44ormore(idioma),
+            color: Colors.redAccent,
+          ),
         if (nivelTempBaja == 1)
-          CardAlertWidget(text: Utils.stringAlertLowTemperature5to10(idioma), color: Colors.yellow, componentsColor: Colors.black87),
+          CardAlertWidget(
+            text: Utils.stringAlertLowTemperature5to10(idioma),
+            color: Colors.yellow,
+            componentsColor: Colors.black87,
+          ),
         if (nivelTempBaja == 2)
-          CardAlertWidget(text: Utils.stringAlertLowTemperature10to15(idioma), color: Colors.orange),
+          CardAlertWidget(
+            text: Utils.stringAlertLowTemperature10to15(idioma),
+            color: Colors.orange,
+          ),
         if (nivelTempBaja == 3)
-          CardAlertWidget(text: Utils.stringAlertLowTemperature15ormore(idioma), color: Colors.redAccent),
+          CardAlertWidget(
+            text: Utils.stringAlertLowTemperature15ormore(idioma),
+            color: Colors.redAccent,
+          ),
       ],
     );
   }
@@ -715,6 +770,14 @@ class Utils {
       return "Se estima probabilidad de lluvias de 60 l/m² o más en una hora durante las próximas 24 horas, procure no salir de casa y protéjase";
     } else {
       return "Severe rain of 60 l/m² or more per hour is expected in the next 24 hours. Stay indoors if possible and stay safe.";
+    }
+  }
+
+  static String stringCheckYourConextion(String idioma) {
+    if (idioma == 'es') {
+      return 'Comprueba tu conexión a internet e inténtalo de nuevo';
+    } else {
+      return 'Check your internet connection and try again';
     }
   }
 }

@@ -42,7 +42,7 @@ final appRouter = GoRouter(
           context,
         );
         return _buildPageConTransicion(
-          //Le pasamos el weatherProvider y el configProvider para poder hacer initState a la hora de buscar 
+          //Le pasamos el weatherProvider y el configProvider para poder hacer initState a la hora de buscar
           //la ubicación actual
           SearchScreen(
             weatherProvider: weatherProvider,
@@ -52,17 +52,33 @@ final appRouter = GoRouter(
         );
       },
     ),
-    GoRoute(path: '/licenses', pageBuilder: (context, state) => _buildPageConTransicion(LicensePage(), state)),
-    GoRoute(path: '/settings', pageBuilder: (context, state) => _buildPageConTransicion(SettingsScreen(), state)),
+    GoRoute(
+      path: '/licenses',
+      pageBuilder: (context, state) =>
+          _buildPageConTransicion(LicensePage(), state),
+    ),
+    GoRoute(
+      path: '/settings',
+      pageBuilder: (context, state) =>
+          _buildPageConTransicion(SettingsScreen(), state),
+    ),
     GoRoute(
       path: '/languageSettings',
-      pageBuilder: (context, state) => _buildPageConTransicion(LanguageSelectorScreen(), state)
+      pageBuilder: (context, state) =>
+          _buildPageConTransicion(LanguageSelectorScreen(), state),
     ),
     GoRoute(
       path: '/onboarding',
-      pageBuilder: (context, state) => _buildPageConTransicion(OnboardingScreen(), state),
+      pageBuilder: (context, state) =>
+          _buildPageConTransicion(OnboardingScreen(), state),
     ),
-    GoRoute(path: '/error', pageBuilder: (context, state) => _buildPageConTransicion(ErrorScreen(), state)),
+    GoRoute(
+      path: '/error',
+      pageBuilder: (context, state) {
+        String message = state.extra as String;
+        return _buildPageConTransicion(ErrorScreen(message: message), state);
+      },
+    ),
   ],
 );
 
@@ -76,25 +92,19 @@ Page _buildPageConTransicion(Widget child, GoRouterState state) {
       final slideIn = Tween<Offset>(
         begin: Offset(1.0, 0.0),
         end: Offset.zero,
-      ).animate(CurvedAnimation(
-        parent: animation,
-        curve: Curves.easeOutCubic,
-      ));
+      ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic));
 
-      final slideOut = Tween<Offset>(
-        begin: Offset.zero,
-        end: Offset(-0.25, 0.0),
-      ).animate(CurvedAnimation(
-        parent: secondaryAnimation,
-        curve: Curves.easeOutCubic,
-      ));
+      final slideOut =
+          Tween<Offset>(begin: Offset.zero, end: Offset(-0.25, 0.0)).animate(
+            CurvedAnimation(
+              parent: secondaryAnimation,
+              curve: Curves.easeOutCubic,
+            ),
+          );
 
       return SlideTransition(
         position: slideOut,
-        child: SlideTransition(
-          position: slideIn,
-          child: child,
-        ),
+        child: SlideTransition(position: slideIn, child: child),
       );
     },
   );

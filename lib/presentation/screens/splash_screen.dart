@@ -9,6 +9,7 @@ import 'package:manule_weather/providers/weather_provider.dart';
 import 'package:manule_weather/services/localizacion_service.dart';
 import 'package:manule_weather/services/tiempo_service.dart';
 import 'package:manule_weather/services/version_service.dart';
+import 'package:manule_weather/utils/Utils.dart';
 import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -24,19 +25,18 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     _getLocalizacionActual();
   }
-  
 
   _getLocalizacionActual() async {
     //Abrimos el configProvider
-    final configProvider = Provider.of<ConfigProvider>(
-        context,
-        listen: false,
-      );
+    final configProvider = Provider.of<ConfigProvider>(context, listen: false);
 
-      await configProvider.comprobarIdiomaYPrimeraVez();
+    await configProvider.comprobarIdiomaYPrimeraVez();
 
     //Antes de hacer toda la logica principal avisamos al usuario en el caso de que haya actualizacion
-    await VersionService().comprobarActualizacion(configProvider.idiomaActual, context);
+    await VersionService().comprobarActualizacion(
+      configProvider.idiomaActual,
+      context,
+    );
 
     bool serviceEnabled;
     LocationPermission permission;
@@ -45,6 +45,7 @@ class _SplashScreenState extends State<SplashScreen> {
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       print('Los servicios de ubicación están desactivados.');
+      if (mounted) context.go('/error', extra: Utils.stringErrorServerDown(configProvider.idiomaActual));
       return;
     }
 
@@ -56,6 +57,7 @@ class _SplashScreenState extends State<SplashScreen> {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         print('El usuario denegó los permisos.');
+        if (mounted) context.go('/error', extra: Utils.stringErrorServerDown(configProvider.idiomaActual));
         return;
       }
     }
@@ -63,38 +65,38 @@ class _SplashScreenState extends State<SplashScreen> {
     if (permission == LocationPermission.deniedForever) {
       // El usuario marcó no volver a preguntar, hay que enviarlo a ajustes
       print('Permisos denegados permanentemente.');
+      if (mounted) context.go('/error', extra: Utils.stringErrorServerDown(configProvider.idiomaActual));
       return;
     }
 
     print(configProvider.primeraVez);
 
-      //Quiero hacer el await aquí y que luego siga con lo demás
-      if (configProvider.primeraVez) {
-        await context.push('/onboarding');
-      }
+    //Quiero hacer el await aquí y que luego siga con lo demás
+    if (configProvider.primeraVez) {
+      await context.push('/onboarding');
+    }
 
     // Tenemos permiso, ya podemos obtener la posición
     Position position = await Geolocator.getCurrentPosition();
     print("Latitud: ${position.latitude}, Longitud: ${position.longitude}");
-    Tiempo? tiempoUbi = await TiempoService().getTiempoLatLon(
-      position.latitude,
-      position.longitude,
-    );
-    String? nombreCiudad = await LocalizacionService().getNombreCiudadByCords(
-      position.longitude,
-      position.latitude,
-      configProvider.idiomaActual
-    );
-    TiempoHoras? tiempoHoras = await TiempoService().getTiempoPorHoras(
-      position.latitude,
-      position.longitude,
-    );
-    TiempoDias? tiempoDias = await TiempoService().getTiempoPorDias(
-      position.latitude,
-      position.longitude,
-    );
-
-    if (tiempoUbi != null && nombreCiudad != null && tiempoHoras != null && tiempoDias != null) {
+    try {
+      Tiempo? tiempoUbi = await TiempoService().getTiempoLatLon(
+        position.latitude,
+        position.longitude,
+      );
+      String? nombreCiudad = await LocalizacionService().getNombreCiudadByCords(
+        position.longitude,
+        position.latitude,
+        configProvider.idiomaActual,
+      );
+      TiempoHoras? tiempoHoras = await TiempoService().getTiempoPorHoras(
+        position.latitude,
+        position.longitude,
+      );
+      TiempoDias? tiempoDias = await TiempoService().getTiempoPorDias(
+        position.latitude,
+        position.longitude,
+      );
       // Actualizamos el Provider AQUÍ, antes de cambiar de pantalla.
       // Usamos listen: false porque estamos dentro de una función, no pintando.
       final weatherProvider = Provider.of<WeatherProvider>(
@@ -104,10 +106,10 @@ class _SplashScreenState extends State<SplashScreen> {
       
 
       weatherProvider.cambiarDatos(
-        tiempoUbi,
-        nombreCiudad,
-        tiempoHoras,
-        tiempoDias,
+        tiempoUbi!,
+        nombreCiudad!,
+        tiempoHoras!,
+        tiempoDias!,
         true,
         position.latitude,
         position.longitude,
@@ -122,9 +124,8 @@ class _SplashScreenState extends State<SplashScreen> {
       if (mounted) {
         context.go('/home');
       }
-      //Usamos mounted para que no crashee la aplicación
-    } else {
-      if (mounted) context.go('/error');
+    } catch (e) {
+      if (mounted) context.go('/error', extra: Utils.stringErrorServerDown(configProvider.idiomaActual));
     }
   }
 
