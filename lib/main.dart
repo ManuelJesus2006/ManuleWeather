@@ -36,9 +36,12 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final configProvider = Provider.of<ConfigProvider>(context);
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(textTheme: GoogleFonts.hedvigLettersSansTextTheme()),
+      darkTheme: ThemeData.dark(),
+      themeMode: configProvider.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
       routerConfig: appRouter,
     );
   }

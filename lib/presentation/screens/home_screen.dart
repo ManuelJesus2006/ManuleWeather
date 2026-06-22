@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -36,7 +37,7 @@ class HomeScreen extends StatelessWidget {
               weatherProvider,
               screenWidth,
               configProvider,
-              navigationProvider
+              navigationProvider,
             ),
           ],
         ),
@@ -72,6 +73,8 @@ class HomeScreen extends StatelessWidget {
   ) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+
+    final puntosUVA = Utils.getPuntosRayosUva(weatherProvider);
 
     Widget _infoCard({required String titulo, required Widget valor}) {
       return Container(
@@ -162,7 +165,11 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.01),
-                Utils.devolverCardAvisos(screenWidth, weatherProvider, configProvider.idiomaActual),
+                Utils.devolverCardAvisos(
+                  screenWidth,
+                  weatherProvider,
+                  configProvider.idiomaActual,
+                ),
                 SizedBox(height: screenHeight * 0.01),
                 Text(
                   '${Utils.stringUpdatedAt(configProvider.idiomaActual)} ${Utils.formatearHora(DateTime.parse(weatherProvider.tiempoActual!.current.time))}',
@@ -353,43 +360,9 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.02),
-                Container(
-                  padding: EdgeInsets.all(screenWidth * 0.03),
-                  width: screenWidth * 0.9,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Utils.obtenerColorUV(
-                      weatherProvider.tiempoActual!.current.uvIndex.round(),
-                    ).withOpacity(0.8),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        Utils.stringUVRays(configProvider.idiomaActual),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: screenWidth * 0.045,
-                        ),
-                      ),
-                      Text(
-                        weatherProvider.tiempoActual!.current.uvIndex
-                            .round()
-                            .toString(),
-                        style: TextStyle(
-                          fontSize: screenWidth * 0.06,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        Utils.stringUvLevel(
-                          weatherProvider.tiempoActual!.current.uvIndex.round(),
-                          configProvider.idiomaActual,
-                        ),
-                        style: TextStyle(fontSize: screenWidth * 0.035),
-                      ),
-                    ],
-                  ),
-                ),
+
+                UV_home_widget(screenWidth: screenWidth, puntosUVA: puntosUVA),
+
                 SizedBox(height: screenHeight * 0.02),
                 _infoCard(
                   titulo: Utils.stringWind(configProvider.idiomaActual),
@@ -487,7 +460,7 @@ class HomeScreen extends StatelessWidget {
     WeatherProvider weatherProvider,
     double screenWidth,
     ConfigProvider configProvider,
-    NavigationProvider navigationProvider
+    NavigationProvider navigationProvider,
   ) {
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -574,7 +547,9 @@ class HomeScreen extends StatelessWidget {
                         _fechaCompletaCard(fecha: fecha),
                       SizedBox(height: screenHeight * 0.015),
                       GestureDetector(
-                        onTap: () => i == 0 ? navigationProvider.cambiarIndice(0) : context.push('/hourDetail', extra: i),
+                        onTap: () => i == 0
+                            ? navigationProvider.cambiarIndice(0)
+                            : context.push('/hourDetail', extra: i),
                         child: Padding(
                           padding: EdgeInsets.symmetric(
                             horizontal: screenWidth * 0.03,
@@ -583,7 +558,7 @@ class HomeScreen extends StatelessWidget {
                             padding: EdgeInsets.all(screenWidth * 0.04),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
-                              color: Colors.grey[200],
+                              color: configProvider.isDarkTheme ? Colors.grey[700] : Colors.grey[200],
                             ),
                             child: Row(
                               children: [
@@ -607,7 +582,12 @@ class HomeScreen extends StatelessWidget {
                                   child: Row(
                                     children: [
                                       Utils.obtenerSimbolo(
-                                        i == 0 ? weatherProvider.tiempoActual!.current.weatherCode : weatherCode,
+                                        i == 0
+                                            ? weatherProvider
+                                                  .tiempoActual!
+                                                  .current
+                                                  .weatherCode
+                                            : weatherCode,
                                         true,
                                         isHoraDeDia,
                                       ),
@@ -623,13 +603,17 @@ class HomeScreen extends StatelessWidget {
                                       Expanded(
                                         child: Text(
                                           Utils.obtenerTiempoText(
-                                            i == 0 ? weatherProvider.tiempoActual!.current.weatherCode : weatherCode,
+                                            i == 0
+                                                ? weatherProvider
+                                                      .tiempoActual!
+                                                      .current
+                                                      .weatherCode
+                                                : weatherCode,
                                             configProvider.idiomaActual,
                                           ),
                                           style: TextStyle(
                                             fontSize: screenWidth * 0.035,
                                             fontWeight: FontWeight.bold,
-                                            color: Colors.black,
                                           ),
                                           overflow: TextOverflow.ellipsis,
                                           maxLines: 1,
@@ -703,13 +687,12 @@ class HomeScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         if (weatherProvider.isUbicacionUser!)
-                          Icon(LucideIcons.navigation, color: Colors.black),
+                          Icon(LucideIcons.navigation),
                         Flexible(
                           child: Text(
                             weatherProvider.localizacion!,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: Colors.black,
                               fontSize: screenWidth * 0.045,
                             ),
                           ),
@@ -744,8 +727,8 @@ class HomeScreen extends StatelessWidget {
                               color:
                                   navigationProvider.indiceTiempoDiasActual ==
                                       index
-                                  ? Colors.blue[100]
-                                  : Colors.grey[100],
+                                  ? configProvider.isDarkTheme ? Colors.blue[400] : Colors.blue[100]
+                                  : configProvider.isDarkTheme ? Colors.grey[800] : Colors.grey[100],
                             ),
                             child: Column(
                               children: [
@@ -798,6 +781,243 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
+class UV_home_widget extends StatelessWidget {
+  const UV_home_widget({
+    super.key,
+    required this.screenWidth,
+    required this.puntosUVA,
+  });
+
+  final double screenWidth;
+  final List<FlSpot> puntosUVA;
+
+  @override
+  Widget build(BuildContext context) {
+    final weatherProvider = Provider.of<WeatherProvider>(context);
+    final configProvider = Provider.of<ConfigProvider>(context);
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+      child: Card(
+        elevation: 3,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            //El bloque superior con el índice UV actual
+            Container(
+              padding: EdgeInsets.all(screenWidth * 0.04),
+              width: double
+                  .infinity,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                color: Utils.obtenerColorUV(
+                  weatherProvider.tiempoActual!.current.uvIndex
+                      .round(),
+                ).withOpacity(0.85),
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    Utils.stringUVRays(configProvider.idiomaActual),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: screenWidth * 0.045,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    weatherProvider.tiempoActual!.current.uvIndex
+                        .round()
+                        .toString(),
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.07,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    Utils.stringUvLevel(
+                      weatherProvider.tiempoActual!.current.uvIndex
+                          .round(),
+                      configProvider.idiomaActual,
+                    ),
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.035,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+      
+            //Gráfica de barras UV
+            Padding(
+              padding: const EdgeInsets.only(
+                top: 20.0,
+                bottom: 10.0,
+                left: 10.0,
+                right: 20.0,
+              ),
+              child: SizedBox(
+                height:
+                    200,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: SizedBox(
+                    width: puntosUVA.length * 50.0,
+                    child: BarChart(
+                      BarChartData(
+                        minY: 0,
+                        maxY: 15,
+                        barTouchData: BarTouchData(
+                          touchTooltipData: BarTouchTooltipData(
+                            getTooltipColor: (group) =>
+                                Colors.black87,
+                            tooltipMargin: 10,
+                            getTooltipItem:
+                                (group, groupIndex, rod, rodIndex) {
+                                  final index = group.x;
+                                  final uv = rod.toY;
+      
+                                  if (index < 0 ||
+                                      index >= puntosUVA.length)
+                                    return null;
+      
+                                  final horaReal = index == 0
+                                      ? weatherProvider
+                                            .tiempoActual!
+                                            .current
+                                            .time
+                                            .substring(11, 13)
+                                      : weatherProvider
+                                            .tiempoHoras!
+                                            .time[index]
+                                            .substring(11, 13);
+      
+                                  return BarTooltipItem(
+                                    'Hora: $horaReal:00\n',
+                                    const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text: 'Rayos UV: $uv',
+                                        style: TextStyle(
+                                          color: Utils.obtenerColorUV(
+                                            uv.toInt(),
+                                          ),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                          ),
+                        ),
+                        titlesData: FlTitlesData(
+                          show: true,
+                          topTitles: const AxisTitles(
+                            sideTitles: SideTitles(showTitles: false),
+                          ),
+                          rightTitles: const AxisTitles(
+                            sideTitles: SideTitles(showTitles: false),
+                          ),
+                          leftTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 30,
+                              interval: 3,
+                            ),
+                          ),
+                          bottomTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 35,
+                              interval: 2,
+                              getTitlesWidget: (value, meta) {
+                                final index = value.toInt();
+                                if (index < 0 ||
+                                    index >= puntosUVA.length)
+                                  return const SizedBox.shrink();
+      
+                                final horaReal = index == 0
+                                    ? weatherProvider
+                                          .tiempoActual!
+                                          .current
+                                          .time
+                                          .substring(11, 13)
+                                    : weatherProvider
+                                          .tiempoHoras!
+                                          .time[index]
+                                          .substring(11, 13);
+      
+                                return Padding(
+                                  padding: const EdgeInsets.only(
+                                    top: 8.0,
+                                  ),
+                                  child: Text(
+                                    '$horaReal:00',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                        gridData: FlGridData(
+                          show: true,
+                          drawVerticalLine: false,
+                          getDrawingHorizontalLine: (value) => FlLine(
+                            color: Colors.grey.withOpacity(0.1),
+                            strokeWidth: 1,
+                          ),
+                        ),
+                        borderData: FlBorderData(show: false),
+                        barGroups: puntosUVA.map((punto) {
+                          return BarChartGroupData(
+                            x: punto.x.toInt(),
+                            barRods: [
+                              BarChartRodData(
+                                toY: punto.y,
+                                color: Utils.obtenerColorUV(
+                                  punto.y.toInt(),
+                                ),
+                                width: 14,
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(4),
+                                  topRight: Radius.circular(4),
+                                ),
+                              ),
+                            ],
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _fechaCompletaCard extends StatelessWidget {
   const _fechaCompletaCard({super.key, required this.fecha});
 
@@ -810,7 +1030,7 @@ class _fechaCompletaCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(screenWidth * 0.025),
       decoration: BoxDecoration(
-        color: Colors.black,
+        color: configProvider.isDarkTheme ? Colors.grey[800] : Colors.black,
         borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
       child: Text(
@@ -863,7 +1083,7 @@ class _tiempoDiaIndividualCard extends StatelessWidget {
         children: [
           Text(
             '${Utils.obtenerDiaSemana(fecha.weekday, configProvider.idiomaActual)} - ${fecha.day} ${Utils.stringOf(configProvider.idiomaActual)} ${Utils.obtenerMes(fecha.month, configProvider.idiomaActual)} ${fecha.year}',
-            style: TextStyle(color: Colors.black, fontSize: 16),
+            style: TextStyle(fontSize: 16),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: 10),

@@ -16,7 +16,11 @@ import 'package:provider/provider.dart';
 class SearchScreen extends StatefulWidget {
   final WeatherProvider weatherProvider;
   final ConfigProvider configProvider;
-  const SearchScreen({super.key, required this.weatherProvider, required this.configProvider});
+  const SearchScreen({
+    super.key,
+    required this.weatherProvider,
+    required this.configProvider,
+  });
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -25,7 +29,9 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
-    widget.weatherProvider.buscarUbicacionActual(widget.configProvider.idiomaActual);
+    widget.weatherProvider.buscarUbicacionActual(
+      widget.configProvider.idiomaActual,
+    );
     super.initState();
   }
 
@@ -52,9 +58,10 @@ class _SearchScreenState extends State<SearchScreen> {
                   Expanded(
                     child: TextField(
                       controller: controladorBusqueda,
-                      style: TextStyle(color: Colors.black),
                       decoration: InputDecoration(
-                        hintText: Utils.stringInputSearch(configProvider.idiomaActual),
+                        hintText: Utils.stringInputSearch(
+                          configProvider.idiomaActual,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(30)),
                         ),
@@ -74,6 +81,41 @@ class _SearchScreenState extends State<SearchScreen> {
             Column(
               children: [
                 _widgetUbicacion(weatherProvider: weatherProvider),
+                if (configProvider.historialBusqueda.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 5,
+                      horizontal: 40,
+                    ),
+                    child: TextButton(
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (BuildContext context) =>
+                              SearchHistoryModalBottomSheet(),
+                        );
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.history),
+                          SizedBox(width: 10),
+                          Text(
+                            Utils.stringShowSearchHistory(
+                              configProvider.idiomaActual,
+                            ),
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ],
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: configProvider.isDarkTheme
+                            ? Colors.grey[800]
+                            : Colors.blue,
+                      ),
+                    ),
+                  ),
                 Divider(thickness: 5, color: Colors.grey[300]),
               ],
             ),
@@ -81,7 +123,7 @@ class _SearchScreenState extends State<SearchScreen> {
               FutureBuilder(
                 future: LocalizacionService().getResultadosBusqueda(
                   controladorBusqueda.text,
-                  configProvider.idiomaActual
+                  configProvider.idiomaActual,
                 ),
                 builder:
                     (
@@ -126,7 +168,7 @@ class _MostrarResultadosState extends State<MostrarResultados> {
         itemBuilder: (context, i) {
           final lugar = widget.lugares[i];
           return !lugar.placeName!.contains(RegExp(r'\d'))
-              ? _widgetLugarBusqueda(lugar: lugar)
+              ? _widgetLugarBusqueda(lugar: lugar, isHistorial: false)
               : Container();
         },
       ),
@@ -153,8 +195,7 @@ class _widgetUbicacion extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final configProvider = Provider.of<ConfigProvider>(context);
-    if (weatherProvider.nombreUbi != '' &&
-        weatherProvider.tempUbi != 0) {
+    if (weatherProvider.nombreUbi != '' && weatherProvider.tempUbi != 0) {
       return GestureDetector(
         onTap: () async {
           weatherProvider
@@ -196,11 +237,13 @@ class _widgetUbicacion extends StatelessWidget {
           }
         },
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
           child: Container(
             padding: EdgeInsets.all(13),
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: configProvider.isDarkTheme
+                  ? Colors.grey[800]
+                  : Colors.grey[300],
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
@@ -227,7 +270,7 @@ class _widgetUbicacion extends StatelessWidget {
                     ),
                     SizedBox(width: 8),
                     Text(
-                      weatherProvider.tempUbi.round().toString(),
+                      '${weatherProvider.tempUbi.round().toString()}ºC',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -237,7 +280,7 @@ class _widgetUbicacion extends StatelessWidget {
                     Expanded(
                       child: Text(
                         weatherProvider.nombreUbi,
-                        style: TextStyle(color: Colors.black, fontSize: 17),
+                        style: TextStyle(fontSize: 17),
                       ),
                     ),
                   ],
@@ -249,17 +292,22 @@ class _widgetUbicacion extends StatelessWidget {
       );
     } else {
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         child: Container(
           padding: EdgeInsets.all(13),
           decoration: BoxDecoration(
-            color: Colors.grey[300],
+            color: configProvider.isDarkTheme
+                ? Colors.grey[800]
+                : Colors.grey[300],
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(Utils.stringObtainingLocation(configProvider.idiomaActual), style: TextStyle(fontSize: 18)),
+              Text(
+                Utils.stringObtainingLocation(configProvider.idiomaActual),
+                style: TextStyle(fontSize: 18),
+              ),
               SizedBox(width: 30),
               CircularProgressIndicator(),
             ],
@@ -271,19 +319,21 @@ class _widgetUbicacion extends StatelessWidget {
 }
 
 class _widgetLugarBusqueda extends StatelessWidget {
-  const _widgetLugarBusqueda({super.key, required this.lugar});
+  const _widgetLugarBusqueda({
+    super.key,
+    required this.lugar,
+    required this.isHistorial,
+  });
 
   final Localizacion lugar;
+  final bool isHistorial;
 
   void mostrarCargando(BuildContext context) {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(
-          color: Colors.white,
-        ),
-      ),
+      builder: (context) =>
+          const Center(child: CircularProgressIndicator(color: Colors.white)),
     );
   }
 
@@ -324,14 +374,17 @@ class _widgetLugarBusqueda extends StatelessWidget {
         int elementosAEliminar = horaActual.hour;
         //Eliminamos las horas pasadas del tiempoHoras
         weatherProvider.eliminarHorasPasadas(elementosAEliminar);
+        if (!isHistorial) configProvider.actualizarHistorialBusqueda(lugar);
         context.go('/home');
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
         child: Container(
           padding: EdgeInsets.all(13),
           decoration: BoxDecoration(
-            color: Colors.grey[300],
+            color: configProvider.isDarkTheme
+                ? Colors.grey[800]
+                : Colors.grey[300],
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -350,16 +403,16 @@ class _widgetLugarBusqueda extends StatelessWidget {
                               Utils.obtenerSimbolo(
                                 snapshot.data!.current.weatherCode,
                                 false,
-                                snapshot.data!.current.isDay == 1 ? true:false
+                                snapshot.data!.current.isDay == 1
+                                    ? true
+                                    : false,
                               ),
                               size: 30,
                               color: Colors.white,
                             ),
                             SizedBox(width: 8),
                             Text(
-                              snapshot.data!.current.temperature2M
-                                  .round()
-                                  .toString(),
+                              '${snapshot.data!.current.temperature2M.round().toString()}ºC',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -372,13 +425,90 @@ class _widgetLugarBusqueda extends StatelessWidget {
               ),
               SizedBox(width: 10),
               Expanded(
-                child: Text(
-                  lugar.placeName!,
-                  style: TextStyle(color: Colors.black, fontSize: 17),
+                child: Row(
+                  //Row principal mantiene el texto y el botón alineados
+                  children: [
+                    Expanded(
+                      //Forzamos al texto a ocupar SOLO el espacio que sobre
+                      child: Text(
+                        lugar.placeName!,
+                        style: const TextStyle(fontSize: 17),
+                        overflow: TextOverflow
+                            .ellipsis, //Si es muy largo, añade "..." en vez de petar
+                        maxLines:
+                            1, //Evita que salte a otra línea desconfigurando la altura
+                      ),
+                    ),
+                    if (isHistorial)
+                      //Botón de eliminar del historial
+                      IconButton(
+                        onPressed: () {
+                          configProvider.eliminarDelHistorial(lugar.id);
+                        },
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                      ),
+                  ],
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class SearchHistoryModalBottomSheet extends StatelessWidget {
+  const SearchHistoryModalBottomSheet({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final configProvider = Provider.of<ConfigProvider>(context);
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SizedBox(
+        width: double
+            .infinity, //obliga a todo el bloque a ocupar el 100% del ancho
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              Utils.stringSearchHistory(configProvider.idiomaActual),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            Divider(thickness: 5, color: Colors.grey[300]),
+            SizedBox(height: 10),
+            if (configProvider.historialBusqueda.isNotEmpty)
+              Center(
+                child: Text(
+                  Utils.stringLimitSearchHistoryAdvisory(
+                    configProvider.idiomaActual,
+                  ),
+                ),
+              ),
+            configProvider.historialBusqueda.isEmpty
+                ? Center(
+                    child: Text(
+                      Utils.stringNoSearchHistoryYet(
+                        configProvider.idiomaActual,
+                      )
+                    ),
+                  )
+                : ListView.builder(
+                    shrinkWrap: true, //Se encoge al tamaño real de tus items
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: configProvider.historialBusqueda.length,
+                    itemBuilder: (context, i) {
+                      final lugar = configProvider.historialBusqueda[i];
+                      return _widgetLugarBusqueda(
+                        lugar: lugar,
+                        isHistorial: true,
+                      );
+                    },
+                  ),
+          ],
         ),
       ),
     );

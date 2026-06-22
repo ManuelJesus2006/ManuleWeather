@@ -1,3 +1,4 @@
+import 'package:fl_chart/src/chart/base/axis_chart/axis_chart_data.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:manule_weather/presentation/widgets/card_alert_widget.dart';
@@ -24,6 +25,8 @@ class Utils {
         return '🇮🇹';
       case 'pt':
         return '🇵🇹';
+      case 'uk':
+        return '🇺🇦';
       default:
         return '🌐';
     }
@@ -525,6 +528,13 @@ class Utils {
       return 'UV Level☀️';
   }
 
+  static String stringUVRaysScreen(String idioma) {
+    if (idioma == 'es')
+      return 'Rayos uva';
+    else
+      return 'UV Rays';
+  }
+
   static String stringUvLevel(int uv, String idioma) {
     if (idioma == 'es') {
       if (uv <= 2) return 'Bajo';
@@ -591,6 +601,40 @@ class Utils {
     } else {
       return "Warning";
     }
+  }
+
+  static String stringDarkTheme(String idioma) {
+    if (idioma == 'es') {
+      return "Modo oscuro";
+    } else {
+      return "Dark mode";
+    }
+  }
+
+  static String stringShowSearchHistory(String idioma) {
+    if (idioma == 'es') {
+      return "Ver historial de búsqueda";
+    } else {
+      return "Show search history";
+    }
+  }
+
+  static String stringSearchHistory(String idioma) {
+    if (idioma == 'es') {
+      return "Historial de búsqueda";
+    } else {
+      return "Search history";
+    }
+  }
+
+  static String stringNoSearchHistoryYet(String idioma) {
+    if (idioma == 'es') return "No has búscado ningún lugar aún";
+    else return "You have not searched any place yet";
+  }
+
+  static String stringLimitSearchHistoryAdvisory(String idioma) {
+    if (idioma == 'es') return "El historial está limitado a 5 lugares";
+    else return "The search history is limited to 5 places";
   }
 
   static devolverCardAvisos(
@@ -693,6 +737,8 @@ class Utils {
     );
   }
 
+  //Strings de los avisos
+
   static String stringAlertUV8(String idioma) {
     if (idioma == 'es') {
       return "Se estiman valores de UV de 8 o más en las próximas 24 horas, no se exponga demasiado al sol y protéjase";
@@ -779,5 +825,25 @@ class Utils {
     } else {
       return 'Check your internet connection and try again';
     }
+  }
+
+  static List<FlSpot> getPuntosRayosUva(WeatherProvider weatherProvider) {
+    List<FlSpot> puntosRayosUva = [];
+
+    // Pillamos las próximas 24 horas exactas de tu API
+    final totalHoras = weatherProvider.tiempoHoras!.time.take(24).length;
+
+    for (var i = 0; i < totalHoras; i++) {
+      if (i == 0) {
+        puntosRayosUva.add(
+          FlSpot(i.toDouble(), weatherProvider.tiempoActual!.current.uvIndex),
+        );
+      } else {
+        puntosRayosUva.add(
+          FlSpot(i.toDouble(), weatherProvider.tiempoHoras!.uvIndex[i]),
+        );
+      }
+    }
+    return puntosRayosUva;
   }
 }

@@ -27,7 +27,9 @@ class LanguageSelectorScreen extends StatelessWidget {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: screenWidth * 0.05,
-                color: Colors.black87,
+                color: configProvider.isDarkTheme
+                    ? Colors.white
+                    : Colors.black87,
               ),
             ),
             SizedBox(height: 16),
@@ -36,8 +38,10 @@ class LanguageSelectorScreen extends StatelessWidget {
                 itemCount: configProvider.idiomasActuales.length,
                 separatorBuilder: (context, index) => SizedBox(height: 10),
                 itemBuilder: (context, index) {
-                  String idiomaActualBucle = configProvider.idiomasActuales[index];
-                  bool isSeleccionado = idiomaActualBucle == configProvider.idiomaActual;
+                  String idiomaActualBucle =
+                      configProvider.idiomasActuales[index];
+                  bool isSeleccionado =
+                      idiomaActualBucle == configProvider.idiomaActual;
 
                   return GestureDetector(
                     onTap: () {
@@ -50,10 +54,20 @@ class LanguageSelectorScreen extends StatelessWidget {
                         vertical: screenWidth * 0.04,
                       ),
                       decoration: BoxDecoration(
-                        color: isSeleccionado ? Colors.blue[50] : Colors.grey[100],
+                        //Si es oscuro usa tonos gris/azul fuerte, si es claro usa los tuyos
+                        color: configProvider.isDarkTheme
+                            ? (isSeleccionado
+                                  ? Colors.blue[900]
+                                  : Colors.grey[800])
+                            : (isSeleccionado
+                                  ? Colors.blue[50]
+                                  : Colors.grey[100]),
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(
-                          color: isSeleccionado ? Colors.blue : Colors.transparent,
+                          // 👇 El borde brilla más en modo oscuro (blueAccent) o se adapta al modo claro
+                          color: isSeleccionado
+                              ? (configProvider.isDarkTheme ? Colors.blueAccent : Colors.blue)
+                              : Colors.transparent,
                           width: 2,
                         ),
                       ),
@@ -69,12 +83,20 @@ class LanguageSelectorScreen extends StatelessWidget {
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: screenWidth * 0.045,
-                              color: isSeleccionado ? Colors.blue[700] : Colors.black87,
+                              color: isSeleccionado
+                                  ? Colors.blue[200]
+                                  : configProvider.isDarkTheme
+                                  ? Colors.white
+                                  : Colors.black87,
                             ),
                           ),
                           Spacer(),
                           if (isSeleccionado)
-                            Icon(LucideIcons.check, color: Colors.blue, size: screenWidth * 0.05),
+                            Icon(
+                              LucideIcons.check,
+                              color: Colors.blue,
+                              size: screenWidth * 0.05,
+                            ),
                         ],
                       ),
                     ),

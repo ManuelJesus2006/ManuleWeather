@@ -31,7 +31,7 @@ class SettingsScreen extends StatelessWidget {
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    color: const Color.fromARGB(255, 205, 206, 255)
+                    color: configProvider.isDarkTheme ? Colors.grey[800] : Color.fromARGB(255, 205, 206, 255)
                   ),
                   child: ListTile(
                     leading: Icon(LucideIcons.scroll),
@@ -44,13 +44,26 @@ class SettingsScreen extends StatelessWidget {
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    color: const Color.fromARGB(255, 205, 206, 255)
+                    color: configProvider.isDarkTheme ? Colors.grey[800] : Color.fromARGB(255, 205, 206, 255)
                   ),
                   child: ListTile(
                     leading: Icon(LucideIcons.languages),
                     trailing: Text(Utils.obtenerIdiomaText(configProvider.idiomaActual), style: TextStyle(fontWeight: FontWeight.bold),),
                     title: Text(Utils.stringLanguagesSettings(configProvider.idiomaActual)),
                     onTap: () => context.push('/languageSettings'),
+                  ),
+                ),
+                SizedBox(height: 15,),
+                Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: configProvider.isDarkTheme ? Colors.grey[800] : Color.fromARGB(255, 205, 206, 255)
+                  ),
+                  child: ListTile(
+                    leading: Icon(LucideIcons.moon),
+                    title: Text(Utils.stringDarkTheme(configProvider.idiomaActual)),
+                    trailing: Switch(value: configProvider.isDarkTheme, onChanged: (value) => configProvider.changeTheme(value)),
                   ),
                 ),
               ],

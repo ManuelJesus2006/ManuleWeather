@@ -32,6 +32,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
     await configProvider.comprobarIdiomaYPrimeraVez();
 
+    await configProvider.comprobarModoOscuro();
+
+    await configProvider.cargarHistorialBusqueda();
+
     //Antes de hacer toda la logica principal avisamos al usuario en el caso de que haya actualizacion
     await VersionService().comprobarActualizacion(
       configProvider.idiomaActual,
