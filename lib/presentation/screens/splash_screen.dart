@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
@@ -129,7 +131,7 @@ class _SplashScreenState extends State<SplashScreen> {
         context.go('/home');
       }
     } catch (e) {
-      if (mounted) context.go('/error', extra: Utils.stringErrorServerDown(configProvider.idiomaActual));
+      if (mounted && e is HttpException) context.go('/error', extra: Utils.stringErrorServerDown(configProvider.idiomaActual));
     }
   }
 

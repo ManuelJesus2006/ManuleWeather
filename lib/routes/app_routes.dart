@@ -7,7 +7,7 @@ import 'package:manule_weather/presentation/screens/onboarding_screen.dart';
 import 'package:manule_weather/presentation/screens/search_screen.dart';
 import 'package:manule_weather/presentation/screens/settings_screen.dart';
 import 'package:manule_weather/presentation/screens/splash_screen.dart';
-import 'package:manule_weather/presentation/screens/weather_hour_detail.dart';
+import 'package:manule_weather/presentation/widgets/weather_hour_detail.dart';
 import 'package:manule_weather/providers/config_provider.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
 import 'package:provider/provider.dart';
@@ -20,16 +20,6 @@ final appRouter = GoRouter(
       path: '/home',
       pageBuilder: (context, state) {
         return _buildPageConTransicion(HomeScreen(), state);
-      },
-    ),
-    GoRoute(
-      path: '/hourDetail',
-      pageBuilder: (context, state) {
-        int indexTiempoHoras = state.extra as int;
-        return _buildPageConTransicion(
-          WeatherHourDetail(indexTiempoHoras: indexTiempoHoras),
-          state,
-        );
       },
     ),
     GoRoute(

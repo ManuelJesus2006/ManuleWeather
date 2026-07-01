@@ -628,13 +628,17 @@ class Utils {
   }
 
   static String stringNoSearchHistoryYet(String idioma) {
-    if (idioma == 'es') return "No has búscado ningún lugar aún";
-    else return "You have not searched any place yet";
+    if (idioma == 'es')
+      return "No has búscado ningún lugar aún";
+    else
+      return "You have not searched any place yet";
   }
 
   static String stringLimitSearchHistoryAdvisory(String idioma) {
-    if (idioma == 'es') return "El historial está limitado a 5 lugares";
-    else return "The search history is limited to 5 places";
+    if (idioma == 'es')
+      return "El historial está limitado a 5 lugares";
+    else
+      return "The search history is limited to 5 places";
   }
 
   static devolverCardAvisos(
@@ -649,6 +653,12 @@ class Utils {
         .take(24)
         .toList();
     List<double> temperatureData = weatherProvider.tiempoHoras!.temperature2M
+        .take(24)
+        .toList();
+    List<double> windSpeedData = weatherProvider.tiempoHoras!.windSpeed10M
+        .take(24)
+        .toList();
+    List<double> windGustData = weatherProvider.tiempoHoras!.windGusts10M
         .take(24)
         .toList();
 
@@ -677,14 +687,32 @@ class Utils {
     else if (temperatureData.any((e) => e < -5))
       nivelTempBaja = 1;
 
+    int nivelWindSpeed = 0;
+    if (windSpeedData.any((e) => e >= 90))
+      nivelWindSpeed = 3;
+    else if (windSpeedData.any((e) => e >= 70))
+      nivelWindSpeed = 2;
+    else if (windSpeedData.any((e) => e >= 50))
+      nivelWindSpeed = 1;
+
+      int nivelWindGust = 0;
+    if (windGustData.any((e) => e >= 120))
+      nivelWindGust = 3;
+    else if (windGustData.any((e) => e >= 90))
+      nivelWindGust = 2;
+    else if (windGustData.any((e) => e >= 70))
+      nivelWindGust = 1;
+
     return Column(
       spacing: 10, //Nuevo de flutter, da espaciado entre elementos
       children: [
+        //LÓGICA AVISOS RAYOS UVA
         if (uvData.any((e) => e >= 8))
           CardAlertWidget(
             text: Utils.stringAlertUV8(idioma),
             color: Colors.redAccent,
           ),
+        //LÓGICA AVISOS NIVEL LLUVIA
         if (nivelLluvia == 1)
           CardAlertWidget(
             text: Utils.stringAlertRainAmount15to30(idioma),
@@ -701,6 +729,7 @@ class Utils {
             text: Utils.stringAlertRainAmount60ormore(idioma),
             color: Colors.redAccent,
           ),
+        //LÓGICA AVISOS ALTAS TEMPERATURAS
         if (nivelTempAlta == 1)
           CardAlertWidget(
             text: Utils.stringAlertTemperature36to40(idioma),
@@ -717,6 +746,7 @@ class Utils {
             text: Utils.stringAlertTemperature44ormore(idioma),
             color: Colors.redAccent,
           ),
+        //LÓGICA AVISOS BAJAS TEMPERATURAS
         if (nivelTempBaja == 1)
           CardAlertWidget(
             text: Utils.stringAlertLowTemperature5to10(idioma),
@@ -731,6 +761,40 @@ class Utils {
         if (nivelTempBaja == 3)
           CardAlertWidget(
             text: Utils.stringAlertLowTemperature15ormore(idioma),
+            color: Colors.redAccent,
+          ),
+        //LÓGICA AVISOS VELOCIDAD VIENTO
+        if (nivelWindSpeed == 1)
+          CardAlertWidget(
+            text: Utils.stringAlertWindSpeedYellow(idioma),
+            color: Colors.yellow,
+            componentsColor: Colors.black87,
+          ),
+        if (nivelWindSpeed == 2)
+          CardAlertWidget(
+            text: Utils.stringAlertWindSpeedOrange(idioma),
+            color: Colors.orange,
+          ),
+        if (nivelWindSpeed == 3)
+          CardAlertWidget(
+            text: Utils.stringAlertWindSpeedRed(idioma),
+            color: Colors.redAccent,
+          ),
+        //LÓGICA AVISOS RACHAS MÁXIMAS DE VIENTO
+         if (nivelWindGust == 1)
+          CardAlertWidget(
+            text: Utils.stringAlertWindGustsYellow(idioma),
+            color: Colors.yellow,
+            componentsColor: Colors.black87,
+          ),
+        if (nivelWindGust == 2)
+          CardAlertWidget(
+            text: Utils.stringAlertWindGustsOrange(idioma),
+            color: Colors.orange,
+          ),
+        if (nivelWindGust == 3)
+          CardAlertWidget(
+            text: Utils.stringAlertWindGustsRed(idioma),
             color: Colors.redAccent,
           ),
       ],
@@ -818,6 +882,54 @@ class Utils {
       return "Severe rain of 60 l/m² or more per hour is expected in the next 24 hours. Stay indoors if possible and stay safe.";
     }
   }
+
+static String stringAlertWindSpeedYellow(String idioma) {
+  if (idioma == 'es') {
+    return "Se esperan vientos de entre 50 y 70 km/h en las próximas 24 horas. Ten precaución al circular en vehículos altos o motos y asegura objetos sueltos en exteriores.";
+  } else {
+    return "Winds of 50 to 70 km/h are expected in the next 24 hours. Take care when driving tall vehicles or motorcycles and secure loose objects outdoors.";
+  }
+}
+
+static String stringAlertWindSpeedOrange(String idioma) {
+  if (idioma == 'es') {
+    return "Se esperan vientos de entre 70 y 90 km/h en las próximas 24 horas. Evita actividades al aire libre en zonas expuestas, retira objetos sueltos y extrema la precaución al conducir.";
+  } else {
+    return "Winds of 70 to 90 km/h are expected in the next 24 hours. Avoid outdoor activities in exposed areas, remove loose objects and take extra care when driving.";
+  }
+}
+
+static String stringAlertWindSpeedRed(String idioma) {
+  if (idioma == 'es') {
+    return "Se esperan vientos superiores a 90 km/h en las próximas 24 horas. Evita salir si no es necesario, aléjate de árboles y estructuras inestables, y no conduzcas vehículos vulnerables al viento.";
+  } else {
+    return "Winds above 90 km/h are expected in the next 24 hours. Avoid going out unless necessary, stay away from trees and unstable structures, and do not drive vehicles vulnerable to wind.";
+  }
+}
+
+static String stringAlertWindGustsYellow(String idioma) {
+  if (idioma == 'es') {
+    return "Se esperan rachas máximas de entre 70 y 90 km/h en las próximas 24 horas. Ten cuidado con objetos sueltos en balcones, terrazas o exteriores.";
+  } else {
+    return "Maximum gusts of 70 to 90 km/h are expected in the next 24 hours. Be careful with loose objects on balconies, terraces or outdoor areas.";
+  }
+}
+
+static String stringAlertWindGustsOrange(String idioma) {
+  if (idioma == 'es') {
+    return "Se esperan rachas máximas de entre 90 y 120 km/h en las próximas 24 horas. Evita zonas con árboles o construcciones inestables y refuerza puertas y ventanas.";
+  } else {
+    return "Maximum gusts of 90 to 120 km/h are expected in the next 24 hours. Avoid areas with trees or unstable structures and reinforce doors and windows.";
+  }
+}
+
+static String stringAlertWindGustsRed(String idioma) {
+  if (idioma == 'es') {
+    return "Se esperan rachas máximas superiores a 120 km/h en las próximas 24 horas. Permanece en un lugar seguro, aléjate de ventanas y evita desplazamientos innecesarios.";
+  } else {
+    return "Maximum gusts above 120 km/h are expected in the next 24 hours. Stay in a safe place, keep away from windows and avoid unnecessary travel.";
+  }
+}
 
   static String stringCheckYourConextion(String idioma) {
     if (idioma == 'es') {

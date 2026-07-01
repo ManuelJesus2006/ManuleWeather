@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:manule_weather/presentation/widgets/weather_hour_detail.dart';
 import 'package:manule_weather/providers/config_provider.dart';
 import 'package:manule_weather/providers/navigation_provider.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
@@ -463,7 +464,6 @@ class HomeScreen extends StatelessWidget {
     NavigationProvider navigationProvider,
   ) {
     final screenHeight = MediaQuery.of(context).size.height;
-
     return SafeArea(
       child: Column(
         children: [
@@ -525,6 +525,7 @@ class HomeScreen extends StatelessWidget {
               child: ListView.builder(
                 itemCount: weatherProvider.tiempoHoras!.time.length,
                 itemBuilder: (context, i) {
+                  bool isAbierto = false;
                   final hora = weatherProvider.tiempoHoras!.time[i];
                   final fecha = DateTime.parse(hora);
                   final temperatura =
@@ -546,94 +547,47 @@ class HomeScreen extends StatelessWidget {
                       if (hora.substring(11, 16) == '00:00')
                         _fechaCompletaCard(fecha: fecha),
                       SizedBox(height: screenHeight * 0.015),
-                      GestureDetector(
-                        onTap: () => i == 0
-                            ? navigationProvider.cambiarIndice(0)
-                            : context.push('/hourDetail', extra: i),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: screenWidth * 0.03,
-                          ),
-                          child: Container(
-                            padding: EdgeInsets.all(screenWidth * 0.04),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              color: configProvider.isDarkTheme ? Colors.grey[700] : Colors.grey[200],
-                            ),
-                            child: Row(
-                              children: [
-                                Text(
-                                  i == 0
-                                      ? Utils.formatearHora(
-                                          DateTime.parse(
-                                            weatherProvider
-                                                .tiempoActual!
-                                                .current
-                                                .time,
-                                          ),
-                                        )
-                                      : hora.substring(11, 16),
-                                  style: TextStyle(
-                                    fontSize: screenWidth * 0.04,
-                                  ),
+
+                      // Estado local por ítem
+                      StatefulBuilder(
+                        builder: (context, setStateItem) {
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // 👇 TU TARJETA ORIGINAL (Al pulsarla, se despliega)
+                              GestureDetector(
+                                onTap: () {
+                                  if (i != 0) {
+                                    setStateItem(() {
+                                      isAbierto = !isAbierto;
+                                    });
+                                  }else{
+                                    navigationProvider.cambiarIndice(0);
+                                  }
+                                },
+                                child: _cardTiempoHoras(
+                                  hora: hora,
+                                  weatherCode: weatherCode,
+                                  isHoraDeDia: isHoraDeDia,
+                                  temperatura: temperatura,
+                                  probLluvia: probLluvia,
+                                  i: i,
                                 ),
-                                SizedBox(width: screenWidth * 0.02),
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      Utils.obtenerSimbolo(
-                                        i == 0
-                                            ? weatherProvider
-                                                  .tiempoActual!
-                                                  .current
-                                                  .weatherCode
-                                            : weatherCode,
-                                        true,
-                                        isHoraDeDia,
-                                      ),
-                                      SizedBox(width: screenWidth * 0.02),
-                                      Text(
-                                        '${i == 0 ? weatherProvider.tiempoActual!.current.temperature2M.round() : temperatura.round()}ºC',
-                                        style: TextStyle(
-                                          fontSize: screenWidth * 0.045,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      SizedBox(width: screenWidth * 0.02),
-                                      Expanded(
-                                        child: Text(
-                                          Utils.obtenerTiempoText(
-                                            i == 0
-                                                ? weatherProvider
-                                                      .tiempoActual!
-                                                      .current
-                                                      .weatherCode
-                                                : weatherCode,
-                                            configProvider.idiomaActual,
-                                          ),
-                                          style: TextStyle(
-                                            fontSize: screenWidth * 0.035,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                        ),
-                                      ),
-                                      SizedBox(width: screenWidth * 0.02),
-                                      Text(
-                                        "💧${probLluvia}%",
-                                        style: TextStyle(
-                                          fontSize: screenWidth * 0.035,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                              ),
+
+                              // 👇 EL DESPLEGABLE ANIMADO (Cero márgenes raros, 100% real)
+                              AnimatedSize(
+                                curve: Curves
+                                    .fastOutSlowIn, // 👈 Arranca rápido para dar sensación de fluidez y frena suave
+                                duration: const Duration(milliseconds: 450),
+
+                                child: isAbierto
+                                    ? WeatherHourDetail(indexTiempoHoras: i)
+                                    : const SizedBox.shrink(),
+                              ),
+                            ],
+                          );
+                        },
                       ),
                     ],
                   );
@@ -692,9 +646,7 @@ class HomeScreen extends StatelessWidget {
                           child: Text(
                             weatherProvider.localizacion!,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: screenWidth * 0.045,
-                            ),
+                            style: TextStyle(fontSize: screenWidth * 0.045),
                           ),
                         ),
                       ],
@@ -727,8 +679,12 @@ class HomeScreen extends StatelessWidget {
                               color:
                                   navigationProvider.indiceTiempoDiasActual ==
                                       index
-                                  ? configProvider.isDarkTheme ? Colors.blue[400] : Colors.blue[100]
-                                  : configProvider.isDarkTheme ? Colors.grey[800] : Colors.grey[100],
+                                  ? configProvider.isDarkTheme
+                                        ? Colors.blue[400]
+                                        : Colors.blue[100]
+                                  : configProvider.isDarkTheme
+                                  ? Colors.grey[800]
+                                  : Colors.grey[100],
                             ),
                             child: Column(
                               children: [
@@ -770,7 +726,106 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   Divider(thickness: 2),
-                  _tiempoDiaIndividualCard(),
+                  _tiempoDiaIndividualCards(),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _cardTiempoHoras extends StatelessWidget {
+  const _cardTiempoHoras({
+    super.key,
+    required this.hora,
+    required this.weatherCode,
+    required this.isHoraDeDia,
+    required this.temperatura,
+    required this.probLluvia,
+    required this.i,
+  });
+
+  final String hora;
+  final int weatherCode;
+  final bool isHoraDeDia;
+  final double temperatura;
+  final int probLluvia;
+  final int i;
+
+  @override
+  Widget build(BuildContext context) {
+    var screenWidth = MediaQuery.of(context).size.width;
+    final configProvider = Provider.of<ConfigProvider>(context);
+    final weatherProvider = Provider.of<WeatherProvider>(context);
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+      child: Container(
+        padding: EdgeInsets.all(screenWidth * 0.04),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: configProvider.isDarkTheme
+              ? Colors.grey[700]
+              : Colors.grey[200],
+        ),
+        child: Row(
+          children: [
+            Text(
+              i == 0
+                  ? Utils.formatearHora(
+                      DateTime.parse(
+                        weatherProvider.tiempoActual!.current.time,
+                      ),
+                    )
+                  : hora.substring(11, 16),
+              style: TextStyle(fontSize: screenWidth * 0.04),
+            ),
+            SizedBox(width: screenWidth * 0.02),
+            Expanded(
+              child: Row(
+                children: [
+                  Utils.obtenerSimbolo(
+                    i == 0
+                        ? weatherProvider.tiempoActual!.current.weatherCode
+                        : weatherCode,
+                    true,
+                    isHoraDeDia,
+                  ),
+                  SizedBox(width: screenWidth * 0.02),
+                  Text(
+                    '${i == 0 ? weatherProvider.tiempoActual!.current.temperature2M.round() : temperatura.round()}ºC',
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.045,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(width: screenWidth * 0.02),
+                  Expanded(
+                    child: Text(
+                      Utils.obtenerTiempoText(
+                        i == 0
+                            ? weatherProvider.tiempoActual!.current.weatherCode
+                            : weatherCode,
+                        configProvider.idiomaActual,
+                      ),
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.035,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ),
+                  SizedBox(width: screenWidth * 0.02),
+                  Text(
+                    "💧${probLluvia}%",
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.035,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -799,25 +854,21 @@ class UV_home_widget extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
       child: Card(
         elevation: 3,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             //El bloque superior con el índice UV actual
             Container(
               padding: EdgeInsets.all(screenWidth * 0.04),
-              width: double
-                  .infinity,
+              width: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
                 ),
                 color: Utils.obtenerColorUV(
-                  weatherProvider.tiempoActual!.current.uvIndex
-                      .round(),
+                  weatherProvider.tiempoActual!.current.uvIndex.round(),
                 ).withOpacity(0.85),
               ),
               child: Column(
@@ -844,8 +895,7 @@ class UV_home_widget extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     Utils.stringUvLevel(
-                      weatherProvider.tiempoActual!.current.uvIndex
-                          .round(),
+                      weatherProvider.tiempoActual!.current.uvIndex.round(),
                       configProvider.idiomaActual,
                     ),
                     style: TextStyle(
@@ -856,7 +906,7 @@ class UV_home_widget extends StatelessWidget {
                 ],
               ),
             ),
-      
+
             //Gráfica de barras UV
             Padding(
               padding: const EdgeInsets.only(
@@ -866,8 +916,7 @@ class UV_home_widget extends StatelessWidget {
                 right: 20.0,
               ),
               child: SizedBox(
-                height:
-                    200,
+                height: 200,
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: SizedBox(
@@ -878,50 +927,40 @@ class UV_home_widget extends StatelessWidget {
                         maxY: 15,
                         barTouchData: BarTouchData(
                           touchTooltipData: BarTouchTooltipData(
-                            getTooltipColor: (group) =>
-                                Colors.black87,
+                            getTooltipColor: (group) => Colors.black87,
                             tooltipMargin: 10,
-                            getTooltipItem:
-                                (group, groupIndex, rod, rodIndex) {
-                                  final index = group.x;
-                                  final uv = rod.toY;
-      
-                                  if (index < 0 ||
-                                      index >= puntosUVA.length)
-                                    return null;
-      
-                                  final horaReal = index == 0
-                                      ? weatherProvider
-                                            .tiempoActual!
-                                            .current
-                                            .time
-                                            .substring(11, 13)
-                                      : weatherProvider
-                                            .tiempoHoras!
-                                            .time[index]
-                                            .substring(11, 13);
-      
-                                  return BarTooltipItem(
-                                    'Hora: $horaReal:00\n',
-                                    const TextStyle(
-                                      color: Colors.white70,
-                                      fontSize: 12,
+                            getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                              final index = group.x;
+                              final uv = rod.toY;
+
+                              if (index < 0 || index >= puntosUVA.length)
+                                return null;
+
+                              final horaReal = index == 0
+                                  ? weatherProvider.tiempoActual!.current.time
+                                        .substring(11, 13)
+                                  : weatherProvider.tiempoHoras!.time[index]
+                                        .substring(11, 13);
+
+                              return BarTooltipItem(
+                                'Hora: $horaReal:00\n',
+                                const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                children: [
+                                  TextSpan(
+                                    text: 'Rayos UV: $uv',
+                                    style: TextStyle(
+                                      color: Utils.obtenerColorUV(uv.toInt()),
                                       fontWeight: FontWeight.bold,
+                                      fontSize: 14,
                                     ),
-                                    children: [
-                                      TextSpan(
-                                        text: 'Rayos UV: $uv',
-                                        style: TextStyle(
-                                          color: Utils.obtenerColorUV(
-                                            uv.toInt(),
-                                          ),
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                },
+                                  ),
+                                ],
+                              );
+                            },
                           ),
                         ),
                         titlesData: FlTitlesData(
@@ -946,25 +985,17 @@ class UV_home_widget extends StatelessWidget {
                               interval: 2,
                               getTitlesWidget: (value, meta) {
                                 final index = value.toInt();
-                                if (index < 0 ||
-                                    index >= puntosUVA.length)
+                                if (index < 0 || index >= puntosUVA.length)
                                   return const SizedBox.shrink();
-      
+
                                 final horaReal = index == 0
-                                    ? weatherProvider
-                                          .tiempoActual!
-                                          .current
-                                          .time
+                                    ? weatherProvider.tiempoActual!.current.time
                                           .substring(11, 13)
-                                    : weatherProvider
-                                          .tiempoHoras!
-                                          .time[index]
+                                    : weatherProvider.tiempoHoras!.time[index]
                                           .substring(11, 13);
-      
+
                                 return Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 8.0,
-                                  ),
+                                  padding: const EdgeInsets.only(top: 8.0),
                                   child: Text(
                                     '$horaReal:00',
                                     style: const TextStyle(
@@ -993,9 +1024,7 @@ class UV_home_widget extends StatelessWidget {
                             barRods: [
                               BarChartRodData(
                                 toY: punto.y,
-                                color: Utils.obtenerColorUV(
-                                  punto.y.toInt(),
-                                ),
+                                color: Utils.obtenerColorUV(punto.y.toInt()),
                                 width: 14,
                                 borderRadius: const BorderRadius.only(
                                   topLeft: Radius.circular(4),
@@ -1041,8 +1070,8 @@ class _fechaCompletaCard extends StatelessWidget {
   }
 }
 
-class _tiempoDiaIndividualCard extends StatelessWidget {
-  const _tiempoDiaIndividualCard({super.key});
+class _tiempoDiaIndividualCards extends StatelessWidget {
+  const _tiempoDiaIndividualCards({super.key});
 
   @override
   Widget build(BuildContext context) {

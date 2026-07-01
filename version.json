@@ -1,5 +1,5 @@
 {
-    "version": "0.9.2",
+    "version": "0.9.3",
   "url": "https://drive.google.com/file/d/1B1Ojsb_gF4Tw8oFm28FiFDGhux1T0b1H/view?usp=sharing",
-  "whatisnew": "Implementación del modo oscuro de forma definitiva | Implementación de gráfica de barras de rayos UVA | Implementación del historial de búsqueda hasta 5 lugares como máximoImplementación del modo oscuro de forma definitiva | Implementación de gráfica de barras de rayos UVA | Implementación del historial de búsqueda hasta 5 lugares como máximo"
+  "whatisnew": "Mejoras de diseño en detalle de tiempo por horas (modo desplegable sin pantalla externa) y nuevos avisos de velocidad de viento y rachas máximas de viento además de implementación de rachas máximas por horas"
 }
