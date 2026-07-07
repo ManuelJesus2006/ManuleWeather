@@ -943,7 +943,7 @@ class UV_home_widget extends StatelessWidget {
                                         .substring(11, 13);
 
                               return BarTooltipItem(
-                                'Hora: $horaReal:00\n',
+                                '${Utils.stringHour(configProvider.idiomaActual)}: $horaReal:00\n',
                                 const TextStyle(
                                   color: Colors.white70,
                                   fontSize: 12,
@@ -951,7 +951,7 @@ class UV_home_widget extends StatelessWidget {
                                 ),
                                 children: [
                                   TextSpan(
-                                    text: 'Rayos UV: $uv',
+                                    text: '${Utils.stringUVRaysScreen(configProvider.idiomaActual)}: $uv',
                                     style: TextStyle(
                                       color: Utils.obtenerColorUV(uv.toInt()),
                                       fontWeight: FontWeight.bold,

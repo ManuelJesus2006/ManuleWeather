@@ -11,7 +11,22 @@ class ConfigProvider with ChangeNotifier {
     Platform.localeName.length - 3,
   );
   bool primeraVez = true;
-  List<String> idiomasActuales = ['es', 'en'];
+  List<String> idiomasActuales = [
+    'es',
+    'en',
+    'it',
+    'fr',
+    'pt',
+    'de',
+    'ru',
+    'uk',
+    'ca',
+    'ar',
+    'ko',
+    'ja',
+    'zh',
+    'he',
+  ];
   bool isDarkTheme = false;
   List<Localizacion> historialBusqueda = [];
 

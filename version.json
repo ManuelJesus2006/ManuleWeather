@@ -1,5 +1,5 @@
 {
-    "version": "0.9.3",
+    "version": "0.9.4",
   "url": "https://drive.google.com/file/d/1B1Ojsb_gF4Tw8oFm28FiFDGhux1T0b1H/view?usp=sharing",
-  "whatisnew": "Mejoras de diseño en detalle de tiempo por horas (modo desplegable sin pantalla externa) y nuevos avisos de velocidad de viento y rachas máximas de viento además de implementación de rachas máximas por horas"
+  "whatisnew": "Actualización de idiomas: Italiano, Francés, Portugués, Alemán, Ruso, Ucraniano, Catalán, Árabe, Coreano, Japones, Chino Mandarín y Hebreo. Algunos de estos idiomas pueden llegar a tener errores gramaticales ESTÁ EN FASE EXPERIMENTAL"
 }
