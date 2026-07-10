@@ -231,6 +231,8 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.03),
+                Utils.devolverPrevisionGraficaLluvia(screenWidth, weatherProvider, configProvider.idiomaActual),
+                SizedBox(height: screenHeight * 0.03),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.07),
                   child: Row(
@@ -989,15 +991,14 @@ class UV_home_widget extends StatelessWidget {
                                   return const SizedBox.shrink();
 
                                 final horaReal = index == 0
-                                    ? weatherProvider.tiempoActual!.current.time
-                                          .substring(11, 13)
+                                    ? Utils.formatearHora(DateTime.parse(weatherProvider.tiempoActual!.current.time))
                                     : weatherProvider.tiempoHoras!.time[index]
-                                          .substring(11, 13);
+                                          .substring(11, 13) + ":00";
 
                                 return Padding(
                                   padding: const EdgeInsets.only(top: 8.0),
                                   child: Text(
-                                    '$horaReal:00',
+                                    '$horaReal',
                                     style: const TextStyle(
                                       fontSize: 12,
                                       color: Colors.grey,

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:manule_weather/models/tiempo_dias_response_model.dart';
 import 'package:manule_weather/models/tiempo_horas_model.dart';
 import 'package:manule_weather/models/tiempo_model.dart';
+import 'package:manule_weather/presentation/widgets/home_widget/home_screen_widget_manager.dart';
 import 'package:manule_weather/providers/config_provider.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
 import 'package:manule_weather/services/localizacion_service.dart';
@@ -51,7 +52,11 @@ class _SplashScreenState extends State<SplashScreen> {
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       print('Los servicios de ubicación están desactivados.');
-      if (mounted) context.go('/error', extra: Utils.stringErrorServerDown(configProvider.idiomaActual));
+      if (mounted)
+        context.go(
+          '/error',
+          extra: Utils.stringErrorServerDown(configProvider.idiomaActual),
+        );
       return;
     }
 
@@ -63,7 +68,11 @@ class _SplashScreenState extends State<SplashScreen> {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         print('El usuario denegó los permisos.');
-        if (mounted) context.go('/error', extra: Utils.stringErrorServerDown(configProvider.idiomaActual));
+        if (mounted)
+          context.go(
+            '/error',
+            extra: Utils.stringErrorServerDown(configProvider.idiomaActual),
+          );
         return;
       }
     }
@@ -71,7 +80,11 @@ class _SplashScreenState extends State<SplashScreen> {
     if (permission == LocationPermission.deniedForever) {
       // El usuario marcó no volver a preguntar, hay que enviarlo a ajustes
       print('Permisos denegados permanentemente.');
-      if (mounted) context.go('/error', extra: Utils.stringErrorServerDown(configProvider.idiomaActual));
+      if (mounted)
+        context.go(
+          '/error',
+          extra: Utils.stringErrorServerDown(configProvider.idiomaActual),
+        );
       return;
     }
 
@@ -109,7 +122,6 @@ class _SplashScreenState extends State<SplashScreen> {
         context,
         listen: false,
       );
-      
 
       weatherProvider.cambiarDatos(
         tiempoUbi!,
@@ -119,6 +131,15 @@ class _SplashScreenState extends State<SplashScreen> {
         true,
         position.latitude,
         position.longitude,
+      );
+
+      //Cambiamos los datos en el widget
+      HomeScreenWidgetManager.actualizarDatos(
+        ciudad: nombreCiudad,
+        idioma: configProvider.idiomaActual,
+        fondoOscuro: configProvider.isDarkTheme,
+        tiempoActual: weatherProvider.tiempoActual!,
+        rainData: Utils.getRainLevelData(weatherProvider,null),
       );
 
       weatherProvider.comprobarNocheDia();
@@ -131,7 +152,11 @@ class _SplashScreenState extends State<SplashScreen> {
         context.go('/home');
       }
     } catch (e) {
-      if (mounted && e is HttpException) context.go('/error', extra: Utils.stringErrorServerDown(configProvider.idiomaActual));
+      if (mounted && e is HttpException)
+        context.go(
+          '/error',
+          extra: Utils.stringErrorServerDown(configProvider.idiomaActual),
+        );
     }
   }
 

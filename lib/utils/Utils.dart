@@ -1,6 +1,11 @@
+import 'dart:ffi';
+
+import 'package:fl_chart/fl_chart.dart';
 import 'package:fl_chart/src/chart/base/axis_chart/axis_chart_data.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:manule_weather/models/lluvia_level_model.dart';
+import 'package:manule_weather/models/tiempo_horas_model.dart';
 import 'package:manule_weather/presentation/widgets/card_alert_widget.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
 
@@ -146,6 +151,37 @@ class Utils {
         return AssetImage('assets/images/fondo_noche.jpg');
     }
   }
+
+  static AssetImage recibirFondoWidget(bool isDeDia, int weatherCode) {
+  // 🚀 PARCHE PARA EL WIDGET: Si es un GIF, cámbialo por un PNG/JPG equivalente estático
+  /*if (weatherCode == 95 || weatherCode == 96 || weatherCode == 99)
+    return const AssetImage("assets/images/fondo_tormenta_estatico.png"); // Crea una versión estática
+
+  const codigosLluvia = {51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82};
+  if (codigosLluvia.contains(weatherCode)) {
+    return const AssetImage('assets/images/fondo_lluvia_estatico.png'); // Versión estática
+  }
+
+  const codigosNieve = {71, 73, 75, 77, 85, 86};
+  if (codigosNieve.contains(weatherCode)) {
+    return const AssetImage('assets/images/fondo_nieve_estatico.png'); // Versión estática
+  }*/
+
+  // Las que ya son .png o .jpg van a funcionar perfectamente de primeras:
+  if (isDeDia) {
+    if (weatherCode == 2)
+      return const AssetImage('assets/images/fondo_parcialmente_nublado_dia.png');
+    else if (weatherCode == 3 || weatherCode == 45 || weatherCode == 48)
+      return const AssetImage('assets/images/fondo_nublado_dia.png');
+    else
+      return const AssetImage('assets/images/fondo_dia.png');
+  } else {
+    if (weatherCode == 3 || weatherCode == 45 || weatherCode == 48)
+      return const AssetImage('assets/images/fondo_nublado_noche.png');
+    else
+      return const AssetImage('assets/images/fondo_noche.jpg');
+  }
+}
 
   static String obtenerDiaSemana(int weekday, String idioma) {
     switch (idioma) {
@@ -2105,12 +2141,16 @@ class Utils {
     return 'App language';
   }
 
- static String stringChooseLanguageText(String idioma) {
+  static String stringChooseLanguageText(String idioma) {
     if (idioma == 'es') return 'Elige el idioma (algunos pueden tener errores)';
-    if (idioma == 'fr') return 'Choisissez la langue (certaines peuvent contenir des erreurs)';
-    if (idioma == 'it') return 'Scegli la lingua (alcune potrebbero contenere errori)';
-    if (idioma == 'de') return 'Sprache auswählen (einige können Fehler enthalten)';
-    if (idioma == 'ru') return 'Выберите язык (некоторые могут содержать ошибки)';
+    if (idioma == 'fr')
+      return 'Choisissez la langue (certaines peuvent contenir des erreurs)';
+    if (idioma == 'it')
+      return 'Scegli la lingua (alcune potrebbero contenere errori)';
+    if (idioma == 'de')
+      return 'Sprache auswählen (einige können Fehler enthalten)';
+    if (idioma == 'ru')
+      return 'Выберите язык (некоторые могут содержать ошибки)';
     if (idioma == 'pt') return 'Escolha o idioma (alguns podem conter erros)';
     if (idioma == 'ca') return 'Tria l\'idioma (alguns poden tindre errades)';
     if (idioma == 'he') return '(בחר שפה (חלקן עשויות להכיל שגיאות';
@@ -3212,6 +3252,23 @@ class Utils {
     return 'Check your internet connection and try again';
   }
 
+  static String stringHour(String idioma) {
+    if (idioma == 'es') return 'Hora';
+    if (idioma == 'fr') return 'Heure';
+    if (idioma == 'it') return 'Ora';
+    if (idioma == 'de') return 'Stunde';
+    if (idioma == 'ru') return 'Час';
+    if (idioma == 'pt') return 'Hora';
+    if (idioma == 'ca') return 'Hora';
+    if (idioma == 'he') return 'שעה';
+    if (idioma == 'uk') return 'Година';
+    if (idioma == 'ar') return 'ساعة';
+    if (idioma == 'zh') return '小时'; // Chino Mandarín
+    if (idioma == 'ko') return '시간';
+    if (idioma == 'ja') return '時間';
+    return 'Hour';
+  }
+
   static List<FlSpot> getPuntosRayosUva(WeatherProvider weatherProvider) {
     List<FlSpot> puntosRayosUva = [];
 
@@ -3232,20 +3289,394 @@ class Utils {
     return puntosRayosUva;
   }
 
-  static String stringHour(String idioma) {
-    if (idioma == 'es') return 'Hora';
-    if (idioma == 'fr') return 'Heure';
-    if (idioma == 'it') return 'Ora';
-    if (idioma == 'de') return 'Stunde';
-    if (idioma == 'ru') return 'Час';
-    if (idioma == 'pt') return 'Hora';
-    if (idioma == 'ca') return 'Hora';
-    if (idioma == 'he') return 'שעה';
-    if (idioma == 'uk') return 'Година';
-    if (idioma == 'ar') return 'ساعة';
-    if (idioma == 'zh') return '小时'; // Chino Mandarín
-    if (idioma == 'ko') return '시간';
-    if (idioma == 'ja') return '時間';
-    return 'Hour';
+  static List<double> getAmountRainData12hrs(WeatherProvider? weatherProvider, TiempoHoras? tiempoHoras) {
+    return weatherProvider != null ? weatherProvider.tiempoHoras!.precipitation
+        .take(12)
+        .toList() : tiempoHoras!.precipitation.take(12).toList();
+  }
+
+  static List<LluviaLevelModel> getRainLevelData(WeatherProvider? weatherProvider, TiempoHoras? tiempoHoras){
+    int i = 0;
+    List<LluviaLevelModel> listaADevolver = [];
+    List<double> amountRainData = getAmountRainData12hrs(weatherProvider, tiempoHoras);
+    List<String> hours = weatherProvider != null ? weatherProvider.tiempoHoras!.time.take(12).toList() : tiempoHoras!.time.take(12).toList();
+
+    amountRainData.forEach((rainData) {
+      if (rainData >= 60) {
+        listaADevolver.add(LluviaLevelModel(nivelLluvia: 5, hora: hours[i]));
+      } else if (rainData >= 30) {
+        listaADevolver.add(LluviaLevelModel(nivelLluvia: 4, hora: hours[i]));
+      } else if (rainData >= 10) {
+        listaADevolver.add(LluviaLevelModel(nivelLluvia: 3, hora: hours[i]));
+      } else if (rainData >= 2) {
+        listaADevolver.add(LluviaLevelModel(nivelLluvia: 2, hora: hours[i]));
+      } else if (rainData >= 0.1) {
+        listaADevolver.add(LluviaLevelModel(nivelLluvia: 1, hora: hours[i]));
+      }else{
+        listaADevolver.add(LluviaLevelModel(nivelLluvia: 0, hora: hours[i]));
+      }
+      i++;
+    });
+
+    return listaADevolver;
+  }
+
+  static Widget devolverPrevisionGraficaLluvia(
+    double screenWidth,
+    WeatherProvider weatherProvider,
+    String idioma,
+  ) {
+    List<LluviaLevelModel> rainBarCharData = getRainLevelData(weatherProvider,null);
+
+    if (rainBarCharData.isEmpty || !rainBarCharData.any((rainData) => rainData.nivelLluvia >= 1)) {
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 20
+      ),
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: Column(
+            children: [
+              Text(Utils.mensajeLluviaDinamico(rainBarCharData, idioma), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
+              SizedBox(
+                height: 200,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: SizedBox(
+                    width: rainBarCharData.length * 60.0, // Subido un poco para dar aire a las etiquetas
+                    child: BarChart(
+                      BarChartData(
+                        minY: 0,
+                        maxY: 6,
+                        barTouchData: BarTouchData(
+                          touchTooltipData: BarTouchTooltipData(
+                            getTooltipColor: (group) => Colors.black87,
+                            tooltipMargin: 10,
+                            getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                              final index = group.x;
+                              if (index < 0 || index >= rainBarCharData.length) return null;
+              
+                              final horaReal = rainBarCharData[index].hora.substring(11, 13);
+              
+                              return BarTooltipItem(
+                                '${Utils.stringHour(idioma)}: $horaReal:00\n',
+                                const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                children: [
+                                  TextSpan(
+                                    text: '${Utils.stringRain(idioma)}: ${getAmountRainData12hrs(weatherProvider,null)[index]} l/m²',
+                                    style: const TextStyle(
+                                      color: Colors.lightBlueAccent,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                        titlesData: FlTitlesData(
+                          show: true,
+                          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                          
+                          // 👇 AQUÍ SE CONFIGURA EL EJE CON TUS NUEVOS TEXTOS TRADUCIDOS
+                          leftTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 65, // Aumentado para que los textos largos no se corten
+                              interval: 1,
+                              getTitlesWidget: (value, meta) {
+                                String textoNivel = '';
+                                
+                                switch (value.toInt()) {
+                                  case 1:
+                                    if (idioma == 'es') textoNivel = 'Débil';
+                                    else if (idioma == 'fr') textoNivel = 'Légère';
+                                    else if (idioma == 'it') textoNivel = 'Leggera';
+                                    else if (idioma == 'de') textoNivel = 'Leicht';
+                                    else if (idioma == 'ru') textoNivel = 'Слабый';
+                                    else if (idioma == 'pt') textoNivel = 'Fraca';
+                                    else if (idioma == 'ca') textoNivel = 'Feble';
+                                    else if (idioma == 'he') textoNivel = 'קל';
+                                    else if (idioma == 'uk') textoNivel = 'Слабкий';
+                                    else if (idioma == 'ar') textoNivel = 'خفيف';
+                                    else if (idioma == 'zh') textoNivel = '小雨';
+                                    else if (idioma == 'ko') textoNivel = '약함';
+                                    else if (idioma == 'ja') textoNivel = '弱い';
+                                    else textoNivel = 'Light';
+                                    break;
+                                  case 2:
+                                    if (idioma == 'es') textoNivel = 'Moderada';
+                                    else if (idioma == 'fr') textoNivel = 'Modérée';
+                                    else if (idioma == 'it') textoNivel = 'Moderata';
+                                    else if (idioma == 'de') textoNivel = 'Mäßig';
+                                    else if (idioma == 'ru') textoNivel = 'Умеренный';
+                                    else if (idioma == 'pt') textoNivel = 'Moderada';
+                                    else if (idioma == 'ca') textoNivel = 'Moderat';
+                                    else if (idioma == 'he') textoNivel = 'מתון';
+                                    else if (idioma == 'uk') textoNivel = 'Помірний';
+                                    else if (idioma == 'ar') textoNivel = 'متوسط';
+                                    else if (idioma == 'zh') textoNivel = '中雨';
+                                    else if (idioma == 'ko') textoNivel = '보통';
+                                    else if (idioma == 'ja') textoNivel = 'やや強い';
+                                    else textoNivel = 'Moderate';
+                                    break;
+                                  case 3:
+                                    if (idioma == 'es') textoNivel = 'Fuerte';
+                                    else if (idioma == 'fr') textoNivel = 'Forte';
+                                    else if (idioma == 'it') textoNivel = 'Forte';
+                                    else if (idioma == 'de') textoNivel = 'Stark';
+                                    else if (idioma == 'ru') textoNivel = 'Сильный';
+                                    else if (idioma == 'pt') textoNivel = 'Forte';
+                                    else if (idioma == 'ca') textoNivel = 'Fort';
+                                    else if (idioma == 'he') textoNivel = 'חזק';
+                                    else if (idioma == 'uk') textoNivel = 'Сильний';
+                                    else if (idioma == 'ar') textoNivel = 'قوي';
+                                    else if (idioma == 'zh') textoNivel = '大雨';
+                                    else if (idioma == 'ko') textoNivel = '강함';
+                                    else if (idioma == 'ja') textoNivel = '強い';
+                                    else textoNivel = 'Heavy';
+                                    break;
+                                  case 4:
+                                    if (idioma == 'es') textoNivel = 'Intensa';
+                                    else if (idioma == 'fr') textoNivel = 'Intense';
+                                    else if (idioma == 'it') textoNivel = 'Molto forte';
+                                    else if (idioma == 'de') textoNivel = 'Heftig';
+                                    else if (idioma == 'ru') textoNivel = 'Интенсив.';
+                                    else if (idioma == 'pt') textoNivel = 'Intensa';
+                                    else if (idioma == 'ca') textoNivel = 'Intens';
+                                    else if (idioma == 'he') textoNivel = 'עז';
+                                    else if (idioma == 'uk') textoNivel = 'Інтенсив.';
+                                    else if (idioma == 'ar') textoNivel = 'شديد';
+                                    else if (idioma == 'zh') textoNivel = '暴雨';
+                                    else if (idioma == 'ko') textoNivel = '매우강함';
+                                    else if (idioma == 'ja') textoNivel = '激しい';
+                                    else textoNivel = 'Intense';
+                                    break;
+                                  case 5:
+                                    if (idioma == 'es') textoNivel = 'Extrema';
+                                    else if (idioma == 'fr') textoNivel = 'Violente';
+                                    else if (idioma == 'it') textoNivel = 'Estrema';
+                                    else if (idioma == 'de') textoNivel = 'Extrem';
+                                    else if (idioma == 'ru') textoNivel = 'Экстрем.';
+                                    else if (idioma == 'pt') textoNivel = 'Extrema';
+                                    else if (idioma == 'ca') textoNivel = 'Extrem';
+                                    else if (idioma == 'he') textoNivel = 'קיצוני';
+                                    else if (idioma == 'uk') textoNivel = 'Екстрем.';
+                                    else if (idioma == 'ar') textoNivel = 'عنيف';
+                                    else if (idioma == 'zh') textoNivel = '特大暴雨';
+                                    else if (idioma == 'ko') textoNivel = '극심함';
+                                    else if (idioma == 'ja') textoNivel = '猛烈な';
+                                    else textoNivel = 'Extreme';
+                                    break;
+                                  default:
+                                    return const SizedBox.shrink(); // Para el nivel 0 no pintamos texto en el eje
+                                }
+              
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 4.0),
+                                  child: Text(
+                                    textoNivel,
+                                    style: const TextStyle(fontSize: 9, color: Colors.grey, fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.end,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          bottomTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 35,
+                              interval: 1,
+                              getTitlesWidget: (value, meta) {
+                                final index = value.toInt();
+                                if (index < 0 || index >= rainBarCharData.length) {
+                                  return const SizedBox.shrink();
+                                }
+              
+                                final horaReal = rainBarCharData[index].hora.substring(11, 13) + ":00";
+              
+                                return Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Text(
+                                    horaReal,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                        gridData: FlGridData(
+                          show: true,
+                          drawVerticalLine: false,
+                          getDrawingHorizontalLine: (value) => FlLine(
+                            color: Colors.grey.withOpacity(0.1),
+                            strokeWidth: 1,
+                          ),
+                        ),
+                        borderData: FlBorderData(show: false),
+                        barGroups: List.generate(rainBarCharData.length, (index) {
+                          final item = rainBarCharData[index];
+                          return BarChartGroupData(
+                            x: index,
+                            barRods: [
+                              BarChartRodData(
+                                toY: item.nivelLluvia.toDouble(),
+                                color: Colors.blue.withOpacity(0.7),
+                                width: 14,
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(4),
+                                  topRight: Radius.circular(4),
+                                ),
+                              ),
+                            ],
+                          );
+                        }),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  
+  static String mensajeLluviaDinamico(List<LluviaLevelModel> rainBarCharData, String idioma) {
+  if (rainBarCharData.isEmpty) return "";
+
+  String mensajeADevolver = "";
+  
+  // Contamos cuántas horas de margen plano
+  int horasHastaLluvia = rainBarCharData.takeWhile((rainData) => rainData.nivelLluvia == 0).length;
+  
+  // Contamos el total de horas que van a tener lluvia en la predicción
+  int horasDeLluvia = rainBarCharData.takeWhile((rainData) => rainData.nivelLluvia >= 1).length;
+
+  if (horasHastaLluvia > 0) {
+    if (horasHastaLluvia == 1) {
+      if (idioma == 'es') mensajeADevolver = 'La lluvia comenzará en menos de una hora';
+      if (idioma == 'fr') mensajeADevolver = 'La pluie commencera dans moins d\'une heure';
+      if (idioma == 'it') mensajeADevolver = 'La pioggia inizierà in meno di un\'ora';
+      if (idioma == 'de') mensajeADevolver = 'Der Regen beginnt in weniger als einer Stunde';
+      if (idioma == 'ru') mensajeADevolver = 'Дождь начнется меньше чем через час';
+      if (idioma == 'pt') mensajeADevolver = 'A chuva começará em menos de uma hora';
+      if (idioma == 'ca') mensajeADevolver = 'La pluja començarà en menys d\'una hora';
+      if (idioma == 'he') mensajeADevolver = 'הגשם יתחיל בעוד פחות משעה';
+      if (idioma == 'uk') mensajeADevolver = 'Дощ почнеться менш ніж через годину';
+      if (idioma == 'ar') mensajeADevolver = 'سيبدأ المطر خلال أقل من ساعة';
+      if (idioma == 'zh') mensajeADevolver = '降雨将在不到一小时内开始';
+      if (idioma == 'ko') mensajeADevolver = '한 시간 이내에 비가 시작될 예정입니다';
+      if (idioma == 'ja') mensajeADevolver = '1時間以内に雨が降り始める見込みです';
+      if (mensajeADevolver.isEmpty) mensajeADevolver = 'Rain will start in less than an hour';
+    } else {
+      // Si quedan 2 o más horas
+      if (idioma == 'es') mensajeADevolver = 'La lluvia comenzará en $horasHastaLluvia horas';
+      if (idioma == 'fr') mensajeADevolver = 'La pluie commencera dans $horasHastaLluvia heures';
+      if (idioma == 'it') mensajeADevolver = 'La pioggia inizierà tra $horasHastaLluvia ore';
+      if (idioma == 'de') mensajeADevolver = 'Der Regen beginnt in $horasHastaLluvia Stunden';
+      if (idioma == 'ru') mensajeADevolver = 'Дождь начнется через $horasHastaLluvia ч.';
+      if (idioma == 'pt') mensajeADevolver = 'A chuva começará em $horasHastaLluvia horas';
+      if (idioma == 'ca') mensajeADevolver = 'La pluja començarà en $horasHastaLluvia hores';
+      if (idioma == 'he') mensajeADevolver = 'הגשם יתחיל בעוד $horasHastaLluvia שעות';
+      if (idioma == 'uk') mensajeADevolver = 'Дощ почнеться через $horasHastaLluvia год.';
+      if (idioma == 'ar') mensajeADevolver = 'سيبدأ المطر خلال $horasHastaLluvia ساعات';
+      if (idioma == 'zh') mensajeADevolver = '降雨将在 $horasHastaLluvia 小时内开始';
+      if (idioma == 'ko') mensajeADevolver = '$horasHastaLluvia时间后开始下雨';
+      if (idioma == 'ja') mensajeADevolver = '$horasHastaLluvia時間後に雨が降り始める見込みです';
+      if (mensajeADevolver.isEmpty) mensajeADevolver = 'Rain will start in $horasHastaLluvia hours';
+    }
+  } 
+  else if (horasDeLluvia > 0) {
+    if (horasDeLluvia == 1) {
+      // CUANDO SOLO QUEDA UNA HORA DE LLUVIA
+      if (idioma == 'es') mensajeADevolver = 'La lluvia continuará durante la próxima hora';
+      if (idioma == 'fr') mensajeADevolver = 'La pluie continuera pendant la prochaine heure';
+      if (idioma == 'it') mensajeADevolver = 'La pioggia continuerà nella prossima ora';
+      if (idioma == 'de') mensajeADevolver = 'Der Regen wird in der nächsten Stunde anhalten';
+      if (idioma == 'ru') mensajeADevolver = 'Дождь продолжится в ближайший час';
+      if (idioma == 'pt') mensajeADevolver = 'A chuva continuará na próxima hora';
+      if (idioma == 'ca') mensajeADevolver = 'La pluja continuarà durant la pròxima hora';
+      if (idioma == 'he') mensajeADevolver = 'הגشם יימשך במהלך השעה הקרובה';
+      if (idioma == 'uk') mensajeADevolver = 'Дощ триватиме протягом наступної години';
+      if (idioma == 'ar') mensajeADevolver = 'سيستمر المطر خلال الساعة القادمة';
+      if (idioma == 'zh') mensajeADevolver = '降雨将持续接下来的一个小时';
+      if (idioma == 'ko') mensajeADevolver = '앞으로 한 시간 동안 비가 계속될 예정입니다';
+      if (idioma == 'ja') mensajeADevolver = '今後1時間、雨が降り続く見込みです';
+      if (mensajeADevolver.isEmpty) mensajeADevolver = 'Rain will continue for the next hour';
+    } else {
+      // CUANDO QUEDAN DOS O MÁS HORAS
+      if (idioma == 'es') mensajeADevolver = 'La lluvia continuará durante las próximas $horasDeLluvia horas';
+      if (idioma == 'fr') mensajeADevolver = 'La pluie continuera pendant les $horasDeLluvia prochaines heures'; // Corregido "próximas" en español que se había colado
+      if (idioma == 'it') mensajeADevolver = 'La pioggia continuerà nelle prossime $horasDeLluvia ore';
+      if (idioma == 'de') mensajeADevolver = 'Der Regen wird in den nächsten $horasDeLluvia Stunden anhalten'; // Corregido el return intruso
+      if (idioma == 'ru') mensajeADevolver = 'Дождь продолжится в ближайшие $horasDeLluvia ч.';
+      if (idioma == 'pt') mensajeADevolver = 'A chuva continuará nas próximas $horasDeLluvia horas';
+      if (idioma == 'ca') mensajeADevolver = 'La pluja continuarà durant les pròximes $horasDeLluvia hores';
+      if (idioma == 'he') mensajeADevolver = 'הגשם יימשך במהלך $horasDeLluvia השעות הקרובות';
+      if (idioma == 'uk') mensajeADevolver = 'Дощ триватиме протягом наступних $horasDeLluvia год.';
+      if (idioma == 'ar') mensajeADevolver = 'سيستمر المطر خلال الـ $horasDeLluvia ساعة القادمة';
+      if (idioma == 'zh') mensajeADevolver = '降雨将持续接下来的 $horasDeLluvia 小时';
+      if (idioma == 'ko') mensajeADevolver = '앞으로 $horasDeLluvia시간 동안 비가 계속될 예정입니다';
+      if (idioma == 'ja') mensajeADevolver = '今後$horasDeLluvia時間、雨が降り続く見込みです';
+      if (mensajeADevolver.isEmpty) mensajeADevolver = 'Rain will continue for the next $horasDeLluvia hours';
+    }
+  }
+
+  if (rainBarCharData.any((rainData) => rainData.nivelLluvia >= 4)) {
+    String avisoAguaceros = "";
+    if (idioma == 'es') avisoAguaceros = '. Se esperan fuertes aguaceros';
+    if (idioma == 'fr') avisoAguaceros = '. De fortes averses sont attendues';
+    if (idioma == 'it') avisoAguaceros = '. Sono previsti forti rovesci';
+    if (idioma == 'de') avisoAguaceros = '. Es werden starke Regenschauer erwartet';
+    if (idioma == 'ru') avisoAguaceros = '. Ожидаются сильные ливни';
+    if (idioma == 'pt') avisoAguaceros = '. Esperam-se fortes aguaceiros';
+    if (idioma == 'ca') avisoAguaceros = '. S\'esperen forts ruixats';
+    if (idioma == 'he') avisoAguaceros = '. צפויים ממטרים עזים';
+    if (idioma == 'uk') avisoAguaceros = '. Очікуються сильні зливи';
+    if (idioma == 'ar') avisoAguaceros = '. يُتوقع هطول زخات مطر غزيرة';
+    if (idioma == 'zh') avisoAguaceros = '。预计会有强阵雨';
+    if (idioma == 'ko') avisoAguaceros = '. 강한 소나기가 예상됩니다';
+    if (idioma == 'ja') avisoAguaceros = '。激しい大雨が予想されます';
+    if (avisoAguaceros.isEmpty) avisoAguaceros = '. Heavy downpours are expected';
+    
+    mensajeADevolver += avisoAguaceros;
+  }
+
+  return mensajeADevolver;
+}
+
+  static String stringRain(String idioma) {
+    if (idioma == 'es') return 'Lluvia';
+    if (idioma == 'fr') return 'Pluie';
+    if (idioma == 'it') return 'Pioggia';
+    if (idioma == 'de') return 'Regen';
+    if (idioma == 'ru') return 'Дождь';
+    if (idioma == 'pt') return 'Chuva';
+    if (idioma == 'ca') return 'Pluja';
+    if (idioma == 'he') return 'גשם';
+    if (idioma == 'uk') return 'Дощ';
+    if (idioma == 'ar') return 'مطر';
+    if (idioma == 'zh') return '降雨'; // Chino Mandarín
+    if (idioma == 'ko') return '비';
+    if (idioma == 'ja') return '雨';
+    return 'Rain';
   }
 }
