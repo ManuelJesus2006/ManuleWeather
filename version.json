@@ -1,5 +1,5 @@
 {
-    "version": "0.9.5",
+    "version": "0.9.6",
   "url": "https://drive.google.com/file/d/1B1Ojsb_gF4Tw8oFm28FiFDGhux1T0b1H/view?usp=sharing",
-  "whatisnew": "Actualización de UX: Funcionalidad en fase beta del Widget de android de la app y gráfica de previsión de lluvia"
+  "whatisnew": "Arreglo de algunos bugs en algunos valores, accesibilidad ante errores inesperados en la pantalla de carga inicial y linea de carga"
 }

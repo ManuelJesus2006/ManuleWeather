@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -45,6 +46,8 @@ class _SplashScreenState extends State<SplashScreen> {
       context,
     );
 
+    configProvider.cambiarValorLineaDeCarga(12.5);
+
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -87,6 +90,7 @@ class _SplashScreenState extends State<SplashScreen> {
         );
       return;
     }
+    configProvider.cambiarValorLineaDeCarga(25);
 
     print(configProvider.primeraVez);
 
@@ -99,23 +103,29 @@ class _SplashScreenState extends State<SplashScreen> {
     Position position = await Geolocator.getCurrentPosition();
     print("Latitud: ${position.latitude}, Longitud: ${position.longitude}");
     try {
-      Tiempo? tiempoUbi = await TiempoService().getTiempoLatLon(
-        position.latitude,
-        position.longitude,
-      );
-      String? nombreCiudad = await LocalizacionService().getNombreCiudadByCords(
-        position.longitude,
-        position.latitude,
-        configProvider.idiomaActual,
-      );
-      TiempoHoras? tiempoHoras = await TiempoService().getTiempoPorHoras(
-        position.latitude,
-        position.longitude,
-      );
-      TiempoDias? tiempoDias = await TiempoService().getTiempoPorDias(
-        position.latitude,
-        position.longitude,
-      );
+      Tiempo? tiempoUbi = await TiempoService()
+          .getTiempoLatLon(position.latitude, position.longitude)
+          .timeout(const Duration(seconds: 10));
+
+      configProvider.cambiarValorLineaDeCarga(37.5);
+      String? nombreCiudad = await LocalizacionService()
+          .getNombreCiudadByCords(
+            position.longitude,
+            position.latitude,
+            configProvider.idiomaActual,
+          )
+          .timeout(const Duration(seconds: 10));
+
+      configProvider.cambiarValorLineaDeCarga(50);
+      TiempoHoras? tiempoHoras = await TiempoService()
+          .getTiempoPorHoras(position.latitude, position.longitude)
+          .timeout(const Duration(seconds: 10));
+
+      configProvider.cambiarValorLineaDeCarga(62.5);
+      TiempoDias? tiempoDias = await TiempoService()
+          .getTiempoPorDias(position.latitude, position.longitude)
+          .timeout(const Duration(seconds: 10));
+      configProvider.cambiarValorLineaDeCarga(75);
       // Actualizamos el Provider AQUÍ, antes de cambiar de pantalla.
       // Usamos listen: false porque estamos dentro de una función, no pintando.
       final weatherProvider = Provider.of<WeatherProvider>(
@@ -132,6 +142,7 @@ class _SplashScreenState extends State<SplashScreen> {
         position.latitude,
         position.longitude,
       );
+      configProvider.cambiarValorLineaDeCarga(87.5);
 
       //Cambiamos los datos en el widget
       HomeScreenWidgetManager.actualizarDatos(
@@ -139,7 +150,7 @@ class _SplashScreenState extends State<SplashScreen> {
         idioma: configProvider.idiomaActual,
         fondoOscuro: configProvider.isDarkTheme,
         tiempoActual: weatherProvider.tiempoActual!,
-        rainData: Utils.getRainLevelData(weatherProvider,null),
+        rainData: Utils.getRainLevelData(weatherProvider, null),
       );
 
       weatherProvider.comprobarNocheDia();
@@ -147,29 +158,91 @@ class _SplashScreenState extends State<SplashScreen> {
       DateTime horaActual = weatherProvider.ahoraCiudad;
       int elementosAEliminar = horaActual.hour;
       weatherProvider.eliminarHorasPasadas(elementosAEliminar);
+      configProvider.cambiarValorLineaDeCarga(100);
 
       if (mounted) {
         context.go('/home');
       }
+    } on TimeoutException {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(Utils.stringErrorTimeout(configProvider.idiomaActual)),
+        ),
+      );
     } catch (e) {
-      if (mounted && e is HttpException)
+      if (mounted && e is HttpException) {
         context.go(
           '/error',
           extra: Utils.stringErrorServerDown(configProvider.idiomaActual),
         );
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(Utils.stringErrorApp(configProvider.idiomaActual)),
+          ),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final configProvider = Provider.of<ConfigProvider>(context);
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            Image.asset('assets/images/LogoApp.png'),
-            SizedBox(height: 8),
-            CircularProgressIndicator(),
-          ],
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Logo con tamaño controlado para que no desentone
+                SizedBox(
+                  width: 120,
+                  height: 120,
+                  child: Image.asset('assets/images/LogoApp.png'),
+                ),
+                const SizedBox(height: 40),
+
+                // 🌟 Línea de carga estilizada (Bordes redondeados y más gruesa)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: SizedBox(
+                    height: 8,
+                    child: LinearProgressIndicator(
+                      value: configProvider.valorLineaDeCarga / 100,
+                      backgroundColor: Colors.grey.withOpacity(0.2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Textos e indicador intactos
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      configProvider.valorLineaDeCarga < 12.5
+                          ? Utils.stringCheckingUpdates(
+                              configProvider.idiomaActual,
+                            )
+                          : Utils.stringLoading(configProvider.idiomaActual),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2.5),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

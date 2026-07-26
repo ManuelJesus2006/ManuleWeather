@@ -2628,42 +2628,42 @@ class Utils {
       nivelLluvia = 1;
 
     int nivelTempAlta = 0;
-    if (temperatureData.any((e) => e > 44))
+    if (temperatureData.any((e) => e.round() > 44))
       nivelTempAlta = 3;
-    else if (temperatureData.any((e) => e >= 39))
+    else if (temperatureData.any((e) => e.round() >= 39))
       nivelTempAlta = 2;
-    else if (temperatureData.any((e) => e >= 36))
+    else if (temperatureData.any((e) => e.round() >= 36))
       nivelTempAlta = 1;
 
     int nivelTempBaja = 0;
-    if (temperatureData.any((e) => e < -15))
+    if (temperatureData.any((e) => e.round() < -15))
       nivelTempBaja = 3;
-    else if (temperatureData.any((e) => e < -10))
+    else if (temperatureData.any((e) => e.round() < -10))
       nivelTempBaja = 2;
-    else if (temperatureData.any((e) => e < -5))
+    else if (temperatureData.any((e) => e.round() < -5))
       nivelTempBaja = 1;
 
     int nivelWindSpeed = 0;
-    if (windSpeedData.any((e) => e >= 90))
+    if (windSpeedData.any((e) => e.round() >= 90))
       nivelWindSpeed = 3;
-    else if (windSpeedData.any((e) => e >= 70))
+    else if (windSpeedData.any((e) => e.round() >= 70))
       nivelWindSpeed = 2;
-    else if (windSpeedData.any((e) => e >= 50))
+    else if (windSpeedData.any((e) => e.round() >= 50))
       nivelWindSpeed = 1;
 
     int nivelWindGust = 0;
-    if (windGustData.any((e) => e >= 120))
+    if (windGustData.any((e) => e.round() >= 120))
       nivelWindGust = 3;
-    else if (windGustData.any((e) => e >= 90))
+    else if (windGustData.any((e) => e.round() >= 90))
       nivelWindGust = 2;
-    else if (windGustData.any((e) => e >= 70))
+    else if (windGustData.any((e) => e.round() >= 70))
       nivelWindGust = 1;
 
     return Column(
       spacing: 10, //Nuevo de flutter, da espaciado entre elementos
       children: [
         //LÓGICA AVISOS RAYOS UVA
-        if (uvData.any((e) => e >= 8))
+        if (uvData.any((e) => e.round() >= 8))
           CardAlertWidget(
             text: Utils.stringAlertUV8(idioma),
             color: Colors.redAccent,
@@ -3678,5 +3678,73 @@ class Utils {
     if (idioma == 'ko') return '비';
     if (idioma == 'ja') return '雨';
     return 'Rain';
+  }
+
+  static String stringErrorApp(String idioma) {
+    if (idioma == 'es') return 'Error en la aplicación. Cierre la app y vuelva a abrirla';
+    if (idioma == 'fr') return 'Erreur dans l\'application. Fermez l\'application et rouvrez-la';
+    if (idioma == 'it') return 'Errore nell\'app. Chiudi l\'app e riaprila';
+    if (idioma == 'de') return 'Ein Fehler ist aufgetreten. Schließen Sie die App und öffnen Sie sie erneut';
+    if (idioma == 'ru') return 'Ошибка в приложении. Закройте приложение и откройте его снова';
+    if (idioma == 'pt') return 'Erro no aplicativo. Feche o app e abra novamente';
+    if (idioma == 'ca') return 'Error a l\'aplicació. Tanqueu l\'aplicació i torneu-la a obrir';
+    if (idioma == 'he') return 'שגיאה באפליקציה. סגור את האפליקציה ופתח שוב';
+    if (idioma == 'uk') return 'Помилка в додатку. Закрийте додаток і відкрийте його знову';
+    if (idioma == 'ar') return 'حدث خطأ في التطبيق. أغلق التطبيق وافتحه مرة أخرى';
+    if (idioma == 'zh') return '应用程序出现错误。请关闭应用并重新打开';
+    if (idioma == 'ko') return '앱에 오류가 발생했습니다. 앱을 닫고 다시 열어주세요';
+    if (idioma == 'ja') return 'アプリでエラーが発生しました。アプリを閉じて再度開いてください';
+    return 'An error has occurred in the app. Close the app and open it again';
+  }
+
+  static String stringErrorTimeout(String idioma) {
+    if (idioma == 'es') return 'Está tardando demasiado, compruebe su conexión a internet, cierre la app y vuelva a abrirla';
+    if (idioma == 'fr') return 'Cela prend trop de temps, vérifiez votre connexion internet, fermez l\'application et rouvrez-la';
+    if (idioma == 'it') return 'Ci sta mettendo troppo tempo, controlla la tua connessione internet, chiudi l\'app e riaprila';
+    if (idioma == 'de') return 'Es dauert zu lange. Bitte überprüfen Sie Ihre Internetverbindung, schließen Sie die App und öffnen Sie sie erneut';
+    if (idioma == 'ru') return 'Занимает слишком много времени, проверьте подключение к интернету, закройте приложение и откройте его снова';
+    if (idioma == 'pt') return 'Está demorando muito. Verifique sua conexão com a internet, feche o app e abra novamente';
+    if (idioma == 'ca') return 'Està trigant massa, comproveu la connexió a internet, tanqueu l\'aplicació i torneu-la a obrir';
+    if (idioma == 'he') return 'זה לוקח יותר מדי זמן, בדוק את חיבור האינטרנט שלך, סגור את האפליקציה ופתח שוב';
+    if (idioma == 'uk') return 'Займає надто багато часу, перевірте підключення до інтернету, закрийте додаток і відкрийте його знову';
+    if (idioma == 'ar') return 'يستغرق الأمر وقتاً طويلاً، تحقق من اتصالك بالإنترنت، أغلق التطبيق وافتحه مرة أخرى';
+    if (idioma == 'zh') return '响应时间过长，请检查您的网络连接，关闭应用并重新打开';
+    if (idioma == 'ko') return '시간이 너무 오래 걸립니다. 인터넷 연결을 확인하고 앱을 닫은 후 다시 열어주세요';
+    if (idioma == 'ja') return '時間がかかりすぎています。インターネット接続を確認し、アプリを閉じて再度開いてください';
+    return 'It is taking a long time, check your internet connection, close the app and open it again';
+  }
+
+  static String stringLoading(String idioma) {
+    if (idioma == 'es') return 'Cargando...';
+    if (idioma == 'fr') return 'Chargement...';
+    if (idioma == 'it') return 'Caricamento...';
+    if (idioma == 'de') return 'Lädt...';
+    if (idioma == 'ru') return 'Загрузка...';
+    if (idioma == 'pt') return 'Carregando...';
+    if (idioma == 'ca') return 'Carregant...';
+    if (idioma == 'he') return 'טוען...';
+    if (idioma == 'uk') return 'Завантаження...';
+    if (idioma == 'ar') return 'جاري التحميل...';
+    if (idioma == 'zh') return '加载中...';
+    if (idioma == 'ko') return '로딩 중...';
+    if (idioma == 'ja') return '読み込み中...';
+    return 'Loading...';
+  }
+
+  static String stringCheckingUpdates(String idioma) {
+    if (idioma == 'es') return 'Buscando actualizaciones...';
+    if (idioma == 'fr') return 'Recherche de mises à jour...';
+    if (idioma == 'it') return 'Controllo aggiornamenti...';
+    if (idioma == 'de') return 'Suche nach Updates...';
+    if (idioma == 'ru') return 'Проверка обновлений...';
+    if (idioma == 'pt') return 'Verificando atualizações...';
+    if (idioma == 'ca') return 'Buscant actualitzacions...';
+    if (idioma == 'he') return 'בודק עדכונים...';
+    if (idioma == 'uk') return 'Перевірка оновлень...';
+    if (idioma == 'ar') return 'جاري التحقق من التحديثات...';
+    if (idioma == 'zh') return '正在检查更新...';
+    if (idioma == 'ko') return '업데이트 확인 중...';
+    if (idioma == 'ja') return 'アップデートを確認中...';
+    return 'Checking for updates...';
   }
 }

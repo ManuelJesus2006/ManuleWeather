@@ -10,6 +10,7 @@ class ConfigProvider with ChangeNotifier {
     0,
     Platform.localeName.length - 3,
   );
+  double valorLineaDeCarga = 0;
   bool primeraVez = true;
   List<String> idiomasActuales = [
     'es',
@@ -120,5 +121,10 @@ class ConfigProvider with ChangeNotifier {
     String historialParsed = jsonEncode(listaMapeada);
 
     await preferences.setString("historial", historialParsed);
+  }
+
+  cambiarValorLineaDeCarga(double nuevoValor) async{
+    valorLineaDeCarga = nuevoValor;
+    notifyListeners();
   }
 }
