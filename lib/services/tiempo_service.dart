@@ -7,10 +7,10 @@ class TiempoService {
   String _urlBase = 'https://api.openweathermap.org/data/2.5/weather';
 
   String _urlBaseOpenMeteo = 'https://api.open-meteo.com/v1/forecast?';
-  String _otrosTiempoHoras = '&hourly=temperature_2m,weather_code,precipitation_probability,uv_index,wind_speed_10m,wind_gusts_10m,cloud_cover,precipitation,relative_humidity_2m&timezone=auto';
+  String _otrosTiempoHoras = '&hourly=temperature_2m,weather_code,precipitation_probability,uv_index,wind_speed_10m,wind_gusts_10m,cloud_cover,precipitation,relative_humidity_2m,snowfall&timezone=auto';
 
-  String _otrosTiempoDias = '&daily=temperature_2m_max,temperature_2m_min,weather_code,wind_speed_10m_max,wind_gusts_10m_max,precipitation_sum,sunrise,sunset&timezone=auto';
-  String _otrosTiempoActual = "&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,relative_humidity_2m,precipitation,cloud_cover,pressure_msl,is_day,visibility,uv_index&timezone=auto";
+  String _otrosTiempoDias = '&daily=temperature_2m_max,temperature_2m_min,weather_code,wind_speed_10m_max,wind_gusts_10m_max,precipitation_sum,sunrise,sunset,snowfall_sum&timezone=auto';
+  String _otrosTiempoActual = "&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,relative_humidity_2m,precipitation,cloud_cover,pressure_msl,is_day,visibility,uv_index,snowfall&timezone=auto";
   Future<Tiempo?> getTiempoLatLon(double lat, double lon) async {
     Uri uri = Uri.parse(
       '${_urlBaseOpenMeteo}latitude=$lat&longitude=$lon$_otrosTiempoActual',

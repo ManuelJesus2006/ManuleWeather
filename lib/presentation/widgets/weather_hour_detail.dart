@@ -142,8 +142,8 @@ class WeatherHourDetail extends StatelessWidget {
             const SizedBox(height: 10),
             _infoCard(
               color: Colors.blue.withOpacity(0.6), //cantidad de lluvia
-              titulo: Utils.stringAmountOfRainSnow(configProvider.idiomaActual),
-              valor: '${tiempoHoras.precipitation[indexTiempoHoras]} l/m²',
+              titulo: Utils.isNevando(tiempoHoras.weatherCode[indexTiempoHoras]) ? Utils.stringAmountOfSnow(configProvider.idiomaActual) : Utils.stringAmountOfRain(configProvider.idiomaActual),
+              valor: Utils.isNevando(tiempoHoras.weatherCode[indexTiempoHoras]) ? '${tiempoHoras.snowfall[indexTiempoHoras]} cm' : '${tiempoHoras.precipitation[indexTiempoHoras]} l/m²',
             ),
             const SizedBox(height: 10),
             _infoCard(

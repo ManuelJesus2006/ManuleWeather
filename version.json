@@ -1,5 +1,5 @@
 {
-    "version": "0.9.6",
+    "version": "0.9.7",
   "url": "https://drive.google.com/file/d/1B1Ojsb_gF4Tw8oFm28FiFDGhux1T0b1H/view?usp=sharing",
-  "whatisnew": "Arreglo de algunos bugs en algunos valores, accesibilidad ante errores inesperados en la pantalla de carga inicial y linea de carga"
+  "whatisnew": "Cambios en las graficas de lluvia y adición de la grafica de nieve aunque con algunas cosas por pulir y en fase beta. Muestra de datos de l/m² cuando hay lluvia y de cm cuando hay nieve en pantalla por horas y por dias. Avisos amarillos, naranjas y rojos por cm de nieve sin testear pero funcionarán correctamente"
 }

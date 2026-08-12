@@ -76,6 +76,13 @@ class HomeScreen extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
 
     final puntosUVA = Utils.getPuntosRayosUva(weatherProvider);
+    bool hayNieve = weatherProvider.tiempoHoras!.weatherCode
+        .take(8)
+        .any((code) => Utils.isNevando(code));
+
+    bool hayLluvia = weatherProvider.tiempoHoras!.weatherCode
+        .take(8)
+        .any((code) => Utils.isLloviendo(code));
 
     Widget _infoCard({required String titulo, required Widget valor}) {
       return Container(
@@ -231,7 +238,22 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.03),
-                Utils.devolverPrevisionGraficaLluvia(screenWidth, weatherProvider, configProvider.idiomaActual),
+                if (Utils.isLloviendo(weatherProvider.tiempoActual!.current.weatherCode) && hayLluvia)
+                Utils.devolverPrevisionGraficaLluvia(
+                  screenWidth,
+                  weatherProvider,
+                  configProvider.idiomaActual,
+                )
+                else if (Utils.isNevando(weatherProvider.tiempoActual!.current.weatherCode) && hayNieve)
+                Utils.devolverPrevisionGraficaNieve(
+                  screenWidth,
+                  weatherProvider,
+                  configProvider.idiomaActual,
+                )
+                else if (hayLluvia && hayNieve) Utils.devolverPrevisionMezclaNieveYLluvia(
+                  screenWidth,
+                  configProvider.idiomaActual
+                ),
                 SizedBox(height: screenHeight * 0.03),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.07),
@@ -563,7 +585,7 @@ class HomeScreen extends StatelessWidget {
                                     setStateItem(() {
                                       isAbierto = !isAbierto;
                                     });
-                                  }else{
+                                  } else {
                                     navigationProvider.cambiarIndice(0);
                                   }
                                 },
@@ -953,7 +975,8 @@ class UV_home_widget extends StatelessWidget {
                                 ),
                                 children: [
                                   TextSpan(
-                                    text: '${Utils.stringUVRaysScreen(configProvider.idiomaActual)}: $uv',
+                                    text:
+                                        '${Utils.stringUVRaysScreen(configProvider.idiomaActual)}: $uv',
                                     style: TextStyle(
                                       color: Utils.obtenerColorUV(uv.toInt()),
                                       fontWeight: FontWeight.bold,
@@ -991,9 +1014,17 @@ class UV_home_widget extends StatelessWidget {
                                   return const SizedBox.shrink();
 
                                 final horaReal = index == 0
-                                    ? Utils.formatearHora(DateTime.parse(weatherProvider.tiempoActual!.current.time))
+                                    ? Utils.formatearHora(
+                                        DateTime.parse(
+                                          weatherProvider
+                                              .tiempoActual!
+                                              .current
+                                              .time,
+                                        ),
+                                      )
                                     : weatherProvider.tiempoHoras!.time[index]
-                                          .substring(11, 13) + ":00";
+                                              .substring(11, 13) +
+                                          ":00";
 
                                 return Padding(
                                   padding: const EdgeInsets.only(top: 8.0),
@@ -1100,13 +1131,16 @@ class _tiempoDiaIndividualCards extends StatelessWidget {
     String rachasMax = weatherProvider.tiempoDias!.windGusts10MMax[indiceActual]
         .round()
         .toString();
+    int weatherCodeActual =
+        weatherProvider.tiempoDias!.weatherCode[indiceActual];
     String desc = Utils.obtenerTiempoText(
-      weatherProvider.tiempoDias!.weatherCode[indiceActual],
+      weatherCodeActual,
       configProvider.idiomaActual,
     );
     DateTime fecha = weatherProvider.tiempoDias!.time[indiceActual];
     double mmLluvia =
         weatherProvider.tiempoDias!.precipitationSum[indiceActual];
+    double cmSnow = weatherProvider.tiempoDias!.snowfallSum[indiceActual];
     return SingleChildScrollView(
       padding: EdgeInsets.all(20),
       child: Column(
@@ -1191,8 +1225,12 @@ class _tiempoDiaIndividualCards extends StatelessWidget {
           SizedBox(height: 10),
           _infoCard(
             color: Colors.blue[600]!.withOpacity(0.6),
-            titulo: Utils.stringAmountOfRainSnow(configProvider.idiomaActual),
-            valor: "$mmLluvia l/m²",
+            titulo: Utils.isNevando(weatherCodeActual)
+                ? Utils.stringAmountOfSnow(configProvider.idiomaActual)
+                : Utils.stringAmountOfRain(configProvider.idiomaActual),
+            valor: Utils.isNevando(weatherCodeActual)
+                ? "$cmSnow cm"
+                : "$mmLluvia l/m²",
           ),
           SizedBox(height: 10),
           _infoCard(

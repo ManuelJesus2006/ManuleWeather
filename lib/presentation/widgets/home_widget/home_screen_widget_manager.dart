@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:manule_weather/models/lluvia_level_model.dart';
+import 'package:manule_weather/models/snow_level_model.dart';
 import 'package:manule_weather/models/tiempo_model.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
 import 'package:manule_weather/utils/Utils.dart';
@@ -15,6 +16,8 @@ class HomeScreenWidgetManager {
     required bool fondoOscuro,
     required Tiempo tiempoActual,
     required List<LluviaLevelModel> rainData,
+    required bool hayNieve,
+    required List<SnowLevelModel> snowData,
   }) async {
     try {
       // 1. Renderizamos el Widget de Flutter como una imagen
@@ -49,18 +52,17 @@ class HomeScreenWidgetManager {
                           mainAxisAlignment: MainAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            
-                              Padding(
-                                padding: const EdgeInsets.only(right: 4),
-                                // Cambia el color del icono según el fondo para que no se vuelva invisible
-                                child: Icon(
-                                  Icons.navigation,
-                                  color: fondoOscuro
-                                      ? Colors.white
-                                      : Colors.black87,
-                                  size: 14,
-                                ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 4),
+                              // Cambia el color del icono según el fondo para que no se vuelva invisible
+                              child: Icon(
+                                Icons.navigation,
+                                color: fondoOscuro
+                                    ? Colors.white
+                                    : Colors.black87,
+                                size: 14,
                               ),
+                            ),
                             Text(
                               ciudad,
                               maxLines: 1,
@@ -117,8 +119,12 @@ class HomeScreenWidgetManager {
                     // 3. ESTADO DEL TIEMPO Y SENSACIÓN TÉRMICA (Parte inferior)
                     Column(
                       children: [
-                        Text(Utils.mensajeLluviaDinamico(rainData, idioma)),
-                        SizedBox(height: 10,),
+                        Text(
+                          hayNieve
+                              ? Utils.mensajeSnowDinamico(snowData, idioma)
+                              : Utils.mensajeLluviaDinamico(rainData, idioma),
+                        ),
+                        SizedBox(height: 10),
                         Text(
                           Utils.obtenerTiempoText(
                             tiempoActual.current.weatherCode,

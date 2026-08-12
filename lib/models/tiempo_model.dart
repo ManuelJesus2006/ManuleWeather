@@ -16,6 +16,7 @@ class Tiempo {
     String timezone;
     String timezoneAbbreviation;
     double elevation;
+    CurrentUnits currentUnits;
     Current current;
 
     Tiempo({
@@ -26,17 +27,19 @@ class Tiempo {
         required this.timezone,
         required this.timezoneAbbreviation,
         required this.elevation,
+        required this.currentUnits,
         required this.current,
     });
 
     factory Tiempo.fromJson(Map<String, dynamic> json) => Tiempo(
         latitude: json["latitude"]?.toDouble(),
-        longitude: json["longitude"]?.toDouble(),
+        longitude: json["longitude"],
         generationtimeMs: json["generationtime_ms"]?.toDouble(),
         utcOffsetSeconds: json["utc_offset_seconds"],
         timezone: json["timezone"],
         timezoneAbbreviation: json["timezone_abbreviation"],
-        elevation: json["elevation"]?.toDouble(),
+        elevation: json["elevation"],
+        currentUnits: CurrentUnits.fromJson(json["current_units"]),
         current: Current.fromJson(json["current"]),
     );
 
@@ -48,6 +51,7 @@ class Tiempo {
         "timezone": timezone,
         "timezone_abbreviation": timezoneAbbreviation,
         "elevation": elevation,
+        "current_units": currentUnits.toJson(),
         "current": current.toJson(),
     };
 }
@@ -68,6 +72,7 @@ class Current {
     int isDay;
     double visibility;
     double uvIndex;
+    double snowfall;
 
     Current({
         required this.time,
@@ -85,6 +90,7 @@ class Current {
         required this.isDay,
         required this.visibility,
         required this.uvIndex,
+        required this.snowfall,
     });
 
     factory Current.fromJson(Map<String, dynamic> json) => Current(
@@ -103,6 +109,7 @@ class Current {
         isDay: json["is_day"],
         visibility: json["visibility"],
         uvIndex: json["uv_index"]?.toDouble(),
+        snowfall: json["snowfall"],
     );
 
     Map<String, dynamic> toJson() => {
@@ -121,6 +128,7 @@ class Current {
         "is_day": isDay,
         "visibility": visibility,
         "uv_index": uvIndex,
+        "snowfall": snowfall,
     };
 }
 
@@ -140,6 +148,7 @@ class CurrentUnits {
     String isDay;
     String visibility;
     String uvIndex;
+    String snowfall;
 
     CurrentUnits({
         required this.time,
@@ -157,6 +166,7 @@ class CurrentUnits {
         required this.isDay,
         required this.visibility,
         required this.uvIndex,
+        required this.snowfall,
     });
 
     factory CurrentUnits.fromJson(Map<String, dynamic> json) => CurrentUnits(
@@ -175,6 +185,7 @@ class CurrentUnits {
         isDay: json["is_day"],
         visibility: json["visibility"],
         uvIndex: json["uv_index"],
+        snowfall: json["snowfall"],
     );
 
     Map<String, dynamic> toJson() => {
@@ -193,5 +204,6 @@ class CurrentUnits {
         "is_day": isDay,
         "visibility": visibility,
         "uv_index": uvIndex,
+        "snowfall": snowfall,
     };
 }

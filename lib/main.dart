@@ -45,12 +45,17 @@ void callbackDispatcher() {
         position.longitude,
       );
       
+      
       await HomeScreenWidgetManager.actualizarDatos(
         ciudad: nombreCiudad!,
         idioma: idiomaActual,
         fondoOscuro: fondoOscuro,
         tiempoActual: tiempoUbi!,
-        rainData: Utils.getRainLevelData(null,tiempoHoras)
+        hayNieve: tiempoHoras!.weatherCode
+    .take(8)
+    .any((code) => Utils.isNevando(code)),
+        rainData: Utils.getRainLevelData(null,tiempoHoras),
+        snowData: Utils.getSnowLevelData(null, tiempoHoras)
       ); 
       
       return Future.value(true);

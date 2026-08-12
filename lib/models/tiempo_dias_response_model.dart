@@ -20,7 +20,6 @@ class TiempoDiasResponse {
   String timezone;
   String timezoneAbbreviation;
   double elevation;
-  DailyUnits dailyUnits;
   TiempoDias tiempoDias;
 
   TiempoDiasResponse({
@@ -31,20 +30,18 @@ class TiempoDiasResponse {
     required this.timezone,
     required this.timezoneAbbreviation,
     required this.elevation,
-    required this.dailyUnits,
     required this.tiempoDias,
   });
 
   factory TiempoDiasResponse.fromJson(Map<String, dynamic> json) =>
       TiempoDiasResponse(
         latitude: json["latitude"]?.toDouble(),
-        longitude: json["longitude"]?.toDouble(),
+        longitude: json["longitude"],
         generationtimeMs: json["generationtime_ms"]?.toDouble(),
         utcOffsetSeconds: json["utc_offset_seconds"],
         timezone: json["timezone"],
         timezoneAbbreviation: json["timezone_abbreviation"],
         elevation: json["elevation"],
-        dailyUnits: DailyUnits.fromJson(json["daily_units"]),
         tiempoDias: TiempoDias.fromJson(json["daily"]),
       );
 
@@ -56,7 +53,6 @@ class TiempoDiasResponse {
     "timezone": timezone,
     "timezone_abbreviation": timezoneAbbreviation,
     "elevation": elevation,
-    "daily_units": dailyUnits.toJson(),
     "daily": tiempoDias.toJson(),
   };
 }
@@ -71,6 +67,7 @@ class TiempoDias {
   List<double> precipitationSum;
   List<String> sunrise;
   List<String> sunset;
+  List<double> snowfallSum;
   List<IconData> iconosGenerales = [];
   List<String> descripcionesCortas = [];
 
@@ -84,6 +81,7 @@ class TiempoDias {
     required this.precipitationSum,
     required this.sunrise,
     required this.sunset,
+    required this.snowfallSum,
   });
 
   factory TiempoDias.fromJson(Map<String, dynamic> json) => TiempoDias(
@@ -101,9 +99,12 @@ class TiempoDias {
     windGusts10MMax: List<double>.from(
       json["wind_gusts_10m_max"].map((x) => x?.toDouble()),
     ),
-    precipitationSum: List<double>.from(json["precipitation_sum"].map((x) => x)),
+    precipitationSum: List<double>.from(
+      json["precipitation_sum"].map((x) => x),
+    ),
     sunrise: List<String>.from(json["sunrise"].map((x) => x)),
     sunset: List<String>.from(json["sunset"].map((x) => x)),
+    snowfallSum: List<double>.from(json["snowfall_sum"].map((x) => x)),
   );
 
   Map<String, dynamic> toJson() => {
@@ -121,53 +122,6 @@ class TiempoDias {
     "precipitation_sum": List<dynamic>.from(precipitationSum.map((x) => x)),
     "sunrise": List<dynamic>.from(sunrise.map((x) => x)),
     "sunset": List<dynamic>.from(sunset.map((x) => x)),
-  };
-}
-
-class DailyUnits {
-  String time;
-  String temperature2MMax;
-  String temperature2MMin;
-  String weatherCode;
-  String windSpeed10MMax;
-  String windGusts10MMax;
-  String precipitationSum;
-  String sunrise;
-  String sunset;
-
-  DailyUnits({
-    required this.time,
-    required this.temperature2MMax,
-    required this.temperature2MMin,
-    required this.weatherCode,
-    required this.windSpeed10MMax,
-    required this.windGusts10MMax,
-    required this.precipitationSum,
-    required this.sunrise,
-    required this.sunset,
-  });
-
-  factory DailyUnits.fromJson(Map<String, dynamic> json) => DailyUnits(
-    time: json["time"],
-    temperature2MMax: json["temperature_2m_max"],
-    temperature2MMin: json["temperature_2m_min"],
-    weatherCode: json["weather_code"],
-    windSpeed10MMax: json["wind_speed_10m_max"],
-    windGusts10MMax: json["wind_gusts_10m_max"],
-    precipitationSum: json["precipitation_sum"],
-    sunrise: json["sunrise"],
-    sunset: json["sunset"],
-  );
-
-  Map<String, dynamic> toJson() => {
-    "time": time,
-    "temperature_2m_max": temperature2MMax,
-    "temperature_2m_min": temperature2MMin,
-    "weather_code": weatherCode,
-    "wind_speed_10m_max": windSpeed10MMax,
-    "wind_gusts_10m_max": windGusts10MMax,
-    "precipitation_sum": precipitationSum,
-    "sunrise": sunrise,
-    "sunset": sunset,
+    "snowfall_sum": List<dynamic>.from(snowfallSum.map((x) => x)),
   };
 }

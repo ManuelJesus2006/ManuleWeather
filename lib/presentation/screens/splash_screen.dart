@@ -150,7 +150,11 @@ class _SplashScreenState extends State<SplashScreen> {
         idioma: configProvider.idiomaActual,
         fondoOscuro: configProvider.isDarkTheme,
         tiempoActual: weatherProvider.tiempoActual!,
+        hayNieve: weatherProvider.tiempoHoras!.weatherCode
+            .take(8)
+            .any((code) => Utils.isNevando(code)),
         rainData: Utils.getRainLevelData(weatherProvider, null),
+        snowData: Utils.getSnowLevelData(weatherProvider, null),
       );
 
       weatherProvider.comprobarNocheDia();
@@ -222,11 +226,10 @@ class _SplashScreenState extends State<SplashScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      configProvider.valorLineaDeCarga < 12.5
-                          ? Utils.stringCheckingUpdates(
-                              configProvider.idiomaActual,
-                            )
-                          : Utils.stringLoading(configProvider.idiomaActual),
+                      Utils.dynamicStringSplashScreen(
+                        configProvider.idiomaActual,
+                        configProvider.valorLineaDeCarga,
+                      ),
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,

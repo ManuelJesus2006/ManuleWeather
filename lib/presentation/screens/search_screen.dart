@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
@@ -204,28 +207,52 @@ class _widgetUbicacion extends StatelessWidget {
           if (!weatherProvider.isUbicacionUser!) {
             mostrarCargando(context);
             Position position = weatherProvider.geolocalizacion!;
+            try {
+              Tiempo? tiempoUbi = await TiempoService()
+                  .getTiempoLatLon(position.latitude, position.longitude)
+                  .timeout(const Duration(seconds: 10));
+              TiempoHoras? tiempoHoras = await TiempoService()
+                  .getTiempoPorHoras(position.latitude, position.longitude)
+                  .timeout(const Duration(seconds: 10));
+              TiempoDias? tiempoDias = await TiempoService()
+                  .getTiempoPorDias(position.latitude, position.longitude)
+                  .timeout(const Duration(seconds: 10));
+              weatherProvider.cambiarDatos(
+                tiempoUbi!,
+                weatherProvider.nombreUbi,
+                tiempoHoras!,
+                tiempoDias!,
+                true,
+                position.latitude,
+                position.longitude,
+              );
+            } on TimeoutException {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    Utils.stringErrorTimeout(configProvider.idiomaActual),
+                  ),
+                ),
+              );
+            } catch (e) {
+              if (context.mounted && e is HttpException) {
+                context.go(
+                  '/error',
+                  extra: Utils.stringErrorServerDown(
+                    configProvider.idiomaActual,
+                  ),
+                );
+              } else if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      Utils.stringErrorApp(configProvider.idiomaActual),
+                    ),
+                  ),
+                );
+              }
+            }
 
-            Tiempo? tiempoUbi = await TiempoService().getTiempoLatLon(
-              position.latitude,
-              position.longitude,
-            );
-            TiempoHoras? tiempoHoras = await TiempoService().getTiempoPorHoras(
-              position.latitude,
-              position.longitude,
-            );
-            TiempoDias? tiempoDias = await TiempoService().getTiempoPorDias(
-              position.latitude,
-              position.longitude,
-            );
-            weatherProvider.cambiarDatos(
-              tiempoUbi!,
-              weatherProvider.nombreUbi,
-              tiempoHoras!,
-              tiempoDias!,
-              true,
-              position.latitude,
-              position.longitude,
-            );
             weatherProvider.comprobarNocheDia();
             weatherProvider.inicializarTiempoDias(configProvider.idiomaActual);
             DateTime horaActual = weatherProvider.ahoraCiudad;
@@ -346,27 +373,50 @@ class _widgetLugarBusqueda extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         mostrarCargando(context);
-        Tiempo? tiempoUbi = await TiempoService().getTiempoLatLon(
-          lugar.center![1],
-          lugar.center![0],
-        );
-        TiempoHoras? tiempoHoras = await TiempoService().getTiempoPorHoras(
-          lugar.center![1],
-          lugar.center![0],
-        );
-        TiempoDias? tiempoDias = await TiempoService().getTiempoPorDias(
-          lugar.center![1],
-          lugar.center![0],
-        );
-        weatherProvider.cambiarDatos(
-          tiempoUbi!,
-          lugar.placeName!,
-          tiempoHoras!,
-          tiempoDias!,
-          false,
-          lugar.center![1],
-          lugar.center![0],
-        );
+        try {
+          Tiempo? tiempoUbi = await TiempoService()
+              .getTiempoLatLon(lugar.center![1], lugar.center![0])
+              .timeout(const Duration(seconds: 10));
+          TiempoHoras? tiempoHoras = await TiempoService()
+              .getTiempoPorHoras(lugar.center![1], lugar.center![0])
+              .timeout(const Duration(seconds: 10));
+          TiempoDias? tiempoDias = await TiempoService()
+              .getTiempoPorDias(lugar.center![1], lugar.center![0])
+              .timeout(const Duration(seconds: 10));
+          weatherProvider.cambiarDatos(
+            tiempoUbi!,
+            lugar.placeName!,
+            tiempoHoras!,
+            tiempoDias!,
+            false,
+            lugar.center![1],
+            lugar.center![0],
+          );
+        } on TimeoutException {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                Utils.stringErrorTimeout(configProvider.idiomaActual),
+              ),
+            ),
+          );
+        } catch (e) {
+          if (context.mounted && e is HttpException) {
+            context.go(
+              '/error',
+              extra: Utils.stringErrorServerDown(configProvider.idiomaActual),
+            );
+          } else if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  Utils.stringErrorApp(configProvider.idiomaActual),
+                ),
+              ),
+            );
+          }
+        }
+
         weatherProvider.comprobarNocheDia();
         weatherProvider.inicializarTiempoDias(configProvider.idiomaActual);
         //Lógica previa para obtener el día actual y sobre esa hora limitar el array de tiempo horas
@@ -493,11 +543,11 @@ class SearchHistoryModalBottomSheet extends StatelessWidget {
                     child: Text(
                       Utils.stringNoSearchHistoryYet(
                         configProvider.idiomaActual,
-                      )
+                      ),
                     ),
                   )
                 : ListView.builder(
-                    shrinkWrap: true, //Se encoge al tamaño real de tus items
+                    shrinkWrap: true, //Se encoge al tamaño real de los items
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: configProvider.historialBusqueda.length,
                     itemBuilder: (context, i) {
