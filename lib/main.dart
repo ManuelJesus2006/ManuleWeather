@@ -1,3 +1,6 @@
+import 'dart:ffi';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
@@ -14,7 +17,7 @@ import 'package:manule_weather/services/tiempo_service.dart';
 import 'package:manule_weather/utils/Utils.dart';
 import 'package:provider/provider.dart';
 import 'package:manule_weather/routes/app_routes.dart';
-import 'package:shared_preferences/shared_preferences.dart'; 
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 // import 'package:manule_weather/widgets/home_widget/home_screen_widget_manager.dart'; // Tu Manager del Widget
 
@@ -22,42 +25,41 @@ import 'package:workmanager/workmanager.dart';
 void callbackDispatcher() {
   Workmanager().executeTask((taskName, inputData) async {
     try {
-      //Obtenemos la posición del usuario
-      Position position = await Geolocator.getCurrentPosition();
-      print("Latitud: ${position.latitude}, Longitud: ${position.longitude}");
       //Buscamos en las preferences el idioma pues no podemos usar el provider
       final preferences = await SharedPreferences.getInstance();
-      String idiomaActual = preferences.getString('lang')!;
-      bool? fondoOscuro = preferences.getBool('modoOscuro');
-      if (fondoOscuro == null) fondoOscuro = false;
-    
-      Tiempo? tiempoUbi = await TiempoService().getTiempoLatLon(
-        position.latitude,
-        position.longitude,
-      );
-      String? nombreCiudad = await LocalizacionService().getNombreCiudadByCords(
-        position.longitude,
-        position.latitude,
-        idiomaActual,
-      );
-      TiempoHoras? tiempoHoras = await TiempoService().getTiempoPorHoras(
-        position.latitude,
-        position.longitude,
-      );
-      
-      
+      String idiomaActual =
+          preferences.getString('lang') ??
+          Platform.localeName.substring(0, Platform.localeName.length - 3);
+      bool? fondoOscuro = preferences.getBool('modoOscuro') ?? false;
+      //Obtenemos la posición del usuario
+      double latitud = preferences.getDouble('last_latitude')!;
+      double longitud = preferences.getDouble('last_longitude')!;
+
+      final resultadosPeticion = await Future.wait([
+        TiempoService().getTiempoLatLon(latitud, longitud),
+        LocalizacionService().getNombreCiudadByCords(
+          longitud,
+          latitud,
+          idiomaActual,
+        ),
+        TiempoService().getTiempoPorHoras(longitud, latitud),
+      ]);
+      Tiempo? tiempoUbi = resultadosPeticion[0] as Tiempo;
+      String? nombreCiudad = resultadosPeticion[1] as String;
+      TiempoHoras? tiempoHoras = resultadosPeticion[2] as TiempoHoras;
+
       await HomeScreenWidgetManager.actualizarDatos(
-        ciudad: nombreCiudad!,
+        ciudad: nombreCiudad,
         idioma: idiomaActual,
         fondoOscuro: fondoOscuro,
-        tiempoActual: tiempoUbi!,
-        hayNieve: tiempoHoras!.weatherCode
-    .take(8)
-    .any((code) => Utils.isNevando(code)),
-        rainData: Utils.getRainLevelData(null,tiempoHoras),
-        snowData: Utils.getSnowLevelData(null, tiempoHoras)
-      ); 
-      
+        tiempoActual: tiempoUbi,
+        hayNieve: tiempoHoras.weatherCode
+            .take(8)
+            .any((code) => Utils.isNevando(code)),
+        rainData: Utils.getRainLevelData(null, tiempoHoras),
+        snowData: Utils.getSnowLevelData(null, tiempoHoras),
+      );
+
       return Future.value(true);
     } catch (e) {
       return Future.value(false);
@@ -78,7 +80,9 @@ void main() async {
   await Workmanager().registerPeriodicTask(
     "bucle_clima_widget",
     "actualizarClimaWidgetTask",
-    frequency: const Duration(minutes: 15), // Mínimo permitido por Android: 15 min
+    frequency: const Duration(
+      minutes: 30,
+    ), // Mínimo permitido por Android: 15 min
     constraints: Constraints(
       networkType: NetworkType.connected, // Solo con internet
     ),
@@ -94,7 +98,7 @@ void main() async {
         providers: [
           ChangeNotifierProvider(create: (_) => WeatherProvider()),
           ChangeNotifierProvider(create: (_) => NavigationProvider()),
-          ChangeNotifierProvider(create: (_) => ConfigProvider())
+          ChangeNotifierProvider(create: (_) => ConfigProvider()),
         ],
         child: const MainApp(),
       ),
@@ -111,7 +115,11 @@ class MainApp extends StatelessWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(textTheme: GoogleFonts.hedvigLettersSansTextTheme()),
-      darkTheme: ThemeData.dark(),
+      darkTheme: ThemeData.dark().copyWith(
+        textTheme: GoogleFonts.hedvigLettersSansTextTheme(
+          ThemeData.dark().textTheme,
+        ),
+      ),
       themeMode: configProvider.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
       routerConfig: appRouter,
     );

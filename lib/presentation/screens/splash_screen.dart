@@ -159,9 +159,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
       weatherProvider.comprobarNocheDia();
       weatherProvider.inicializarTiempoDias(configProvider.idiomaActual);
-      DateTime horaActual = weatherProvider.ahoraCiudad;
-      int elementosAEliminar = horaActual.hour;
+      int elementosAEliminar = weatherProvider.ahoraCiudad.hour;
       weatherProvider.eliminarHorasPasadas(elementosAEliminar);
+      weatherProvider.cambiarFaseLunar();
       configProvider.cambiarValorLineaDeCarga(100);
 
       if (mounted) {
@@ -208,7 +208,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
                 const SizedBox(height: 40),
 
-                // 🌟 Línea de carga estilizada (Bordes redondeados y más gruesa)
+                //Linea de carga
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: SizedBox(
@@ -220,8 +220,6 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
-                // Textos e indicador intactos
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

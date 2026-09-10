@@ -1,5 +1,5 @@
 {
-    "version": "0.9.7",
+    "version": "0.9.8",
   "url": "https://drive.google.com/file/d/1B1Ojsb_gF4Tw8oFm28FiFDGhux1T0b1H/view?usp=sharing",
-  "whatisnew": "Cambios en las graficas de lluvia y adición de la grafica de nieve aunque con algunas cosas por pulir y en fase beta. Muestra de datos de l/m² cuando hay lluvia y de cm cuando hay nieve en pantalla por horas y por dias. Avisos amarillos, naranjas y rojos por cm de nieve sin testear pero funcionarán correctamente"
+  "whatisnew": "Fase beta de las fases lunares SIN API, optimización de peticiones API y arreglo de algunos bugs en específico bug de cambio de fuente de texto al cambiar al modo oscuro"
 }

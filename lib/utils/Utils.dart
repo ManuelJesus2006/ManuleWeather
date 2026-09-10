@@ -1898,38 +1898,38 @@ class Utils {
   }
 
   static String stringAmountOfRain(String idioma) {
-  if (idioma == 'es') return 'Cantidad de lluvia🌧️';
-  if (idioma == 'fr') return 'Quantité de pluie🌧️';
-  if (idioma == 'it') return 'Quantità di pioggia🌧️';
-  if (idioma == 'de') return 'Regenmenge🌧️';
-  if (idioma == 'ru') return 'Количество дождя🌧️';
-  if (idioma == 'pt') return 'Quantidade de chuva🌧️';
-  if (idioma == 'ca') return 'Quantitat de pluja🌧️';
-  if (idioma == 'he') return 'כמות גשם🌧️';
-  if (idioma == 'uk') return 'Кількість дощу🌧️';
-  if (idioma == 'ar') return 'كمية الأمطار🌧️';
-  if (idioma == 'zh') return '降雨量🌧️';
-  if (idioma == 'ko') return '강수량🌧️';
-  if (idioma == 'ja') return '降水量🌧️';
-  return 'Amount of rain🌧️';
-}
+    if (idioma == 'es') return 'Cantidad de lluvia🌧️';
+    if (idioma == 'fr') return 'Quantité de pluie🌧️';
+    if (idioma == 'it') return 'Quantità di pioggia🌧️';
+    if (idioma == 'de') return 'Regenmenge🌧️';
+    if (idioma == 'ru') return 'Количество дождя🌧️';
+    if (idioma == 'pt') return 'Quantidade de chuva🌧️';
+    if (idioma == 'ca') return 'Quantitat de pluja🌧️';
+    if (idioma == 'he') return 'כמות גשם🌧️';
+    if (idioma == 'uk') return 'Кількість дощу🌧️';
+    if (idioma == 'ar') return 'كمية الأمطار🌧️';
+    if (idioma == 'zh') return '降雨量🌧️';
+    if (idioma == 'ko') return '강수량🌧️';
+    if (idioma == 'ja') return '降水量🌧️';
+    return 'Amount of rain🌧️';
+  }
 
-static String stringAmountOfSnow(String idioma) {
-  if (idioma == 'es') return 'Cantidad de nieve❄️';
-  if (idioma == 'fr') return 'Quantité de neige❄️';
-  if (idioma == 'it') return 'Quantità di neve❄️';
-  if (idioma == 'de') return 'Schneemenge❄️';
-  if (idioma == 'ru') return 'Количество снега❄️';
-  if (idioma == 'pt') return 'Quantidade de neve❄️';
-  if (idioma == 'ca') return 'Quantitat de neu❄️';
-  if (idioma == 'he') return 'כמות שלג❄️';
-  if (idioma == 'uk') return 'Кількість снігу❄️';
-  if (idioma == 'ar') return 'كمية الثلوج❄️';
-  if (idioma == 'zh') return '降雪量❄️';
-  if (idioma == 'ko') return '강설량❄️';
-  if (idioma == 'ja') return '降雪量❄️';
-  return 'Amount of snow❄️';
-}
+  static String stringAmountOfSnow(String idioma) {
+    if (idioma == 'es') return 'Cantidad de nieve❄️';
+    if (idioma == 'fr') return 'Quantité de neige❄️';
+    if (idioma == 'it') return 'Quantità di neve❄️';
+    if (idioma == 'de') return 'Schneemenge❄️';
+    if (idioma == 'ru') return 'Количество снега❄️';
+    if (idioma == 'pt') return 'Quantidade de neve❄️';
+    if (idioma == 'ca') return 'Quantitat de neu❄️';
+    if (idioma == 'he') return 'כמות שלג❄️';
+    if (idioma == 'uk') return 'Кількість снігу❄️';
+    if (idioma == 'ar') return 'كمية الثلوج❄️';
+    if (idioma == 'zh') return '降雪量❄️';
+    if (idioma == 'ko') return '강설량❄️';
+    if (idioma == 'ja') return '降雪量❄️';
+    return 'Amount of snow❄️';
+  }
 
   static String stringMaxWindSpeed(String idioma) {
     if (idioma == 'es') return 'Velocidad de viento máxima🍃';
@@ -2638,8 +2638,8 @@ static String stringAmountOfSnow(String idioma) {
         .take(24)
         .toList();
     List<double> snowCmData = weatherProvider.tiempoHoras!.snowfall
-      .take(24)
-      .toList();
+        .take(24)
+        .toList();
 
     // Calculamos el nivel más alto de cada categoría
     int nivelLluvia = 0;
@@ -2785,11 +2785,20 @@ static String stringAmountOfSnow(String idioma) {
             color: Colors.redAccent,
           ),
         if (nivelSnowAlert == 1)
-          CardAlertWidget(text: Utils.stringAlertSnowYellow(idioma), color: Colors.yellow),
+          CardAlertWidget(
+            text: Utils.stringAlertSnowYellow(idioma),
+            color: Colors.yellow,
+          ),
         if (nivelSnowAlert == 2)
-          CardAlertWidget(text: Utils.stringAlertSnowOrange(idioma), color: Colors.orange),
+          CardAlertWidget(
+            text: Utils.stringAlertSnowOrange(idioma),
+            color: Colors.orange,
+          ),
         if (nivelSnowAlert == 3)
-         CardAlertWidget(text: Utils.stringAlertSnowRed(idioma), color: Colors.redAccent)
+          CardAlertWidget(
+            text: Utils.stringAlertSnowRed(idioma),
+            color: Colors.redAccent,
+          ),
       ],
     );
   }
@@ -3264,16 +3273,26 @@ static String stringAmountOfSnow(String idioma) {
   }
 
   static String stringAlertSnowYellow(String idioma) {
-    if (idioma == 'es') return "Se esperan acumulaciones de nieve de entre 5 y 10 cm. Tenga precaución al desplazarse.";
-    if (idioma == 'fr') return "Des accumulations de neige entre 5 et 10 cm sont attendues. Soyez prudent lors de vos déplacements.";
-    if (idioma == 'it') return "Sono previsti accumuli di neve tra 5 e 10 cm. Fare attenzione durante gli spostamenti.";
-    if (idioma == 'de') return "Es werden Schneemengen zwischen 5 und 10 cm erwartet. Seien Sie vorsichtig im Verkehr.";
-    if (idioma == 'ru') return "Ожидается накопление снега от 5 до 10 см. Будьте осторожны при передвижении.";
-    if (idioma == 'pt') return "Esperam-se acumulações de neve entre 5 e 10 cm. Tenha cuidado nas deslocações.";
-    if (idioma == 'ca') return "S'esperen acumulacions de neu d'entre 5 i 10 cm. Tingueu precaució en els desplaçaments.";
-    if (idioma == 'he') return "צפויות הצטברויות שלג בין 5 ל-10 ס\"מ. יש לנקוט זהירות בדרכים.";
-    if (idioma == 'uk') return "Очікується накопичення снігу від 5 до 10 см. Будьте обережні під час пересування.";
-    if (idioma == 'ar') return "من المتوقع تراكم الثلوج بين 5 و 10 سم. يرجى توخي الحذر عند التنقل.";
+    if (idioma == 'es')
+      return "Se esperan acumulaciones de nieve de entre 5 y 10 cm. Tenga precaución al desplazarse.";
+    if (idioma == 'fr')
+      return "Des accumulations de neige entre 5 et 10 cm sont attendues. Soyez prudent lors de vos déplacements.";
+    if (idioma == 'it')
+      return "Sono previsti accumuli di neve tra 5 e 10 cm. Fare attenzione durante gli spostamenti.";
+    if (idioma == 'de')
+      return "Es werden Schneemengen zwischen 5 und 10 cm erwartet. Seien Sie vorsichtig im Verkehr.";
+    if (idioma == 'ru')
+      return "Ожидается накопление снега от 5 до 10 см. Будьте осторожны при передвижении.";
+    if (idioma == 'pt')
+      return "Esperam-se acumulações de neve entre 5 e 10 cm. Tenha cuidado nas deslocações.";
+    if (idioma == 'ca')
+      return "S'esperen acumulacions de neu d'entre 5 i 10 cm. Tingueu precaució en els desplaçaments.";
+    if (idioma == 'he')
+      return "צפויות הצטברויות שלג בין 5 ל-10 ס\"מ. יש לנקוט זהירות בדרכים.";
+    if (idioma == 'uk')
+      return "Очікується накопичення снігу від 5 до 10 см. Будьте обережні під час пересування.";
+    if (idioma == 'ar')
+      return "من المتوقع تراكم الثلوج بين 5 و 10 سم. يرجى توخي الحذر عند التنقل.";
     if (idioma == 'zh') return "预计积雪量在5至10厘米之间。出行请注意安全。";
     if (idioma == 'ko') return "5~10cm의 눈이 쌓일 것으로 예상됩니다. 이동 시 주의하세요.";
     if (idioma == 'ja') return "5〜10cmの積雪が予想されます。移動の際はご注意ください。";
@@ -3281,16 +3300,26 @@ static String stringAmountOfSnow(String idioma) {
   }
 
   static String stringAlertSnowOrange(String idioma) {
-    if (idioma == 'es') return "Se esperan acumulaciones de nieve de entre 10 y 20 cm. Evite desplazamientos innecesarios.";
-    if (idioma == 'fr') return "Des accumulations de neige entre 10 et 20 cm sont attendues. Évitez les déplacements inutiles.";
-    if (idioma == 'it') return "Sono previsti accumuli di neve tra 10 e 20 cm. Evitare spostamenti non necessari.";
-    if (idioma == 'de') return "Es werden Schneemengen zwischen 10 und 20 cm erwartet. Vermeiden Sie unnötige Fahrten.";
-    if (idioma == 'ru') return "Ожидается накопление снега от 10 до 20 см. Избегайте ненужных поездок.";
-    if (idioma == 'pt') return "Esperam-se acumulações de neve entre 10 e 20 cm. Evite deslocações desnecessárias.";
-    if (idioma == 'ca') return "S'esperen acumulacions de neu d'entre 10 i 20 cm. Eviteu els desplaçaments innecessaris.";
-    if (idioma == 'he') return "צפויות הצטברויות שלג בין 10 ל-20 ס\"מ. הימנעו מנסיעות שאינן הכרחיות.";
-    if (idioma == 'uk') return "Очікується накопичення снігу від 10 до 20 см. Уникайте непотрібних поїздок.";
-    if (idioma == 'ar') return "من المتوقع تراكم الثلوج بين 10 و 20 سم. تجنب التنقلات غير الضرورية.";
+    if (idioma == 'es')
+      return "Se esperan acumulaciones de nieve de entre 10 y 20 cm. Evite desplazamientos innecesarios.";
+    if (idioma == 'fr')
+      return "Des accumulations de neige entre 10 et 20 cm sont attendues. Évitez les déplacements inutiles.";
+    if (idioma == 'it')
+      return "Sono previsti accumuli di neve tra 10 e 20 cm. Evitare spostamenti non necessari.";
+    if (idioma == 'de')
+      return "Es werden Schneemengen zwischen 10 und 20 cm erwartet. Vermeiden Sie unnötige Fahrten.";
+    if (idioma == 'ru')
+      return "Ожидается накопление снега от 10 до 20 см. Избегайте ненужных поездок.";
+    if (idioma == 'pt')
+      return "Esperam-se acumulações de neve entre 10 e 20 cm. Evite deslocações desnecessárias.";
+    if (idioma == 'ca')
+      return "S'esperen acumulacions de neu d'entre 10 i 20 cm. Eviteu els desplaçaments innecessaris.";
+    if (idioma == 'he')
+      return "צפויות הצטברויות שלג בין 10 ל-20 ס\"מ. הימנעו מנסיעות שאינן הכרחיות.";
+    if (idioma == 'uk')
+      return "Очікується накопичення снігу від 10 до 20 см. Уникайте непотрібних поїздок.";
+    if (idioma == 'ar')
+      return "من المتوقع تراكم الثلوج بين 10 و 20 سم. تجنب التنقلات غير الضرورية.";
     if (idioma == 'zh') return "预计积雪量在10至20厘米之间。请避免不必要的出行。";
     if (idioma == 'ko') return "10~20cm의 눈이 쌓일 것으로 예상됩니다. 불필요한 이동을 자제하세요.";
     if (idioma == 'ja') return "10〜20cmの積雪が予想されます。不要不急の外出は控えてください。";
@@ -3298,16 +3327,26 @@ static String stringAmountOfSnow(String idioma) {
   }
 
   static String stringAlertSnowRed(String idioma) {
-    if (idioma == 'es') return "Se esperan acumulaciones de nieve superiores a 20 cm. Peligro extremo, no viaje.";
-    if (idioma == 'fr') return "Des accumulations de neige supérieures à 20 cm sont attendues. Danger extrême, ne voyagez pas.";
-    if (idioma == 'it') return "Sono previsti accumuli di neve superiori a 20 cm. Pericolo estremo, non mettersi in viaggio.";
-    if (idioma == 'de') return "Es werden Schneemengen von über 20 cm erwartet. Extreme Gefahr, fahren Sie nicht.";
-    if (idioma == 'ru') return "Ожидается накопление снега более 20 см. Чрезвычайная опасность, не выезжайте.";
-    if (idioma == 'pt') return "Esperam-se acumulações de neve superiores a 20 cm. Perigo extremo, não viaje.";
-    if (idioma == 'ca') return "S'esperen acumulacions de neu superiors a 20 cm. Perill extrem, no viatgeu.";
-    if (idioma == 'he') return "צפויות הצטברויות שלג של מעל 20 ס\"מ. סכנה חמורה, אין לנסוע.";
-    if (idioma == 'uk') return "Очікується накопичення снігу понад 20 см. Надзвичайна небезпека, не виїжджайте.";
-    if (idioma == 'ar') return "من المتوقع تراكم الثلوج بأكثر من 20 سم. خطر شديد، لا تسافر.";
+    if (idioma == 'es')
+      return "Se esperan acumulaciones de nieve superiores a 20 cm. Peligro extremo, no viaje.";
+    if (idioma == 'fr')
+      return "Des accumulations de neige supérieures à 20 cm sont attendues. Danger extrême, ne voyagez pas.";
+    if (idioma == 'it')
+      return "Sono previsti accumuli di neve superiori a 20 cm. Pericolo estremo, non mettersi in viaggio.";
+    if (idioma == 'de')
+      return "Es werden Schneemengen von über 20 cm erwartet. Extreme Gefahr, fahren Sie nicht.";
+    if (idioma == 'ru')
+      return "Ожидается накопление снега более 20 см. Чрезвычайная опасность, не выезжайте.";
+    if (idioma == 'pt')
+      return "Esperam-se acumulações de neve superiores a 20 cm. Perigo extremo, não viaje.";
+    if (idioma == 'ca')
+      return "S'esperen acumulacions de neu superiors a 20 cm. Perill extrem, no viatgeu.";
+    if (idioma == 'he')
+      return "צפויות הצטברויות שלג של מעל 20 ס\"מ. סכנה חמורה, אין לנסוע.";
+    if (idioma == 'uk')
+      return "Очікується накопичення снігу понад 20 см. Надзвичайна небезпека, не виїжджайте.";
+    if (idioma == 'ar')
+      return "من المتوقع تراكم الثلوج بأكثر من 20 سم. خطر شديد، لا تسافر.";
     if (idioma == 'zh') return "预计积雪量将超过20厘米。极度危险，请勿出行。";
     if (idioma == 'ko') return "20cm 이상의 눈이 쌓일 것으로 예상됩니다. 매우 위험하므로 이동하지 마세요.";
     if (idioma == 'ja') return "20cm以上の積雪が予想されます。極めて危険ですので、移動しないでください。";
@@ -4071,16 +4110,33 @@ static String stringAmountOfSnow(String idioma) {
   }
 
   static bool isNevando(int weatherCode) {
-  const codigosNieve = {71, 73, 75, 77, 85, 86};
-  return codigosNieve.contains(weatherCode);
-}
+    const codigosNieve = {71, 73, 75, 77, 85, 86};
+    return codigosNieve.contains(weatherCode);
+  }
 
-static bool isLloviendo(int weatherCode) {
-  const codigosLluvia = {51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82};
-  return codigosLluvia.contains(weatherCode);
-}
+  static bool isLloviendo(int weatherCode) {
+    const codigosLluvia = {
+      51,
+      53,
+      55,
+      56,
+      57,
+      61,
+      63,
+      65,
+      66,
+      67,
+      80,
+      81,
+      82,
+      95,
+      96,
+      99,
+    };
+    return codigosLluvia.contains(weatherCode);
+  }
 
-    static Widget devolverPrevisionGraficaNieve(
+  static Widget devolverPrevisionGraficaNieve(
     double screenWidth,
     WeatherProvider weatherProvider,
     String idioma,
@@ -4424,109 +4480,170 @@ static bool isLloviendo(int weatherCode) {
         : tiempoHoras!.snowfall.take(8).toList();
   }
 
-static String mensajeSnowDinamico(List<SnowLevelModel> snowBarCharData, String idioma) {
-  if (snowBarCharData.isEmpty) return "";
+  static String mensajeSnowDinamico(
+    List<SnowLevelModel> snowBarCharData,
+    String idioma,
+  ) {
+    if (snowBarCharData.isEmpty) return "";
 
-  String mensajeADevolver = "";
+    String mensajeADevolver = "";
 
-  int horasHastaSnow = snowBarCharData
-      .takeWhile((snowData) => snowData.nivelSnow == 0)
-      .length;
+    int horasHastaSnow = snowBarCharData
+        .takeWhile((snowData) => snowData.nivelSnow == 0)
+        .length;
 
-  int horasDeSnow = snowBarCharData
-      .where((snowData) => snowData.nivelSnow >= 1)
-      .length;
+    int horasDeSnow = snowBarCharData
+        .where((snowData) => snowData.nivelSnow >= 1)
+        .length;
 
-  if (horasHastaSnow > 0) {
-    if (horasHastaSnow == 1) {
-      if (idioma == 'es') mensajeADevolver = 'La nieve comenzará en menos de una hora';
-      if (idioma == 'fr') mensajeADevolver = 'La neige commencera dans moins d\'une heure';
-      if (idioma == 'it') mensajeADevolver = 'La neve inizierà in meno di un\'ora';
-      if (idioma == 'de') mensajeADevolver = 'Der Schnee beginnt in weniger als einer Stunde';
-      if (idioma == 'ru') mensajeADevolver = 'Снег начнется менее чем через час';
-      if (idioma == 'pt') mensajeADevolver = 'A neve começará em menos de uma hora';
-      if (idioma == 'ca') mensajeADevolver = 'La neu començarà en menys d\'una hora';
-      if (idioma == 'he') mensajeADevolver = 'השלג יתחיל בעוד פחות משעה';
-      if (idioma == 'uk') mensajeADevolver = 'Сніг почнеться менш ніж через годину';
-      if (idioma == 'ar') mensajeADevolver = 'ستبدأ الثلوج خلال أقل من ساعة';
-      if (idioma == 'zh') mensajeADevolver = '降雪将在不到一小时内开始';
-      if (idioma == 'ko') mensajeADevolver = '한 시간 이내에 눈이 시작될 예정입니다';
-      if (idioma == 'ja') mensajeADevolver = '1時間以内に雪が降り始める見込みです';
-      if (mensajeADevolver.isEmpty) mensajeADevolver = 'Snow will start in less than an hour';
-    } else {
-      if (idioma == 'es') mensajeADevolver = 'La nieve comenzará en $horasHastaSnow horas';
-      if (idioma == 'fr') mensajeADevolver = 'La neige commencera dans $horasHastaSnow heures';
-      if (idioma == 'it') mensajeADevolver = 'La neve inizierà tra $horasHastaSnow ore';
-      if (idioma == 'de') mensajeADevolver = 'Der Schnee beginnt in $horasHastaSnow Stunden';
-      if (idioma == 'ru') mensajeADevolver = 'Снег начнется через $horasHastaSnow ч.';
-      if (idioma == 'pt') mensajeADevolver = 'A neve começará em $horasHastaSnow horas';
-      if (idioma == 'ca') mensajeADevolver = 'La neu començarà en $horasHastaSnow hores';
-      if (idioma == 'he') mensajeADevolver = 'השלג יתחיל בעוד $horasHastaSnow שעות';
-      if (idioma == 'uk') mensajeADevolver = 'Сніг почнеться через $horasHastaSnow год.';
-      if (idioma == 'ar') mensajeADevolver = 'ستبدأ الثلوج خلال $horasHastaSnow ساعات';
-      if (idioma == 'zh') mensajeADevolver = '降雪将在 $horasHastaSnow 小时内开始';
-      if (idioma == 'ko') mensajeADevolver = '$horasHastaSnow시간 후에 눈이 시작될 예정입니다';
-      if (idioma == 'ja') mensajeADevolver = '$horasHastaSnow時間後に雪が降り始める見込みです';
-      if (mensajeADevolver.isEmpty) mensajeADevolver = 'Snow will start in $horasHastaSnow hours';
+    if (horasHastaSnow > 0) {
+      if (horasHastaSnow == 1) {
+        if (idioma == 'es')
+          mensajeADevolver = 'La nieve comenzará en menos de una hora';
+        if (idioma == 'fr')
+          mensajeADevolver = 'La neige commencera dans moins d\'une heure';
+        if (idioma == 'it')
+          mensajeADevolver = 'La neve inizierà in meno di un\'ora';
+        if (idioma == 'de')
+          mensajeADevolver = 'Der Schnee beginnt in weniger als einer Stunde';
+        if (idioma == 'ru')
+          mensajeADevolver = 'Снег начнется менее чем через час';
+        if (idioma == 'pt')
+          mensajeADevolver = 'A neve começará em menos de uma hora';
+        if (idioma == 'ca')
+          mensajeADevolver = 'La neu començarà en menys d\'una hora';
+        if (idioma == 'he') mensajeADevolver = 'השלג יתחיל בעוד פחות משעה';
+        if (idioma == 'uk')
+          mensajeADevolver = 'Сніг почнеться менш ніж через годину';
+        if (idioma == 'ar') mensajeADevolver = 'ستبدأ الثلوج خلال أقل من ساعة';
+        if (idioma == 'zh') mensajeADevolver = '降雪将在不到一小时内开始';
+        if (idioma == 'ko') mensajeADevolver = '한 시간 이내에 눈이 시작될 예정입니다';
+        if (idioma == 'ja') mensajeADevolver = '1時間以内に雪が降り始める見込みです';
+        if (mensajeADevolver.isEmpty)
+          mensajeADevolver = 'Snow will start in less than an hour';
+      } else {
+        if (idioma == 'es')
+          mensajeADevolver = 'La nieve comenzará en $horasHastaSnow horas';
+        if (idioma == 'fr')
+          mensajeADevolver = 'La neige commencera dans $horasHastaSnow heures';
+        if (idioma == 'it')
+          mensajeADevolver = 'La neve inizierà tra $horasHastaSnow ore';
+        if (idioma == 'de')
+          mensajeADevolver = 'Der Schnee beginnt in $horasHastaSnow Stunden';
+        if (idioma == 'ru')
+          mensajeADevolver = 'Снег начнется через $horasHastaSnow ч.';
+        if (idioma == 'pt')
+          mensajeADevolver = 'A neve começará em $horasHastaSnow horas';
+        if (idioma == 'ca')
+          mensajeADevolver = 'La neu començarà en $horasHastaSnow hores';
+        if (idioma == 'he')
+          mensajeADevolver = 'השלג יתחיל בעוד $horasHastaSnow שעות';
+        if (idioma == 'uk')
+          mensajeADevolver = 'Сніг почнеться через $horasHastaSnow год.';
+        if (idioma == 'ar')
+          mensajeADevolver = 'ستبدأ الثلوج خلال $horasHastaSnow ساعات';
+        if (idioma == 'zh') mensajeADevolver = '降雪将在 $horasHastaSnow 小时内开始';
+        if (idioma == 'ko')
+          mensajeADevolver = '$horasHastaSnow시간 후에 눈이 시작될 예정입니다';
+        if (idioma == 'ja')
+          mensajeADevolver = '$horasHastaSnow時間後に雪が降り始める見込みです';
+        if (mensajeADevolver.isEmpty)
+          mensajeADevolver = 'Snow will start in $horasHastaSnow hours';
+      }
+    } else if (horasDeSnow > 0) {
+      if (horasDeSnow == 1) {
+        if (idioma == 'es')
+          mensajeADevolver = 'La nieve continuará durante la próxima hora';
+        if (idioma == 'fr')
+          mensajeADevolver = 'La neige continuera pendant la prochaine heure';
+        if (idioma == 'it')
+          mensajeADevolver = 'La neve continuerà nella prossima ora';
+        if (idioma == 'de')
+          mensajeADevolver = 'Der Schnee wird in der nächsten Stunde anhalten';
+        if (idioma == 'ru')
+          mensajeADevolver = 'Снег продолжится в ближайший час';
+        if (idioma == 'pt')
+          mensajeADevolver = 'A neve continuará na próxima hora';
+        if (idioma == 'ca')
+          mensajeADevolver = 'La neu continuarà durant la pròxima hora';
+        if (idioma == 'he') mensajeADevolver = 'השלג יימשך במהלך השעה הקרובה';
+        if (idioma == 'uk')
+          mensajeADevolver = 'Сніг триватиме протягом наступної години';
+        if (idioma == 'ar')
+          mensajeADevolver = 'ستستمر الثلوج خلال الساعة القادمة';
+        if (idioma == 'zh') mensajeADevolver = '降雪将持续接下来的一个小时';
+        if (idioma == 'ko') mensajeADevolver = '앞으로 한 시간 동안 눈이 계속될 예정입니다';
+        if (idioma == 'ja') mensajeADevolver = '今後1時間、雪が降り続く見込みです';
+        if (mensajeADevolver.isEmpty)
+          mensajeADevolver = 'Snow will continue for the next hour';
+      } else {
+        if (idioma == 'es')
+          mensajeADevolver =
+              'La nieve continuará durante las próximas $horasDeSnow horas';
+        if (idioma == 'fr')
+          mensajeADevolver =
+              'La neige continuera pendant les $horasDeSnow prochaines heures';
+        if (idioma == 'it')
+          mensajeADevolver =
+              'La neve continuerà nelle prossime $horasDeSnow ore';
+        if (idioma == 'de')
+          mensajeADevolver =
+              'Der Schnee wird in den nächsten $horasDeSnow Stunden anhalten';
+        if (idioma == 'ru')
+          mensajeADevolver = 'Снег продолжится в ближайшие $horasDeSnow ч.';
+        if (idioma == 'pt')
+          mensajeADevolver =
+              'A neve continuará nas próximas $horasDeSnow horas';
+        if (idioma == 'ca')
+          mensajeADevolver =
+              'La neu continuarà durant les pròximes $horasDeSnow hores';
+        if (idioma == 'he')
+          mensajeADevolver = 'השלג יימשך במהלך $horasDeSnow השעות הקרובות';
+        if (idioma == 'uk')
+          mensajeADevolver =
+              'Сніг триватиме протягом наступних $horasDeSnow год.';
+        if (idioma == 'ar')
+          mensajeADevolver = 'ستستمر الثلوج خلال الـ $horasDeSnow ساعة القادمة';
+        if (idioma == 'zh') mensajeADevolver = '降雪将持续接下来的 $horasDeSnow 小时';
+        if (idioma == 'ko')
+          mensajeADevolver = '앞으로 $horasDeSnow시간 동안 눈이 계속될 예정입니다';
+        if (idioma == 'ja') mensajeADevolver = '今後$horasDeSnow時間、雪が降り続く見込みです';
+        if (mensajeADevolver.isEmpty)
+          mensajeADevolver =
+              'Snow will continue for the next $horasDeSnow hours';
+      }
     }
-  } else if (horasDeSnow > 0) {
-    if (horasDeSnow == 1) {
-      if (idioma == 'es') mensajeADevolver = 'La nieve continuará durante la próxima hora';
-      if (idioma == 'fr') mensajeADevolver = 'La neige continuera pendant la prochaine heure';
-      if (idioma == 'it') mensajeADevolver = 'La neve continuerà nella prossima ora';
-      if (idioma == 'de') mensajeADevolver = 'Der Schnee wird in der nächsten Stunde anhalten';
-      if (idioma == 'ru') mensajeADevolver = 'Снег продолжится в ближайший час';
-      if (idioma == 'pt') mensajeADevolver = 'A neve continuará na próxima hora';
-      if (idioma == 'ca') mensajeADevolver = 'La neu continuarà durant la pròxima hora';
-      if (idioma == 'he') mensajeADevolver = 'השלג יימשך במהלך השעה הקרובה';
-      if (idioma == 'uk') mensajeADevolver = 'Сніг триватиме протягом наступної години';
-      if (idioma == 'ar') mensajeADevolver = 'ستستمر الثلوج خلال الساعة القادمة';
-      if (idioma == 'zh') mensajeADevolver = '降雪将持续接下来的一个小时';
-      if (idioma == 'ko') mensajeADevolver = '앞으로 한 시간 동안 눈이 계속될 예정입니다';
-      if (idioma == 'ja') mensajeADevolver = '今後1時間、雪が降り続く見込みです';
-      if (mensajeADevolver.isEmpty) mensajeADevolver = 'Snow will continue for the next hour';
-    } else {
-      if (idioma == 'es') mensajeADevolver = 'La nieve continuará durante las próximas $horasDeSnow horas';
-      if (idioma == 'fr') mensajeADevolver = 'La neige continuera pendant les $horasDeSnow prochaines heures';
-      if (idioma == 'it') mensajeADevolver = 'La neve continuerà nelle prossime $horasDeSnow ore';
-      if (idioma == 'de') mensajeADevolver = 'Der Schnee wird in den nächsten $horasDeSnow Stunden anhalten';
-      if (idioma == 'ru') mensajeADevolver = 'Снег продолжится в ближайшие $horasDeSnow ч.';
-      if (idioma == 'pt') mensajeADevolver = 'A neve continuará nas próximas $horasDeSnow horas';
-      if (idioma == 'ca') mensajeADevolver = 'La neu continuarà durant les pròximes $horasDeSnow hores';
-      if (idioma == 'he') mensajeADevolver = 'השלג יימשך במהלך $horasDeSnow השעות הקרובות';
-      if (idioma == 'uk') mensajeADevolver = 'Сніг триватиме протягом наступних $horasDeSnow год.';
-      if (idioma == 'ar') mensajeADevolver = 'ستستمر الثلوج خلال الـ $horasDeSnow ساعة القادمة';
-      if (idioma == 'zh') mensajeADevolver = '降雪将持续接下来的 $horasDeSnow 小时';
-      if (idioma == 'ko') mensajeADevolver = '앞으로 $horasDeSnow시간 동안 눈이 계속될 예정입니다';
-      if (idioma == 'ja') mensajeADevolver = '今後$horasDeSnow時間、雪が降り続く見込みです';
-      if (mensajeADevolver.isEmpty) mensajeADevolver = 'Snow will continue for the next $horasDeSnow hours';
+
+    if (snowBarCharData.any((snowData) => snowData.nivelSnow >= 4)) {
+      String avisoNieveFuerte = "";
+      if (idioma == 'es') avisoNieveFuerte = '. Se esperan nevadas intensas';
+      if (idioma == 'fr')
+        avisoNieveFuerte = '. De fortes chutes de neige sont attendues';
+      if (idioma == 'it') avisoNieveFuerte = '. Sono previste intense nevicate';
+      if (idioma == 'de')
+        avisoNieveFuerte = '. Starke Schneefälle werden erwartet';
+      if (idioma == 'ru') avisoNieveFuerte = '. Ожидается сильный снегопад';
+      if (idioma == 'pt') avisoNieveFuerte = '. Esperam-se nevadas intensas';
+      if (idioma == 'ca') avisoNieveFuerte = '. S\'esperen nevades intenses';
+      if (idioma == 'he') avisoNieveFuerte = '. צפויות שלגים כבדים';
+      if (idioma == 'uk') avisoNieveFuerte = '. Очікується сильний снігопад';
+      if (idioma == 'ar') avisoNieveFuerte = '. يُتوقع تساقط كثيف للثلوج';
+      if (idioma == 'zh') avisoNieveFuerte = '。预计会有强降雪';
+      if (idioma == 'ko') avisoNieveFuerte = '. 강한 눈이 예상됩니다';
+      if (idioma == 'ja') avisoNieveFuerte = '。激しい降雪が予想されます';
+      if (avisoNieveFuerte.isEmpty)
+        avisoNieveFuerte = '. Heavy snowfall is expected';
+
+      mensajeADevolver += avisoNieveFuerte;
     }
+
+    return mensajeADevolver;
   }
 
-  if (snowBarCharData.any((snowData) => snowData.nivelSnow >= 4)) {
-    String avisoNieveFuerte = "";
-    if (idioma == 'es') avisoNieveFuerte = '. Se esperan nevadas intensas';
-    if (idioma == 'fr') avisoNieveFuerte = '. De fortes chutes de neige sont attendues';
-    if (idioma == 'it') avisoNieveFuerte = '. Sono previste intense nevicate';
-    if (idioma == 'de') avisoNieveFuerte = '. Starke Schneefälle werden erwartet';
-    if (idioma == 'ru') avisoNieveFuerte = '. Ожидается сильный снегопад';
-    if (idioma == 'pt') avisoNieveFuerte = '. Esperam-se nevadas intensas';
-    if (idioma == 'ca') avisoNieveFuerte = '. S\'esperen nevades intenses';
-    if (idioma == 'he') avisoNieveFuerte = '. צפויות שלגים כבדים';
-    if (idioma == 'uk') avisoNieveFuerte = '. Очікується сильний снігопад';
-    if (idioma == 'ar') avisoNieveFuerte = '. يُتوقع تساقط كثيف للثلوج';
-    if (idioma == 'zh') avisoNieveFuerte = '。预计会有强降雪';
-    if (idioma == 'ko') avisoNieveFuerte = '. 강한 눈이 예상됩니다';
-    if (idioma == 'ja') avisoNieveFuerte = '。激しい降雪が予想されます';
-    if (avisoNieveFuerte.isEmpty) avisoNieveFuerte = '. Heavy snowfall is expected';
-
-    mensajeADevolver += avisoNieveFuerte;
-  }
-
-  return mensajeADevolver;
-}
-
-  static List<SnowLevelModel> getSnowLevelData(WeatherProvider? weatherProvider, TiempoHoras? tiempoHoras) {
+  static List<SnowLevelModel> getSnowLevelData(
+    WeatherProvider? weatherProvider,
+    TiempoHoras? tiempoHoras,
+  ) {
     int i = 0;
     List<SnowLevelModel> listaADevolver = [];
     List<double> amountSnowData = getAmountSnowData12hrs(
@@ -4558,34 +4675,44 @@ static String mensajeSnowDinamico(List<SnowLevelModel> snowBarCharData, String i
   }
 
   static String stringSnow(String idioma) {
-  if (idioma == 'es') return 'Nieve';
-  if (idioma == 'fr') return 'Neige';
-  if (idioma == 'it') return 'Neve';
-  if (idioma == 'de') return 'Schnee';
-  if (idioma == 'ru') return 'Снег';
-  if (idioma == 'pt') return 'Neve';
-  if (idioma == 'ca') return 'Neu';
-  if (idioma == 'he') return 'שלג';
-  if (idioma == 'uk') return 'Сніг';
-  if (idioma == 'ar') return 'ثلج';
-  if (idioma == 'zh') return '雪';
-  if (idioma == 'ko') return '눈';
-  if (idioma == 'ja') return '雪';
-  return 'Snow';
-}
+    if (idioma == 'es') return 'Nieve';
+    if (idioma == 'fr') return 'Neige';
+    if (idioma == 'it') return 'Neve';
+    if (idioma == 'de') return 'Schnee';
+    if (idioma == 'ru') return 'Снег';
+    if (idioma == 'pt') return 'Neve';
+    if (idioma == 'ca') return 'Neu';
+    if (idioma == 'he') return 'שלג';
+    if (idioma == 'uk') return 'Сніг';
+    if (idioma == 'ar') return 'ثلج';
+    if (idioma == 'zh') return '雪';
+    if (idioma == 'ko') return '눈';
+    if (idioma == 'ja') return '雪';
+    return 'Snow';
+  }
 
-static devolverPrevisionMezclaNieveYLluvia(double screenWidth, String idiomaActual) {
-  return Padding(
-    padding: EdgeInsets.symmetric(horizontal: 20),
-    child: Card(
-      child: Padding(padding:  EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      child: Text(Utils.stringMixSnowAndRain(idiomaActual), style: TextStyle(fontWeight: FontWeight.bold),),)
-    ),
-  );
-}
-static String stringMixSnowAndRain(String idioma) {
+  static devolverPrevisionMezclaNieveYLluvia(
+    double screenWidth,
+    String idiomaActual,
+  ) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      child: Card(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: Text(
+            Utils.stringMixSnowAndRain(idiomaActual),
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
+    );
+  }
+
+  static String stringMixSnowAndRain(String idioma) {
     if (idioma == 'es') return 'Mezcla de agua y nieve hasta nuevo aviso';
-    if (idioma == 'fr') return 'Mélange de pluie et de neige jusqu\'à nouvel ordre';
+    if (idioma == 'fr')
+      return 'Mélange de pluie et de neige jusqu\'à nouvel ordre';
     if (idioma == 'it') return 'Misto di pioggia e neve fino a nuovo avviso';
     if (idioma == 'de') return 'Mischung aus Regen und Schnee bis auf Weiteres';
     if (idioma == 'ru') return 'Смесь дождя и снега до дальнейшего уведомления';
@@ -4598,5 +4725,54 @@ static String stringMixSnowAndRain(String idioma) {
     if (idioma == 'ko') return '추후 공지가 있을 때까지 비와 눈이 섞여 내림';
     if (idioma == 'ja') return '追って通知があるまで雨と雪が混ざる';
     return 'Mix of rain and snow until further notice';
+  }
+
+  static String stringActualMoonPhase(String idioma) {
+    if (idioma == 'es') return 'Fase lunar actual🌙';
+    if (idioma == 'fr') return 'Phase lunaire actuelle🌙';
+    if (idioma == 'it') return 'Fase lunare attuale🌙';
+    if (idioma == 'de') return 'Aktuelle Mondphase🌙';
+    if (idioma == 'ru') return 'Текущая фаза луны🌙';
+    if (idioma == 'pt') return 'Fase lunar atual🌙';
+    if (idioma == 'ca') return 'Fase lunar actual🌙';
+    if (idioma == 'he') return 'שלב הירח הנוכחי🌙';
+    if (idioma == 'uk') return 'Поточна фаза місяця🌙';
+    if (idioma == 'ar') return 'مرحلة القمر الحالية🌙';
+    if (idioma == 'zh') return '当前月相🌙';
+    if (idioma == 'ko') return '현재 달의 위상🌙';
+    if (idioma == 'ja') return '現在の月相🌙';
+    return 'Current lunar phase';
+  }
+
+  static String stringFaseLunarDinamica(double fase, String idioma) {
+    // 1. Convertimos el valor (0.0 a 1.0) en un índice del 0 al 7.
+    int i;
+    // Márgenes estrictos (1.5%) para que cuadre exacto con el dibujo
+    if (fase <= 0.015 || fase >= 0.985) i = 0;      // Nueva (casi 100% oscura)
+    else if (fase < 0.235) i = 1;                   // Creciente
+    else if (fase <= 0.265) i = 2;                  // Cuarto creciente
+    else if (fase < 0.485) i = 3;                   // Gibosa creciente
+    else if (fase <= 0.515) i = 4;                  // Llena (casi 100% iluminada)
+    else if (fase < 0.735) i = 5;                   // Gibosa menguante
+    else if (fase <= 0.765) i = 6;                  // Cuarto menguante
+    else i = 7;                                     // Menguante
+
+    // 2. Devolvemos el array correspondiente a cada idioma en base a ese índice
+    if (idioma == 'es') return ['Luna nueva', 'Luna creciente', 'Cuarto creciente', 'Luna gibosa creciente', 'Luna llena', 'Luna gibosa menguante', 'Cuarto menguante', 'Luna menguante'][i];
+    if (idioma == 'fr') return ['Nouvelle lune', 'Premier croissant', 'Premier quartier', 'Gibbeuse croissante', 'Pleine lune', 'Gibbeuse décroissante', 'Dernier quartier', 'Dernier croissant'][i];
+    if (idioma == 'it') return ['Luna nuova', 'Luna crescente', 'Primo quarto', 'Gibbosa crescente', 'Luna piena', 'Gibbosa calante', 'Ultimo quarto', 'Luna calante'][i];
+    if (idioma == 'de') return ['Neumond', 'Zunehmende Sichel', 'Erstes Viertel', 'Zunehmender Mond', 'Vollmond', 'Abnehmender Mond', 'Letztes Viertel', 'Abnehmende Sichel'][i];
+    if (idioma == 'ru') return ['Новолуние', 'Растущий серп', 'Первая четверть', 'Растущая луна', 'Полнолуние', 'Убывающая луна', 'Последняя четверть', 'Убывающий серп'][i];
+    if (idioma == 'pt') return ['Lua nova', 'Lua crescente', 'Quarto crescente', 'Gibosa crescente', 'Lua cheia', 'Gibosa minguante', 'Quarto minguante', 'Lua minguante'][i];
+    if (idioma == 'ca') return ['Lluna nova', 'Lluna creixent', 'Quart creixent', 'Gibosa creixent', 'Lluna plena', 'Gibosa minvant', 'Quart minvant', 'Lluna minvant'][i];
+    if (idioma == 'he') return ['ירח חדש', 'סהר מתמלא', 'רבע ראשון', 'ירח מתמלא', 'ירח מלא', 'ירח חסר', 'רבע אחרון', 'סהר חסר'][i];
+    if (idioma == 'uk') return ['Новий місяць', 'Зростаючий серп', 'Перша чверть', 'Зростаючий місяць', 'Повний місяць', 'Спадаючий місяць', 'Остання чверть', 'Спадаючий серп'][i];
+    if (idioma == 'ar') return ['قمر جديد', 'هلال متزايد', 'تربيع أول', 'أحدب متزايد', 'قمر مكتمل', 'أحدب متناقص', 'تربيع أخير', 'هلال متناقص'][i];
+    if (idioma == 'zh') return ['新月', '蛾眉月', '上弦月', '盈凸月', '满月', '亏凸月', '下弦月', '残月'][i];
+    if (idioma == 'ko') return ['신월', '초승달', '상현달', '차오르는 달', '보름달', '기우는 달', '하현달', '그믐달'][i];
+    if (idioma == 'ja') return ['新月', '三日月', '上弦の月', '満ちていく月', '満月', '欠けていく月', '下弦の月', '二十六夜'][i];
+    
+    // Fallback por defecto (Inglés)
+    return ['New Moon', 'Waxing Crescent', 'First Quarter', 'Waxing Gibbous', 'Full Moon', 'Waning Gibbous', 'Last Quarter', 'Waning Crescent'][i];
   }
 }

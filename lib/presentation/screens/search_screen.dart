@@ -208,20 +208,28 @@ class _widgetUbicacion extends StatelessWidget {
             mostrarCargando(context);
             Position position = weatherProvider.geolocalizacion!;
             try {
-              Tiempo? tiempoUbi = await TiempoService()
-                  .getTiempoLatLon(position.latitude, position.longitude)
-                  .timeout(const Duration(seconds: 10));
-              TiempoHoras? tiempoHoras = await TiempoService()
-                  .getTiempoPorHoras(position.latitude, position.longitude)
-                  .timeout(const Duration(seconds: 10));
-              TiempoDias? tiempoDias = await TiempoService()
-                  .getTiempoPorDias(position.latitude, position.longitude)
-                  .timeout(const Duration(seconds: 10));
+              final resultadosPeticion = await Future.wait([
+                TiempoService().getTiempoLatLon(
+                  position.latitude,
+                  position.longitude,
+                ),
+                TiempoService().getTiempoPorHoras(
+                  position.latitude,
+                  position.longitude,
+                ),
+                TiempoService().getTiempoPorDias(
+                  position.latitude,
+                  position.longitude,
+                ),
+              ]).timeout(const Duration(seconds: 10));
+              Tiempo? tiempoUbi = resultadosPeticion[0] as Tiempo;
+              TiempoHoras? tiempoHoras = resultadosPeticion[1] as TiempoHoras;
+              TiempoDias? tiempoDias = resultadosPeticion[2] as TiempoDias;
               weatherProvider.cambiarDatos(
-                tiempoUbi!,
+                tiempoUbi,
                 weatherProvider.nombreUbi,
-                tiempoHoras!,
-                tiempoDias!,
+                tiempoHoras,
+                tiempoDias,
                 true,
                 position.latitude,
                 position.longitude,
@@ -255,9 +263,9 @@ class _widgetUbicacion extends StatelessWidget {
 
             weatherProvider.comprobarNocheDia();
             weatherProvider.inicializarTiempoDias(configProvider.idiomaActual);
-            DateTime horaActual = weatherProvider.ahoraCiudad;
-            int elementosAEliminar = horaActual.hour;
+            int elementosAEliminar = weatherProvider.ahoraCiudad.hour;
             weatherProvider.eliminarHorasPasadas(elementosAEliminar);
+            weatherProvider.cambiarFaseLunar();
             context.go('/home');
           } else {
             context.pop();
@@ -374,20 +382,25 @@ class _widgetLugarBusqueda extends StatelessWidget {
       onTap: () async {
         mostrarCargando(context);
         try {
-          Tiempo? tiempoUbi = await TiempoService()
-              .getTiempoLatLon(lugar.center![1], lugar.center![0])
-              .timeout(const Duration(seconds: 10));
-          TiempoHoras? tiempoHoras = await TiempoService()
-              .getTiempoPorHoras(lugar.center![1], lugar.center![0])
-              .timeout(const Duration(seconds: 10));
-          TiempoDias? tiempoDias = await TiempoService()
-              .getTiempoPorDias(lugar.center![1], lugar.center![0])
-              .timeout(const Duration(seconds: 10));
+          final resultadosPeticion = await Future.wait([
+            TiempoService().getTiempoLatLon(lugar.center![1], lugar.center![0]),
+            TiempoService().getTiempoPorHoras(
+              lugar.center![1],
+              lugar.center![0],
+            ),
+            TiempoService().getTiempoPorDias(
+              lugar.center![1],
+              lugar.center![0],
+            ),
+          ]).timeout(const Duration(seconds: 10));
+          Tiempo? tiempoUbi = resultadosPeticion[0] as Tiempo;
+          TiempoHoras? tiempoHoras = resultadosPeticion[1] as TiempoHoras;
+          TiempoDias? tiempoDias = resultadosPeticion[2] as TiempoDias;
           weatherProvider.cambiarDatos(
-            tiempoUbi!,
+            tiempoUbi,
             lugar.placeName!,
-            tiempoHoras!,
-            tiempoDias!,
+            tiempoHoras,
+            tiempoDias,
             false,
             lugar.center![1],
             lugar.center![0],
@@ -420,10 +433,10 @@ class _widgetLugarBusqueda extends StatelessWidget {
         weatherProvider.comprobarNocheDia();
         weatherProvider.inicializarTiempoDias(configProvider.idiomaActual);
         //Lógica previa para obtener el día actual y sobre esa hora limitar el array de tiempo horas
-        DateTime horaActual = weatherProvider.ahoraCiudad;
-        int elementosAEliminar = horaActual.hour;
+        int elementosAEliminar = weatherProvider.ahoraCiudad.hour;
         //Eliminamos las horas pasadas del tiempoHoras
         weatherProvider.eliminarHorasPasadas(elementosAEliminar);
+        weatherProvider.cambiarFaseLunar();
         if (!isHistorial) configProvider.actualizarHistorialBusqueda(lugar);
         context.go('/home');
       },
