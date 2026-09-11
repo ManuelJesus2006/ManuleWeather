@@ -4741,7 +4741,24 @@ class Utils {
     if (idioma == 'zh') return '当前月相🌙';
     if (idioma == 'ko') return '현재 달의 위상🌙';
     if (idioma == 'ja') return '現在の月相🌙';
-    return 'Current lunar phase';
+    return 'Current lunar phase🌙';
+  }
+
+  static String stringMoonPhase(String idioma) {
+    if (idioma == 'es') return 'Fase lunar🌙';
+    if (idioma == 'fr') return 'Phase lunaire🌙';
+    if (idioma == 'it') return 'Fase lunare🌙';
+    if (idioma == 'de') return 'Mondphase🌙';
+    if (idioma == 'ru') return 'Фаза луны🌙';
+    if (idioma == 'pt') return 'Fase lunar🌙';
+    if (idioma == 'ca') return 'Fase lunar🌙';
+    if (idioma == 'he') return 'שלב הירח🌙';
+    if (idioma == 'uk') return 'Фаза місяця🌙';
+    if (idioma == 'ar') return 'مرحلة القمر🌙';
+    if (idioma == 'zh') return '月相🌙';
+    if (idioma == 'ko') return '달의 위상🌙';
+    if (idioma == 'ja') return '月相🌙';
+    return 'Moon phase🌙';
   }
 
   static String stringFaseLunarDinamica(double fase, String idioma) {
@@ -4775,4 +4792,69 @@ class Utils {
     // Fallback por defecto (Inglés)
     return ['New Moon', 'Waxing Crescent', 'First Quarter', 'Waxing Gibbous', 'Full Moon', 'Waning Gibbous', 'Last Quarter', 'Waning Crescent'][i];
   }
+
+  static double calcularFaseLunarByFecha(DateTime fecha) {
+    DateTime lunaLlenaReferencia = DateTime(2000, 1, 6); // Luna llena conocida
+    // Calculamos los días exactos con decimales usando los segundos para máxima precisión
+    double diasDesde = fecha.difference(lunaLlenaReferencia).inSeconds / 86400;
+    // El ciclo lunar exacto en días
+    const double cicloLunar = 29.530588;
+
+    //Calculamos la fase del 0-1
+    return (diasDesde % cicloLunar) / cicloLunar;
+  }
+
+  static String adviseOfTheNextFullOrNewMoon(double fase, String idioma, WeatherProvider weatherProvider) {
+    // Si la fase está entre que empieza la Luna Nueva (0.985) cruzando el 0 
+    // hasta antes de que empiece la Luna Llena (0.485), lo próximo es la Llena.
+    if (fase >= 0.985 || fase < 0.485) {
+      return stringNextFullMoon(idioma, weatherProvider);
+    } 
+    // En cuanto pisamos el margen de Luna Llena (0.485) y mientras va menguando, 
+    // lo próximo es la Nueva.
+    else {
+      return stringNextNewMoon(idioma, weatherProvider);
+    }
+  }
+
+  static String stringNextFullMoon(String idioma, WeatherProvider weatherProvider) {
+    String fechaFormatted = '${weatherProvider.fechaProximaLunaLlena.day} ${Utils.stringOf(idioma)} ${Utils.obtenerMes(weatherProvider.fechaProximaLunaLlena.month, idioma)}';
+    
+    if (idioma == 'es') return 'Próxima luna llena: $fechaFormatted';
+    if (idioma == 'fr') return 'Prochaine pleine lune : $fechaFormatted';
+    if (idioma == 'it') return 'Prossima luna piena: $fechaFormatted';
+    if (idioma == 'de') return 'Nächster Vollmond: $fechaFormatted';
+    if (idioma == 'ru') return 'Следующее полнолуние: $fechaFormatted';
+    if (idioma == 'pt') return 'Próxima lua cheia: $fechaFormatted';
+    if (idioma == 'ca') return 'Propera lluna plena: $fechaFormatted';
+    if (idioma == 'he') return 'ירח מלא הבא: $fechaFormatted';
+    if (idioma == 'uk') return 'Наступний повний місяць: $fechaFormatted';
+    if (idioma == 'ar') return 'القمر المكتمل القادم: $fechaFormatted';
+    if (idioma == 'zh') return '下一次满月: $fechaFormatted';
+    if (idioma == 'ko') return '다음 보름달: $fechaFormatted';
+    if (idioma == 'ja') return '次の満月: $fechaFormatted';
+    
+    return 'Next full moon: $fechaFormatted';
+  }
+
+  static String stringNextNewMoon(String idioma, WeatherProvider weatherProvider) {
+    String fechaFormatted = '${weatherProvider.fechaProximaLunaNueva.day} ${Utils.stringOf(idioma)} ${Utils.obtenerMes(weatherProvider.fechaProximaLunaNueva.month, idioma)}';
+    if (idioma == 'es') return 'Próxima luna nueva: $fechaFormatted';
+    if (idioma == 'fr') return 'Prochaine nouvelle lune : $fechaFormatted';
+    if (idioma == 'it') return 'Prossima luna nuova: $fechaFormatted';
+    if (idioma == 'de') return 'Nächster Neumond: $fechaFormatted';
+    if (idioma == 'ru') return 'Следующее новолуние: $fechaFormatted';
+    if (idioma == 'pt') return 'Próxima lua nova: $fechaFormatted';
+    if (idioma == 'ca') return 'Propera lluna nova: $fechaFormatted';
+    if (idioma == 'he') return 'ירח חדש הבא: $fechaFormatted';
+    if (idioma == 'uk') return 'Наступний новий місяць: $fechaFormatted';
+    if (idioma == 'ar') return 'القمر الجديد القادم: $fechaFormatted';
+    if (idioma == 'zh') return '下一次新月: $fechaFormatted';
+    if (idioma == 'ko') return '다음 신월: $fechaFormatted';
+    if (idioma == 'ja') return '次の新月: $fechaFormatted';
+    
+    return 'Next new moon: $fechaFormatted';
+  }
+
+  
 }

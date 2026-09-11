@@ -184,16 +184,16 @@ class WeatherProvider with ChangeNotifier {
   }
 
   void cambiarFaseLunar() {
+    //Para calcular simplemente la fase actual utilizamos un método aparte que reutilizo para el tiempoDias
+    faseLunar = Utils.calcularFaseLunarByFecha(ahoraCiudad);
+
+    //Para obtener los datos de las proximas lunas llena y nueva volvemos a usar lo mismo que el método anterior pero sin hacer lo mismo
     DateTime lunaLlenaReferencia = DateTime(2000, 1, 6); // Luna llena conocida
-    // Calculamos los días exactos con decimales usando los segundos para máxima precisión
     double diasDesde = ahoraCiudad.difference(lunaLlenaReferencia).inSeconds / 86400;
+
     // El ciclo lunar exacto en días
     const double cicloLunar = 29.530588;
-
-    //Calculamos la fase del 0-1
-    faseLunar = (diasDesde % cicloLunar) / cicloLunar;
     
-    // En qué momento del ciclo estamos (en días)
     double faseActualDias = diasDesde % cicloLunar;
 
     // Días que faltan para la próxima Luna Nueva (final del ciclo)
