@@ -6,6 +6,7 @@ import 'package:manule_weather/models/tiempo_model.dart';
 import 'package:manule_weather/services/localizacion_service.dart';
 import 'package:manule_weather/services/tiempo_service.dart';
 import 'package:manule_weather/utils/Utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WeatherProvider with ChangeNotifier {
   Tiempo? tiempoActual;
@@ -20,6 +21,8 @@ class WeatherProvider with ChangeNotifier {
   bool isDeDia = false;
   DateTime sunrise = DateTime.now();
   DateTime sunset = DateTime.now();
+  DateTime moonrise = DateTime.now();
+  DateTime moonset = DateTime.now();
   DateTime ahoraCiudad = DateTime.now();
   TiempoDias? tiempoDias;
   double latitudActual = 0;
@@ -36,7 +39,7 @@ class WeatherProvider with ChangeNotifier {
     bool isUbicacionUser,
     double latitude,
     double longitude,
-  ) {
+  ) async{
     this.tiempoActual = tiempo;
     this.localizacion = localizacion;
     this.tiempoHoras = tiempoHoras;
@@ -44,6 +47,11 @@ class WeatherProvider with ChangeNotifier {
     this.tiempoDias = tiempoDias;
     latitudActual = latitude;
     longitudActual = longitude;
+    if (isUbicacionUser){ //Si el cambio de data es de la ubicación actual, los guardamos para las notificaciones y el widget
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setDouble('last_latitude', latitudActual);
+      await preferences.setDouble('last_longitude', longitudActual);
+    }
     notifyListeners();
   }
 
@@ -85,6 +93,10 @@ class WeatherProvider with ChangeNotifier {
 
     sunset = DateTime.parse(tiempoDias!.sunset[0]);
 
+    moonrise = DateTime.parse(tiempoDias!.moonrise[0]!);
+
+    moonset = DateTime.parse(tiempoDias!.moonset[0]!);
+
     ahoraCiudad = DateTime.parse(tiempoActual!.current.time);
     isDeDia = tiempoActual!.current.isDay == 1 ? true : false;
     notifyListeners();
@@ -118,6 +130,7 @@ class WeatherProvider with ChangeNotifier {
 
   Future<void> actualizarDatos(String idioma) async {
     if (isUbicacionUser!) {
+      final preferences = await SharedPreferences.getInstance();
       Position position = await Geolocator.getCurrentPosition();
       print("Latitud: ${position.latitude}, Longitud: ${position.longitude}");
 

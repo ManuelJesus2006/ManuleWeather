@@ -67,6 +67,8 @@ class TiempoDias {
   List<double> precipitationSum;
   List<String> sunrise;
   List<String> sunset;
+  List<String?> moonrise;
+  List<String?> moonset;
   List<double> snowfallSum;
   List<IconData> iconosGenerales = [];
   List<String> descripcionesCortas = [];
@@ -81,6 +83,8 @@ class TiempoDias {
     required this.precipitationSum,
     required this.sunrise,
     required this.sunset,
+    required this.moonrise,
+    required this.moonset,
     required this.snowfallSum,
   });
 
@@ -104,6 +108,8 @@ class TiempoDias {
     ),
     sunrise: List<String>.from(json["sunrise"].map((x) => x)),
     sunset: List<String>.from(json["sunset"].map((x) => x)),
+    moonrise: List<String?>.from(json["moonrise"].map((x) => x)),
+    moonset: List<String?>.from(json["moonset"].map((x) => x)),
     snowfallSum: List<double>.from(json["snowfall_sum"].map((x) => x)),
   );
 

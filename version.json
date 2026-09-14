@@ -1,5 +1,5 @@
 {
-    "version": "0.9.8",
+    "version": "0.9.9",
   "url": "https://drive.google.com/file/d/1B1Ojsb_gF4Tw8oFm28FiFDGhux1T0b1H/view?usp=sharing",
-  "whatisnew": "Fase beta de las fases lunares SIN API, optimización de peticiones API y arreglo de algunos bugs en específico bug de cambio de fuente de texto al cambiar al modo oscuro"
+  "whatisnew": "Implementación de las notificaciones en la app (actualizaciones, avisos, tiempo actual) y poder activarlas y desactivarlas, asimismo, se ha mejorado la busqueda de información en segundo plano para las notificaciones y también para el widget de la aplicación aunque aún puede dar fallos. Consecuentemente, se ha agregado la hora de la salida y puesta de la luna y por último se ha arreglado el diseño en la pantalla por horas y pequeños cambios en la pantalla de inicio"
 }

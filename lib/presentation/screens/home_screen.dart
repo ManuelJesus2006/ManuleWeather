@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:manule_weather/presentation/widgets/fase_lunar_widget.dart';
+import 'package:manule_weather/presentation/widgets/moonrise_moonset_widget.dart';
 import 'package:manule_weather/presentation/widgets/weather_hour_detail.dart';
 import 'package:manule_weather/providers/config_provider.dart';
 import 'package:manule_weather/providers/navigation_provider.dart';
@@ -148,29 +149,39 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (weatherProvider.isUbicacionUser!)
-                        Icon(
-                          LucideIcons.navigation,
-                          color: Colors.white,
-                          size: screenWidth * 0.04,
-                        ),
-                      Flexible(
-                        child: Text(
-                          weatherProvider.localizacion!,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.045),
+                  child: Container(
+                    padding: EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: weatherProvider.isDeDia
+                          ? Colors.blue
+                          : Colors.grey[900],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min, //Para que el contenedor con el color y el borderRadius se modifiquen según el tamaño del Row
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (weatherProvider.isUbicacionUser!)
+                          Icon(
+                            LucideIcons.navigation,
                             color: Colors.white,
-                            fontSize: screenWidth * 0.045,
+                            size: screenWidth * 0.04,
+                          ),
+                        Flexible(
+                          child: Text(
+                            weatherProvider.localizacion!,
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: screenWidth * 0.045,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.01),
@@ -178,6 +189,7 @@ class HomeScreen extends StatelessWidget {
                   screenWidth,
                   weatherProvider,
                   configProvider.idiomaActual,
+                  false
                 ),
                 SizedBox(height: screenHeight * 0.01),
                 Text(
@@ -287,7 +299,7 @@ class HomeScreen extends StatelessWidget {
                             ),
                             SizedBox(height: screenHeight * 0.01),
                             Text(
-                              '${weatherProvider.tiempoDias!.temperature2MMax[0].round()}ºC',
+                              '${weatherProvider.tiempoActual!.current.temperature2MMax.round()}ºC',
                               style: TextStyle(
                                 fontSize: screenWidth * 0.05,
                                 color: Colors.white,
@@ -315,7 +327,7 @@ class HomeScreen extends StatelessWidget {
                             ),
                             SizedBox(height: screenHeight * 0.01),
                             Text(
-                              '${weatherProvider.tiempoDias!.temperature2MMin[0].round()}ºC',
+                              '${weatherProvider.tiempoActual!.current.temperature2MMin.round()}ºC',
                               style: TextStyle(
                                 fontSize: screenWidth * 0.05,
                                 color: Colors.white,
@@ -397,7 +409,13 @@ class HomeScreen extends StatelessWidget {
                 UV_home_widget(screenWidth: screenWidth, puntosUVA: puntosUVA),
 
                 SizedBox(height: screenHeight * 0.02),
-                FaseLunarWidget(screenWidth: screenWidth, screenHeight: screenHeight, faseLunarAPintar: weatherProvider.faseLunar),
+                FaseLunarWidget(
+                  screenWidth: screenWidth,
+                  screenHeight: screenHeight,
+                  faseLunarAPintar: weatherProvider.faseLunar,
+                ),
+                SizedBox(height: screenHeight * 0.01),
+                MoonRiseMoonSetWidget(screenWidth: screenWidth, screenHeight: screenHeight, indexDay: 0,),
                 SizedBox(height: screenHeight * 0.02),
                 _infoCard(
                   titulo: Utils.stringWind(configProvider.idiomaActual),
@@ -502,9 +520,15 @@ class HomeScreen extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            height: 150,
-            decoration: BoxDecoration(color: Colors.blue),
+            padding: EdgeInsets.only(bottom: 20),
+            decoration: BoxDecoration(
+              color: configProvider.isDarkTheme
+                  ? Colors.grey[900]
+                  : Colors.blue,
+              borderRadius: BorderRadius.circular(20),
+            ),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -534,7 +558,7 @@ class HomeScreen extends StatelessWidget {
                       Flexible(
                         child: Text(
                           weatherProvider.localizacion!,
-                          maxLines: 2,
+                          maxLines: 3,
                           overflow: TextOverflow.ellipsis,
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -1258,7 +1282,13 @@ class _tiempoDiaIndividualCards extends StatelessWidget {
             valor: "$rachasMax km/h",
           ),
           SizedBox(height: 10),
-          FaseLunarWidget(screenWidth: screenWidth, screenHeight: screenHeight, faseLunarAPintar: faseLunarDelDia)
+          FaseLunarWidget(
+            screenWidth: screenWidth,
+            screenHeight: screenHeight,
+            faseLunarAPintar: faseLunarDelDia,
+          ),
+          SizedBox(height: 10),
+          MoonRiseMoonSetWidget(screenWidth: screenWidth, screenHeight: screenHeight, indexDay: indiceActual,)
         ],
       ),
     );
@@ -1293,5 +1323,3 @@ Widget _infoCard({
     ),
   );
 }
-
-

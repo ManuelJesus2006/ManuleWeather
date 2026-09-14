@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:manule_weather/models/localizacion_model.dart';
+import 'package:manule_weather/services/notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ConfigProvider with ChangeNotifier {
@@ -30,6 +31,7 @@ class ConfigProvider with ChangeNotifier {
   ];
   bool isDarkTheme = false;
   List<Localizacion> historialBusqueda = [];
+  bool isNotificationsActive = false;
 
   comprobarIdiomaYPrimeraVez() async {
     final preferences = await SharedPreferences.getInstance();
@@ -62,6 +64,27 @@ class ConfigProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  changeNotifications(bool newValue) async {
+    if (newValue == true) {
+      if (!await NotificationService.estanPermitidas()) {
+        await NotificationService.init();
+        isNotificationsActive = await NotificationService.estanPermitidas();
+        final preferences = await SharedPreferences.getInstance();
+        await preferences.setBool('notifications', isNotificationsActive);
+      } else {
+        isNotificationsActive = newValue;
+        final preferences = await SharedPreferences.getInstance();
+        await preferences.setBool('notifications', isNotificationsActive);
+      }
+    } else {
+      isNotificationsActive = newValue;
+      await NotificationService.borrarTodasLasNotificaciones();
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setBool('notifications', isNotificationsActive);
+    }
+    notifyListeners();
+  }
+
   void changeTheme(bool newValue) async {
     isDarkTheme = newValue;
     final preferences = await SharedPreferences.getInstance();
@@ -73,6 +96,13 @@ class ConfigProvider with ChangeNotifier {
     final preferences = await SharedPreferences.getInstance();
     bool? isModoOscuro = preferences.getBool('modoOscuro');
     if (isModoOscuro != null) isDarkTheme = isModoOscuro;
+    notifyListeners();
+  }
+
+  comprobarNotificaciones() async {
+    final preferences = await SharedPreferences.getInstance();
+    bool? notificaciones = preferences.getBool('notifications');
+    if (notificaciones != null) isNotificationsActive = notificaciones;
     notifyListeners();
   }
 
@@ -123,7 +153,7 @@ class ConfigProvider with ChangeNotifier {
     await preferences.setString("historial", historialParsed);
   }
 
-  cambiarValorLineaDeCarga(double nuevoValor) async{
+  cambiarValorLineaDeCarga(double nuevoValor) async {
     valorLineaDeCarga = nuevoValor;
     notifyListeners();
   }

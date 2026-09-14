@@ -2,16 +2,16 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:manule_weather/environment.dart';
+import 'package:manule_weather/services/notification_service.dart';
 import 'package:manule_weather/utils/Utils.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class VersionService {
-  String url_version =
-      "https://raw.githubusercontent.com/ManuelJesus2006/ManuleWeather/main/version.json";
 
   Future<void> comprobarActualizacion(String idiomaActual, BuildContext context) async {
-    Uri uri = Uri.parse(url_version);
+    Uri uri = Uri.parse(Environment.url_version);
     final response = await get(uri);
 
     if (response.statusCode == 200) {
@@ -24,6 +24,7 @@ class VersionService {
       final versionActual = info.version;
 
       if (versionServer != versionActual) {
+        await NotificationService.mostrarNotificacion(titulo: Utils.stringNewUpdate(idiomaActual, versionServer), cuerpo: whatisnew, id: 0);
         await showDialog(context: context, builder: (context) => AlertDialog(
           title: Text(Utils.stringNewUpdate(idiomaActual, versionServer)),
           content: Text(whatisnew),

@@ -7,8 +7,10 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:manule_weather/models/lluvia_level_model.dart';
 import 'package:manule_weather/models/snow_level_model.dart';
 import 'package:manule_weather/models/tiempo_horas_model.dart';
+import 'package:manule_weather/models/tiempo_model.dart';
 import 'package:manule_weather/presentation/widgets/card_alert_widget.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
+import 'package:manule_weather/services/notification_service.dart';
 
 class Utils {
   static String formatearHora(DateTime fecha) {
@@ -1761,6 +1763,42 @@ class Utils {
     return 'Sunset🌄';
   }
 
+  static String stringMoonrise(String idiomaActual) {
+    if (idiomaActual == 'es') return 'Salida de la luna';
+    if (idiomaActual == 'fr') return 'Lever de la lune';
+    if (idiomaActual == 'it') return 'Sorgere della luna';
+    if (idiomaActual == 'de') return 'Mondaufgang';
+    if (idiomaActual == 'ru') return 'Восход луны';
+    if (idiomaActual == 'pt') return 'Nascer da lua';
+    if (idiomaActual == 'ca') return 'Sortida de la lluna';
+    if (idiomaActual == 'he') return 'זריחת הירח';
+    if (idiomaActual == 'uk') return 'Схід місяця';
+    if (idiomaActual == 'ar') return 'شروق القمر';
+    if (idiomaActual == 'zh') return '月出';
+    if (idiomaActual == 'ko') return '월출';
+    if (idiomaActual == 'ja') return '月の出';
+
+    return 'Moonrise';
+  }
+
+  static String stringMoonset(String idiomaActual) {
+    if (idiomaActual == 'es') return 'Puesta de la luna';
+    if (idiomaActual == 'fr') return 'Coucher de la lune';
+    if (idiomaActual == 'it') return 'Tramonto della luna';
+    if (idiomaActual == 'de') return 'Monduntergang';
+    if (idiomaActual == 'ru') return 'Заход луны';
+    if (idiomaActual == 'pt') return 'Pôr da lua';
+    if (idiomaActual == 'ca') return 'Posta de la lluna';
+    if (idiomaActual == 'he') return 'שקיעת הירח';
+    if (idiomaActual == 'uk') return 'Захід місяця';
+    if (idiomaActual == 'ar') return 'غروب القمر';
+    if (idiomaActual == 'zh') return '月落';
+    if (idiomaActual == 'ko') return '월몰';
+    if (idiomaActual == 'ja') return '月の入り';
+
+    return 'Moonset';
+  }
+
   static String stringWind(String idioma) {
     if (idioma == 'es') return 'Viento🍃';
     if (idioma == 'fr') return 'Vent🍃';
@@ -1954,7 +1992,34 @@ class Utils {
     if (idioma == 'it') return 'di';
     if (idioma == 'pt') return 'de';
     if (idioma == 'ca') return 'de';
-    return '';
+    if (idioma == 'de') return 'von';
+    if (idioma == 'ru') return 'из'; 
+    if (idioma == 'uk') return 'з';
+    if (idioma == 'he') return 'של';
+    if (idioma == 'ar') return 'من';
+    if (idioma == 'zh') return '的';
+    if (idioma == 'ko') return '의';
+    if (idioma == 'ja') return 'の';
+    
+    return 'of';
+  }
+
+  static String stringIn(String idioma) {
+    if (idioma == 'es') return 'en';
+    if (idioma == 'fr') return 'en';
+    if (idioma == 'it') return 'in';
+    if (idioma == 'pt') return 'em';
+    if (idioma == 'ca') return 'en';
+    if (idioma == 'de') return 'in';
+    if (idioma == 'ru') return 'в'; 
+    if (idioma == 'uk') return 'в';
+    if (idioma == 'he') return 'ב';
+    if (idioma == 'ar') return 'في';
+    if (idioma == 'zh') return '在';
+    if (idioma == 'ko') return '에';
+    if (idioma == 'ja') return 'に';
+    
+    return 'in';
   }
 
   static String stringLicenses(String idioma) {
@@ -2197,6 +2262,24 @@ class Utils {
     if (idioma == 'ko') return '최근 업데이트 (현지 시간):';
     if (idioma == 'ja') return '最終更新（現地時間）:';
     return 'Last update (local time):';
+  }
+
+  static String stringOnlyLocalTime(String idioma) {
+    if (idioma == 'es') return 'Hora local';
+    if (idioma == 'fr') return 'Heure locale';
+    if (idioma == 'it') return 'Ora locale';
+    if (idioma == 'de') return 'Ortszeit';
+    if (idioma == 'ru') return 'Местное время';
+    if (idioma == 'pt') return 'Hora local';
+    if (idioma == 'ca') return 'Hora local';
+    if (idioma == 'he') return 'זמן מקומי';
+    if (idioma == 'uk') return 'Місцевий час';
+    if (idioma == 'ar') return 'التوقيت المحلي';
+    if (idioma == 'zh') return '当地时间';
+    if (idioma == 'ko') return '현지 시간';
+    if (idioma == 'ja') return '現地時間';
+    
+    return 'Local time';
   }
 
   static String stringErrorServerDown(String idioma) {
@@ -2621,6 +2704,7 @@ class Utils {
     double screenWidth,
     WeatherProvider weatherProvider,
     String idioma,
+    bool isNotification,
   ) {
     List<double> uvData = weatherProvider.tiempoHoras!.uvIndex
         .take(24)
@@ -4765,32 +4849,152 @@ class Utils {
     // 1. Convertimos el valor (0.0 a 1.0) en un índice del 0 al 7.
     int i;
     // Márgenes estrictos (1.5%) para que cuadre exacto con el dibujo
-    if (fase <= 0.015 || fase >= 0.985) i = 0;      // Nueva (casi 100% oscura)
-    else if (fase < 0.235) i = 1;                   // Creciente
-    else if (fase <= 0.265) i = 2;                  // Cuarto creciente
-    else if (fase < 0.485) i = 3;                   // Gibosa creciente
-    else if (fase <= 0.515) i = 4;                  // Llena (casi 100% iluminada)
-    else if (fase < 0.735) i = 5;                   // Gibosa menguante
-    else if (fase <= 0.765) i = 6;                  // Cuarto menguante
-    else i = 7;                                     // Menguante
+    if (fase <= 0.015 || fase >= 0.985)
+      i = 0; // Nueva (casi 100% oscura)
+    else if (fase < 0.235)
+      i = 1; // Creciente
+    else if (fase <= 0.265)
+      i = 2; // Cuarto creciente
+    else if (fase < 0.485)
+      i = 3; // Gibosa creciente
+    else if (fase <= 0.515)
+      i = 4; // Llena (casi 100% iluminada)
+    else if (fase < 0.735)
+      i = 5; // Gibosa menguante
+    else if (fase <= 0.765)
+      i = 6; // Cuarto menguante
+    else
+      i = 7; // Menguante
 
     // 2. Devolvemos el array correspondiente a cada idioma en base a ese índice
-    if (idioma == 'es') return ['Luna nueva', 'Luna creciente', 'Cuarto creciente', 'Luna gibosa creciente', 'Luna llena', 'Luna gibosa menguante', 'Cuarto menguante', 'Luna menguante'][i];
-    if (idioma == 'fr') return ['Nouvelle lune', 'Premier croissant', 'Premier quartier', 'Gibbeuse croissante', 'Pleine lune', 'Gibbeuse décroissante', 'Dernier quartier', 'Dernier croissant'][i];
-    if (idioma == 'it') return ['Luna nuova', 'Luna crescente', 'Primo quarto', 'Gibbosa crescente', 'Luna piena', 'Gibbosa calante', 'Ultimo quarto', 'Luna calante'][i];
-    if (idioma == 'de') return ['Neumond', 'Zunehmende Sichel', 'Erstes Viertel', 'Zunehmender Mond', 'Vollmond', 'Abnehmender Mond', 'Letztes Viertel', 'Abnehmende Sichel'][i];
-    if (idioma == 'ru') return ['Новолуние', 'Растущий серп', 'Первая четверть', 'Растущая луна', 'Полнолуние', 'Убывающая луна', 'Последняя четверть', 'Убывающий серп'][i];
-    if (idioma == 'pt') return ['Lua nova', 'Lua crescente', 'Quarto crescente', 'Gibosa crescente', 'Lua cheia', 'Gibosa minguante', 'Quarto minguante', 'Lua minguante'][i];
-    if (idioma == 'ca') return ['Lluna nova', 'Lluna creixent', 'Quart creixent', 'Gibosa creixent', 'Lluna plena', 'Gibosa minvant', 'Quart minvant', 'Lluna minvant'][i];
-    if (idioma == 'he') return ['ירח חדש', 'סהר מתמלא', 'רבע ראשון', 'ירח מתמלא', 'ירח מלא', 'ירח חסר', 'רבע אחרון', 'סהר חסר'][i];
-    if (idioma == 'uk') return ['Новий місяць', 'Зростаючий серп', 'Перша чверть', 'Зростаючий місяць', 'Повний місяць', 'Спадаючий місяць', 'Остання чверть', 'Спадаючий серп'][i];
-    if (idioma == 'ar') return ['قمر جديد', 'هلال متزايد', 'تربيع أول', 'أحدب متزايد', 'قمر مكتمل', 'أحدب متناقص', 'تربيع أخير', 'هلال متناقص'][i];
-    if (idioma == 'zh') return ['新月', '蛾眉月', '上弦月', '盈凸月', '满月', '亏凸月', '下弦月', '残月'][i];
-    if (idioma == 'ko') return ['신월', '초승달', '상현달', '차오르는 달', '보름달', '기우는 달', '하현달', '그믐달'][i];
-    if (idioma == 'ja') return ['新月', '三日月', '上弦の月', '満ちていく月', '満月', '欠けていく月', '下弦の月', '二十六夜'][i];
-    
+    if (idioma == 'es')
+      return [
+        'Luna nueva',
+        'Luna creciente',
+        'Cuarto creciente',
+        'Luna gibosa creciente',
+        'Luna llena',
+        'Luna gibosa menguante',
+        'Cuarto menguante',
+        'Luna menguante',
+      ][i];
+    if (idioma == 'fr')
+      return [
+        'Nouvelle lune',
+        'Premier croissant',
+        'Premier quartier',
+        'Gibbeuse croissante',
+        'Pleine lune',
+        'Gibbeuse décroissante',
+        'Dernier quartier',
+        'Dernier croissant',
+      ][i];
+    if (idioma == 'it')
+      return [
+        'Luna nuova',
+        'Luna crescente',
+        'Primo quarto',
+        'Gibbosa crescente',
+        'Luna piena',
+        'Gibbosa calante',
+        'Ultimo quarto',
+        'Luna calante',
+      ][i];
+    if (idioma == 'de')
+      return [
+        'Neumond',
+        'Zunehmende Sichel',
+        'Erstes Viertel',
+        'Zunehmender Mond',
+        'Vollmond',
+        'Abnehmender Mond',
+        'Letztes Viertel',
+        'Abnehmende Sichel',
+      ][i];
+    if (idioma == 'ru')
+      return [
+        'Новолуние',
+        'Растущий серп',
+        'Первая четверть',
+        'Растущая луна',
+        'Полнолуние',
+        'Убывающая луна',
+        'Последняя четверть',
+        'Убывающий серп',
+      ][i];
+    if (idioma == 'pt')
+      return [
+        'Lua nova',
+        'Lua crescente',
+        'Quarto crescente',
+        'Gibosa crescente',
+        'Lua cheia',
+        'Gibosa minguante',
+        'Quarto minguante',
+        'Lua minguante',
+      ][i];
+    if (idioma == 'ca')
+      return [
+        'Lluna nova',
+        'Lluna creixent',
+        'Quart creixent',
+        'Gibosa creixent',
+        'Lluna plena',
+        'Gibosa minvant',
+        'Quart minvant',
+        'Lluna minvant',
+      ][i];
+    if (idioma == 'he')
+      return [
+        'ירח חדש',
+        'סהר מתמלא',
+        'רבע ראשון',
+        'ירח מתמלא',
+        'ירח מלא',
+        'ירח חסר',
+        'רבע אחרון',
+        'סהר חסר',
+      ][i];
+    if (idioma == 'uk')
+      return [
+        'Новий місяць',
+        'Зростаючий серп',
+        'Перша чверть',
+        'Зростаючий місяць',
+        'Повний місяць',
+        'Спадаючий місяць',
+        'Остання чверть',
+        'Спадаючий серп',
+      ][i];
+    if (idioma == 'ar')
+      return [
+        'قمر جديد',
+        'هلال متزايد',
+        'تربيع أول',
+        'أحدب متزايد',
+        'قمر مكتمل',
+        'أحدب متناقص',
+        'تربيع أخير',
+        'هلال متناقص',
+      ][i];
+    if (idioma == 'zh')
+      return ['新月', '蛾眉月', '上弦月', '盈凸月', '满月', '亏凸月', '下弦月', '残月'][i];
+    if (idioma == 'ko')
+      return ['신월', '초승달', '상현달', '차오르는 달', '보름달', '기우는 달', '하현달', '그믐달'][i];
+    if (idioma == 'ja')
+      return ['新月', '三日月', '上弦の月', '満ちていく月', '満月', '欠けていく月', '下弦の月', '二十六夜'][i];
+
     // Fallback por defecto (Inglés)
-    return ['New Moon', 'Waxing Crescent', 'First Quarter', 'Waxing Gibbous', 'Full Moon', 'Waning Gibbous', 'Last Quarter', 'Waning Crescent'][i];
+    return [
+      'New Moon',
+      'Waxing Crescent',
+      'First Quarter',
+      'Waxing Gibbous',
+      'Full Moon',
+      'Waning Gibbous',
+      'Last Quarter',
+      'Waning Crescent',
+    ][i];
   }
 
   static double calcularFaseLunarByFecha(DateTime fecha) {
@@ -4804,22 +5008,30 @@ class Utils {
     return (diasDesde % cicloLunar) / cicloLunar;
   }
 
-  static String adviseOfTheNextFullOrNewMoon(double fase, String idioma, WeatherProvider weatherProvider) {
-    // Si la fase está entre que empieza la Luna Nueva (0.985) cruzando el 0 
+  static String adviseOfTheNextFullOrNewMoon(
+    double fase,
+    String idioma,
+    WeatherProvider weatherProvider,
+  ) {
+    // Si la fase está entre que empieza la Luna Nueva (0.985) cruzando el 0
     // hasta antes de que empiece la Luna Llena (0.485), lo próximo es la Llena.
     if (fase >= 0.985 || fase < 0.485) {
       return stringNextFullMoon(idioma, weatherProvider);
-    } 
-    // En cuanto pisamos el margen de Luna Llena (0.485) y mientras va menguando, 
+    }
+    // En cuanto pisamos el margen de Luna Llena (0.485) y mientras va menguando,
     // lo próximo es la Nueva.
     else {
       return stringNextNewMoon(idioma, weatherProvider);
     }
   }
 
-  static String stringNextFullMoon(String idioma, WeatherProvider weatherProvider) {
-    String fechaFormatted = '${weatherProvider.fechaProximaLunaLlena.day} ${Utils.stringOf(idioma)} ${Utils.obtenerMes(weatherProvider.fechaProximaLunaLlena.month, idioma)}';
-    
+  static String stringNextFullMoon(
+    String idioma,
+    WeatherProvider weatherProvider,
+  ) {
+    String fechaFormatted =
+        '${weatherProvider.fechaProximaLunaLlena.day} ${Utils.stringOf(idioma)} ${Utils.obtenerMes(weatherProvider.fechaProximaLunaLlena.month, idioma)}';
+
     if (idioma == 'es') return 'Próxima luna llena: $fechaFormatted';
     if (idioma == 'fr') return 'Prochaine pleine lune : $fechaFormatted';
     if (idioma == 'it') return 'Prossima luna piena: $fechaFormatted';
@@ -4833,12 +5045,16 @@ class Utils {
     if (idioma == 'zh') return '下一次满月: $fechaFormatted';
     if (idioma == 'ko') return '다음 보름달: $fechaFormatted';
     if (idioma == 'ja') return '次の満月: $fechaFormatted';
-    
+
     return 'Next full moon: $fechaFormatted';
   }
 
-  static String stringNextNewMoon(String idioma, WeatherProvider weatherProvider) {
-    String fechaFormatted = '${weatherProvider.fechaProximaLunaNueva.day} ${Utils.stringOf(idioma)} ${Utils.obtenerMes(weatherProvider.fechaProximaLunaNueva.month, idioma)}';
+  static String stringNextNewMoon(
+    String idioma,
+    WeatherProvider weatherProvider,
+  ) {
+    String fechaFormatted =
+        '${weatherProvider.fechaProximaLunaNueva.day} ${Utils.stringOf(idioma)} ${Utils.obtenerMes(weatherProvider.fechaProximaLunaNueva.month, idioma)}';
     if (idioma == 'es') return 'Próxima luna nueva: $fechaFormatted';
     if (idioma == 'fr') return 'Prochaine nouvelle lune : $fechaFormatted';
     if (idioma == 'it') return 'Prossima luna nuova: $fechaFormatted';
@@ -4852,9 +5068,626 @@ class Utils {
     if (idioma == 'zh') return '下一次新月: $fechaFormatted';
     if (idioma == 'ko') return '다음 신월: $fechaFormatted';
     if (idioma == 'ja') return '次の新月: $fechaFormatted';
-    
+
     return 'Next new moon: $fechaFormatted';
   }
 
-  
+  static String stringNotAvailable(String idiomaActual) {
+    if (idiomaActual == 'es') return 'No disponible';
+    if (idiomaActual == 'fr') return 'Non disponible';
+    if (idiomaActual == 'it') return 'Non disponibile';
+    if (idiomaActual == 'de') return 'Nicht verfügbar';
+    if (idiomaActual == 'ru') return 'Недоступно';
+    if (idiomaActual == 'pt') return 'Não disponível';
+    if (idiomaActual == 'ca') return 'No disponible';
+    if (idiomaActual == 'he') return 'לא זמין';
+    if (idiomaActual == 'uk') return 'Недоступно';
+    if (idiomaActual == 'ar') return 'غير متوفر';
+    if (idiomaActual == 'zh') return '不可用';
+    if (idiomaActual == 'ko') return '이용 불가';
+    if (idiomaActual == 'ja') return '利用不可';
+
+    return 'Not available';
+  }
+
+  static String stringNotifications(String idiomaActual) {
+    if (idiomaActual == 'es') return 'Notificaciones';
+    if (idiomaActual == 'fr') return 'Notifications';
+    if (idiomaActual == 'it') return 'Notifiche';
+    if (idiomaActual == 'de') return 'Benachrichtigungen';
+    if (idiomaActual == 'ru') return 'Уведомления';
+    if (idiomaActual == 'pt') return 'Notificações';
+    if (idiomaActual == 'ca') return 'Notificacions';
+    if (idiomaActual == 'he') return 'התראות';
+    if (idiomaActual == 'uk') return 'Сповіщення';
+    if (idiomaActual == 'ar') return 'إشعارات';
+    if (idiomaActual == 'zh') return '通知';
+    if (idiomaActual == 'ko') return '알림';
+    if (idiomaActual == 'ja') return '通知';
+
+    return 'Notifications';
+  }
+
+  static String stringAlertTitleRedUV(String idioma) {
+    if (idioma == 'es') return '🔴Alerta roja por rayos UVA🔴';
+    if (idioma == 'fr') return '🔴Alerte rouge aux rayons UV🔴';
+    if (idioma == 'it') return '🔴Allerta rossa per raggi UV🔴';
+    if (idioma == 'de') return '🔴Rote Warnung vor UV-Strahlung🔴';
+    if (idioma == 'ru') return '🔴Красный уровень опасности УФ-излучения🔴';
+    if (idioma == 'pt') return '🔴Alerta vermelho para raios UV🔴';
+    if (idioma == 'ca') return '🔴Alerta vermella per raigs UV🔴';
+    if (idioma == 'he') return '🔴התראת קרינת UV אדומה🔴';
+    if (idioma == 'uk')
+      return '🔴Червоний рівень небезпеки УФ-випромінювання🔴';
+    if (idioma == 'ar') return '🔴تنبيه أحمر للأشعة فوق البنفسجية🔴';
+    if (idioma == 'zh') return '🔴紫外线红色预警🔴';
+    if (idioma == 'ko') return '🔴자외선 적색 경보🔴';
+    if (idioma == 'ja') return '🔴紫外線レッドアラート🔴';
+
+    return '🔴Red UV Alert🔴';
+  }
+
+  // ==========================================
+  // TÍTULOS DE AVISOS POR LLUVIA
+  // ==========================================
+  static String stringAlertTitleYellowRain(String idioma) {
+    if (idioma == 'es') return '🟡 Aviso amarillo por lluvias 🟡';
+    if (idioma == 'fr') return '🟡 Alerte jaune pluie 🟡';
+    if (idioma == 'it') return '🟡 Allerta gialla pioggia 🟡';
+    if (idioma == 'de') return '🟡 Gelbe Regenwarnung 🟡';
+    if (idioma == 'ru') return '🟡 Желтый уровень: дождь 🟡';
+    if (idioma == 'pt') return '🟡 Alerta amarelo de chuva 🟡';
+    if (idioma == 'ca') return '🟡 Avís groc per pluges 🟡';
+    if (idioma == 'he') return '🟡 התראת גשם צהובה 🟡';
+    if (idioma == 'uk') return '🟡 Жовтий рівень: дощ 🟡';
+    if (idioma == 'ar') return '🟡 إنذار أصفر للأمطار 🟡';
+    if (idioma == 'zh') return '🟡 降雨黄色预警 🟡';
+    if (idioma == 'ko') return '🟡 강우 황색 경보 🟡';
+    if (idioma == 'ja') return '🟡 降雨イエローアラート 🟡';
+    return '🟡 Yellow rain alert 🟡';
+  }
+
+  static String stringAlertTitleOrangeRain(String idioma) {
+    if (idioma == 'es') return '🟠 Aviso naranja por lluvias 🟠';
+    if (idioma == 'fr') return '🟠 Alerte orange pluie 🟠';
+    if (idioma == 'it') return '🟠 Allerta arancione pioggia 🟠';
+    if (idioma == 'de') return '🟠 Orange Regenwarnung 🟠';
+    if (idioma == 'ru') return '🟠 Оранжевый уровень: дождь 🟠';
+    if (idioma == 'pt') return '🟠 Alerta laranja de chuva 🟠';
+    if (idioma == 'ca') return '🟠 Avís taronja per pluges 🟠';
+    if (idioma == 'he') return '🟠 התראת גשם כתומה 🟠';
+    if (idioma == 'uk') return '🟠 Помаранчевий рівень: дощ 🟠';
+    if (idioma == 'ar') return '🟠 إنذار برتقالي للأمطار 🟠';
+    if (idioma == 'zh') return '🟠 降雨橙色预警 🟠';
+    if (idioma == 'ko') return '🟠 강우 주황색 경보 🟠';
+    if (idioma == 'ja') return '🟠 降雨オレンジアラート 🟠';
+    return '🟠 Orange rain alert 🟠';
+  }
+
+  static String stringAlertTitleRedRain(String idioma) {
+    if (idioma == 'es') return '🔴 Aviso rojo por lluvias 🔴';
+    if (idioma == 'fr') return '🔴 Alerte rouge pluie 🔴';
+    if (idioma == 'it') return '🔴 Allerta rossa pioggia 🔴';
+    if (idioma == 'de') return '🔴 Rote Regenwarnung 🔴';
+    if (idioma == 'ru') return '🔴 Красный уровень: дождь 🔴';
+    if (idioma == 'pt') return '🔴 Alerta vermelho de chuva 🔴';
+    if (idioma == 'ca') return '🔴 Avís vermell per pluges 🔴';
+    if (idioma == 'he') return '🔴 התראת גשם אדומה 🔴';
+    if (idioma == 'uk') return '🔴 Червоний рівень: дощ 🔴';
+    if (idioma == 'ar') return '🔴 إنذار أحمر للأمطار 🔴';
+    if (idioma == 'zh') return '🔴 降雨红色预警 🔴';
+    if (idioma == 'ko') return '🔴 강우 적색 경보 🔴';
+    if (idioma == 'ja') return '🔴 降雨レッドアラート 🔴';
+    return '🔴 Red rain alert 🔴';
+  }
+
+  // ==========================================
+  // TÍTULOS DE AVISOS POR ALTAS TEMPERATURAS
+  // ==========================================
+  static String stringAlertTitleYellowTemp(String idioma) {
+    if (idioma == 'es') return '🟡 Aviso amarillo por altas temperaturas 🟡';
+    if (idioma == 'fr') return '🟡 Alerte jaune canicule 🟡';
+    if (idioma == 'it') return '🟡 Allerta gialla alte temperature 🟡';
+    if (idioma == 'de') return '🟡 Gelbe Hitzewarnung 🟡';
+    if (idioma == 'ru') return '🟡 Желтый уровень: жара 🟡';
+    if (idioma == 'pt') return '🟡 Alerta amarelo de calor 🟡';
+    if (idioma == 'ca') return '🟡 Avís groc per altes temperatures 🟡';
+    if (idioma == 'he') return '🟡 התראת חום צהובה 🟡';
+    if (idioma == 'uk') return '🟡 Жовтий рівень: спека 🟡';
+    if (idioma == 'ar') return '🟡 إنذار أصفر للحرارة 🟡';
+    if (idioma == 'zh') return '🟡 高温黄色预警 🟡';
+    if (idioma == 'ko') return '🟡 폭염 황색 경보 🟡';
+    if (idioma == 'ja') return '🟡 高温イエローアラート 🟡';
+    return '🟡 Yellow high temperature alert 🟡';
+  }
+
+  static String stringAlertTitleOrangeTemp(String idioma) {
+    if (idioma == 'es') return '🟠 Aviso naranja por altas temperaturas 🟠';
+    if (idioma == 'fr') return '🟠 Alerte orange canicule 🟠';
+    if (idioma == 'it') return '🟠 Allerta arancione alte temperature 🟠';
+    if (idioma == 'de') return '🟠 Orange Hitzewarnung 🟠';
+    if (idioma == 'ru') return '🟠 Оранжевый уровень: жара 🟠';
+    if (idioma == 'pt') return '🟠 Alerta laranja de calor 🟠';
+    if (idioma == 'ca') return '🟠 Avís taronja per altes temperatures 🟠';
+    if (idioma == 'he') return '🟠 התראת חום כתומה 🟠';
+    if (idioma == 'uk') return '🟠 Помаранчевий рівень: спека 🟠';
+    if (idioma == 'ar') return '🟠 إنذار برتقالي للحرارة 🟠';
+    if (idioma == 'zh') return '🟠 高温橙色预警 🟠';
+    if (idioma == 'ko') return '🟠 폭염 주황색 경보 🟠';
+    if (idioma == 'ja') return '🟠 高温オレンジアラート 🟠';
+    return '🟠 Orange high temperature alert 🟠';
+  }
+
+  static String stringAlertTitleRedTemp(String idioma) {
+    if (idioma == 'es') return '🔴 Aviso rojo por altas temperaturas 🔴';
+    if (idioma == 'fr') return '🔴 Alerte rouge canicule 🔴';
+    if (idioma == 'it') return '🔴 Allerta rossa alte temperature 🔴';
+    if (idioma == 'de') return '🔴 Rote Hitzewarnung 🔴';
+    if (idioma == 'ru') return '🔴 Красный уровень: жара 🔴';
+    if (idioma == 'pt') return '🔴 Alerta vermelho de calor 🔴';
+    if (idioma == 'ca') return '🔴 Avís vermell per altes temperatures 🔴';
+    if (idioma == 'he') return '🔴 התראת חום אדומה 🔴';
+    if (idioma == 'uk') return '🔴 Червоний рівень: спека 🔴';
+    if (idioma == 'ar') return '🔴 إنذار أحمر للحرارة 🔴';
+    if (idioma == 'zh') return '🔴 高温红色预警 🔴';
+    if (idioma == 'ko') return '🔴 폭염 적색 경보 🔴';
+    if (idioma == 'ja') return '🔴 高温レッドアラート 🔴';
+    return '🔴 Red high temperature alert 🔴';
+  }
+
+  // ==========================================
+  // TÍTULOS DE AVISOS POR BAJAS TEMPERATURAS
+  // ==========================================
+  static String stringAlertTitleYellowLowTemp(String idioma) {
+    if (idioma == 'es') return '🟡 Aviso amarillo por bajas temperaturas 🟡';
+    if (idioma == 'fr') return '🟡 Alerte jaune grand froid 🟡';
+    if (idioma == 'it') return '🟡 Allerta gialla basse temperature 🟡';
+    if (idioma == 'de') return '🟡 Gelbe Kältewarnung 🟡';
+    if (idioma == 'ru') return '🟡 Желтый уровень: мороз 🟡';
+    if (idioma == 'pt') return '🟡 Alerta amarelo de frio 🟡';
+    if (idioma == 'ca') return '🟡 Avís groc per baixes temperatures 🟡';
+    if (idioma == 'he') return '🟡 התראת קור צהובה 🟡';
+    if (idioma == 'uk') return '🟡 Жовтий рівень: мороз 🟡';
+    if (idioma == 'ar') return '🟡 إنذار أصفر للبرودة 🟡';
+    if (idioma == 'zh') return '🟡 低温黄色预警 🟡';
+    if (idioma == 'ko') return '🟡 한파 황색 경보 🟡';
+    if (idioma == 'ja') return '🟡 低温イエローアラート 🟡';
+    return '🟡 Yellow low temperature alert 🟡';
+  }
+
+  static String stringAlertTitleOrangeLowTemp(String idioma) {
+    if (idioma == 'es') return '🟠 Aviso naranja por bajas temperaturas 🟠';
+    if (idioma == 'fr') return '🟠 Alerte orange grand froid 🟠';
+    if (idioma == 'it') return '🟠 Allerta arancione basse temperature 🟠';
+    if (idioma == 'de') return '🟠 Orange Kältewarnung 🟠';
+    if (idioma == 'ru') return '🟠 Оранжевый уровень: мороз 🟠';
+    if (idioma == 'pt') return '🟠 Alerta laranja de frio 🟠';
+    if (idioma == 'ca') return '🟠 Avís taronja per baixes temperatures 🟠';
+    if (idioma == 'he') return '🟠 התראת קור כתומה 🟠';
+    if (idioma == 'uk') return '🟠 Помаранчевий рівень: мороз 🟠';
+    if (idioma == 'ar') return '🟠 إنذار برتقالي للبرودة 🟠';
+    if (idioma == 'zh') return '🟠 低温橙色预警 🟠';
+    if (idioma == 'ko') return '🟠 한파 주황색 경보 🟠';
+    if (idioma == 'ja') return '🟠 低温オレンジアラート 🟠';
+    return '🟠 Orange low temperature alert 🟠';
+  }
+
+  static String stringAlertTitleRedLowTemp(String idioma) {
+    if (idioma == 'es') return '🔴 Aviso rojo por bajas temperaturas 🔴';
+    if (idioma == 'fr') return '🔴 Alerte rouge grand froid 🔴';
+    if (idioma == 'it') return '🔴 Allerta rossa basse temperature 🔴';
+    if (idioma == 'de') return '🔴 Rote Kältewarnung 🔴';
+    if (idioma == 'ru') return '🔴 Красный уровень: мороз 🔴';
+    if (idioma == 'pt') return '🔴 Alerta vermelho de frio 🔴';
+    if (idioma == 'ca') return '🔴 Avís vermell per baixes temperatures 🔴';
+    if (idioma == 'he') return '🔴 התראת קור אדומה 🔴';
+    if (idioma == 'uk') return '🔴 Червоний рівень: мороз 🔴';
+    if (idioma == 'ar') return '🔴 إنذار أحمر للبرودة 🔴';
+    if (idioma == 'zh') return '🔴 低温红色预警 🔴';
+    if (idioma == 'ko') return '🔴 한파 적색 경보 🔴';
+    if (idioma == 'ja') return '🔴 低温レッドアラート 🔴';
+    return '🔴 Red low temperature alert 🔴';
+  }
+
+  // ==========================================
+  // TÍTULOS DE AVISOS POR VIENTO
+  // ==========================================
+  static String stringAlertTitleYellowWind(String idioma) {
+    if (idioma == 'es') return '🟡 Aviso amarillo por viento 🟡';
+    if (idioma == 'fr') return '🟡 Alerte jaune vent 🟡';
+    if (idioma == 'it') return '🟡 Allerta gialla vento 🟡';
+    if (idioma == 'de') return '🟡 Gelbe Sturmwarnung 🟡';
+    if (idioma == 'ru') return '🟡 Желтый уровень: ветер 🟡';
+    if (idioma == 'pt') return '🟡 Alerta amarelo de vento 🟡';
+    if (idioma == 'ca') return '🟡 Avís groc per vent 🟡';
+    if (idioma == 'he') return '🟡 התראת רוח צהובה 🟡';
+    if (idioma == 'uk') return '🟡 Жовтий рівень: вітер 🟡';
+    if (idioma == 'ar') return '🟡 إنذار أصفر للرياح 🟡';
+    if (idioma == 'zh') return '🟡 大风黄色预警 🟡';
+    if (idioma == 'ko') return '🟡 강풍 황색 경보 🟡';
+    if (idioma == 'ja') return '🟡 強風イエローアラート 🟡';
+    return '🟡 Yellow wind alert 🟡';
+  }
+
+  static String stringAlertTitleOrangeWind(String idioma) {
+    if (idioma == 'es') return '🟠 Aviso naranja por viento 🟠';
+    if (idioma == 'fr') return '🟠 Alerte orange vent 🟠';
+    if (idioma == 'it') return '🟠 Allerta arancione vento 🟠';
+    if (idioma == 'de') return '🟠 Orange Sturmwarnung 🟠';
+    if (idioma == 'ru') return '🟠 Оранжевый уровень: ветер 🟠';
+    if (idioma == 'pt') return '🟠 Alerta laranja de vento 🟠';
+    if (idioma == 'ca') return '🟠 Avís taronja per vent 🟠';
+    if (idioma == 'he') return '🟠 התראת רוח כתומה 🟠';
+    if (idioma == 'uk') return '🟠 Помаранчевий рівень: вітер 🟠';
+    if (idioma == 'ar') return '🟠 إنذار برتقالي للرياح 🟠';
+    if (idioma == 'zh') return '🟠 大风橙色预警 🟠';
+    if (idioma == 'ko') return '🟠 강풍 주황색 경보 🟠';
+    if (idioma == 'ja') return '🟠 強風オレンジアラート 🟠';
+    return '🟠 Orange wind alert 🟠';
+  }
+
+  static String stringAlertTitleRedWind(String idioma) {
+    if (idioma == 'es') return '🔴 Aviso rojo por viento 🔴';
+    if (idioma == 'fr') return '🔴 Alerte rouge vent 🔴';
+    if (idioma == 'it') return '🔴 Allerta rossa vento 🔴';
+    if (idioma == 'de') return '🔴 Rote Sturmwarnung 🔴';
+    if (idioma == 'ru') return '🔴 Красный уровень: ветер 🔴';
+    if (idioma == 'pt') return '🔴 Alerta vermelho de vento 🔴';
+    if (idioma == 'ca') return '🔴 Avís vermell per vent 🔴';
+    if (idioma == 'he') return '🔴 התראת רוח אדומה 🔴';
+    if (idioma == 'uk') return '🔴 Червоний рівень: вітер 🔴';
+    if (idioma == 'ar') return '🔴 إنذار أحمر للرياح 🔴';
+    if (idioma == 'zh') return '🔴 大风红色预警 🔴';
+    if (idioma == 'ko') return '🔴 강풍 적색 경보 🔴';
+    if (idioma == 'ja') return '🔴 強風レッドアラート 🔴';
+    return '🔴 Red wind alert 🔴';
+  }
+
+  // ==========================================
+  // TÍTULOS DE AVISOS POR RACHAS DE VIENTO
+  // ==========================================
+  static String stringAlertTitleYellowGust(String idioma) {
+    if (idioma == 'es') return '🟡 Aviso amarillo por rachas de viento 🟡';
+    if (idioma == 'fr') return '🟡 Alerte jaune rafales 🟡';
+    if (idioma == 'it') return '🟡 Allerta gialla raffiche di vento 🟡';
+    if (idioma == 'de') return '🟡 Gelbe Windböenwarnung 🟡';
+    if (idioma == 'ru') return '🟡 Желтый уровень: порывы ветра 🟡';
+    if (idioma == 'pt') return '🟡 Alerta amarelo para rajadas de vento 🟡';
+    if (idioma == 'ca') return '🟡 Avís groc per ratxes de vent 🟡';
+    if (idioma == 'he') return '🟡 התראת משבי רוח צהובה 🟡';
+    if (idioma == 'uk') return '🟡 Жовтий рівень: пориви вітру 🟡';
+    if (idioma == 'ar') return '🟡 إنذار أصفر لهبات الرياح 🟡';
+    if (idioma == 'zh') return '🟡 阵风黄色预警 🟡';
+    if (idioma == 'ko') return '🟡 돌풍 황색 경보 🟡';
+    if (idioma == 'ja') return '🟡 突風イエローアラート 🟡';
+    return '🟡 Yellow wind gusts alert 🟡';
+  }
+
+  static String stringAlertTitleOrangeGust(String idioma) {
+    if (idioma == 'es') return '🟠 Aviso naranja por rachas de viento 🟠';
+    if (idioma == 'fr') return '🟠 Alerte orange rafales 🟠';
+    if (idioma == 'it') return '🟠 Allerta arancione raffiche di vento 🟠';
+    if (idioma == 'de') return '🟠 Orange Windböenwarnung 🟠';
+    if (idioma == 'ru') return '🟠 Оранжевый уровень: порывы ветра 🟠';
+    if (idioma == 'pt') return '🟠 Alerta laranja para rajadas de vento 🟠';
+    if (idioma == 'ca') return '🟠 Avís taronja per ratxes de vent 🟠';
+    if (idioma == 'he') return '🟠 התראת משבי רוח כתומה 🟠';
+    if (idioma == 'uk') return '🟠 Помаранчевий рівень: пориви вітру 🟠';
+    if (idioma == 'ar') return '🟠 إنذار برتقالي لهبات الرياح 🟠';
+    if (idioma == 'zh') return '🟠 阵风橙色预警 🟠';
+    if (idioma == 'ko') return '🟠 돌풍 주황색 경보 🟠';
+    if (idioma == 'ja') return '🟠 突風オレンジアラート 🟠';
+    return '🟠 Orange wind gusts alert 🟠';
+  }
+
+  static String stringAlertTitleRedGust(String idioma) {
+    if (idioma == 'es') return '🔴 Aviso rojo por rachas de viento 🔴';
+    if (idioma == 'fr') return '🔴 Alerte rouge rafales 🔴';
+    if (idioma == 'it') return '🔴 Allerta rossa raffiche di vento 🔴';
+    if (idioma == 'de') return '🔴 Rote Windböenwarnung 🔴';
+    if (idioma == 'ru') return '🔴 Красный уровень: порывы ветра 🔴';
+    if (idioma == 'pt') return '🔴 Alerta vermelho para rajadas de vento 🔴';
+    if (idioma == 'ca') return '🔴 Avís vermell per ratxes de vent 🔴';
+    if (idioma == 'he') return '🔴 התראת משבי רוח אדומה 🔴';
+    if (idioma == 'uk') return '🔴 Червоний рівень: пориви вітру 🔴';
+    if (idioma == 'ar') return '🔴 إنذار أحمر لهبات الرياح 🔴';
+    if (idioma == 'zh') return '🔴 阵风红色预警 🔴';
+    if (idioma == 'ko') return '🔴 돌풍 적색 경보 🔴';
+    if (idioma == 'ja') return '🔴 突風レッドアラート 🔴';
+    return '🔴 Red wind gusts alert 🔴';
+  }
+
+  // ==========================================
+  // TÍTULOS DE AVISOS POR NIEVE
+  // ==========================================
+  static String stringAlertTitleYellowSnow(String idioma) {
+    if (idioma == 'es') return '🟡 Aviso amarillo por nieve 🟡';
+    if (idioma == 'fr') return '🟡 Alerte jaune neige 🟡';
+    if (idioma == 'it') return '🟡 Allerta gialla neve 🟡';
+    if (idioma == 'de') return '🟡 Gelbe Schneewarnung 🟡';
+    if (idioma == 'ru') return '🟡 Желтый уровень: снег 🟡';
+    if (idioma == 'pt') return '🟡 Alerta amarelo de neve 🟡';
+    if (idioma == 'ca') return '🟡 Avís groc per neu 🟡';
+    if (idioma == 'he') return '🟡 התראת שלג צהובה 🟡';
+    if (idioma == 'uk') return '🟡 Жовтий рівень: сніг 🟡';
+    if (idioma == 'ar') return '🟡 إنذار أصفر للثلوج 🟡';
+    if (idioma == 'zh') return '🟡 降雪黄色预警 🟡';
+    if (idioma == 'ko') return '🟡 대설 황색 경보 🟡';
+    if (idioma == 'ja') return '🟡 降雪イエローアラート 🟡';
+    return '🟡 Yellow snow alert 🟡';
+  }
+
+  static String stringAlertTitleOrangeSnow(String idioma) {
+    if (idioma == 'es') return '🟠 Aviso naranja por nieve 🟠';
+    if (idioma == 'fr') return '🟠 Alerte orange neige 🟠';
+    if (idioma == 'it') return '🟠 Allerta arancione neve 🟠';
+    if (idioma == 'de') return '🟠 Orange Schneewarnung 🟠';
+    if (idioma == 'ru') return '🟠 Оранжевый уровень: снег 🟠';
+    if (idioma == 'pt') return '🟠 Alerta laranja de neve 🟠';
+    if (idioma == 'ca') return '🟠 Avís taronja per neu 🟠';
+    if (idioma == 'he') return '🟠 התראת שלג כתומה 🟠';
+    if (idioma == 'uk') return '🟠 Помаранчевий рівень: сніг 🟠';
+    if (idioma == 'ar') return '🟠 إنذار برتقالي للثلوج 🟠';
+    if (idioma == 'zh') return '🟠 降雪橙色预警 🟠';
+    if (idioma == 'ko') return '🟠 대설 주황색 경보 🟠';
+    if (idioma == 'ja') return '🟠 降雪オレンジアラート 🟠';
+    return '🟠 Orange snow alert 🟠';
+  }
+
+  static String stringAlertTitleRedSnow(String idioma) {
+    if (idioma == 'es') return '🔴 Aviso rojo por nieve 🔴';
+    if (idioma == 'fr') return '🔴 Alerte rouge neige 🔴';
+    if (idioma == 'it') return '🔴 Allerta rossa neve 🔴';
+    if (idioma == 'de') return '🔴 Rote Schneewarnung 🔴';
+    if (idioma == 'ru') return '🔴 Красный уровень: снег 🔴';
+    if (idioma == 'pt') return '🔴 Alerta vermelho de neve 🔴';
+    if (idioma == 'ca') return '🔴 Avís vermell per neu 🔴';
+    if (idioma == 'he') return '🔴 התראת שלג אדומה 🔴';
+    if (idioma == 'uk') return '🔴 Червоний рівень: сніг 🔴';
+    if (idioma == 'ar') return '🔴 إنذار أحمر للثلوج 🔴';
+    if (idioma == 'zh') return '🔴 降雪红色预警 🔴';
+    if (idioma == 'ko') return '🔴 대설 적색 경보 🔴';
+    if (idioma == 'ja') return '🔴 降雪レッドアラート 🔴';
+    return '🔴 Red snow alert 🔴';
+  }
+
+  static void devolverNotificacionesAvisos(
+    String idioma,
+    TiempoHoras tiempoHoras,
+  ) {
+    List<double> uvData = tiempoHoras.uvIndex.take(24).toList();
+    List<double> amountRainData = tiempoHoras.precipitation.take(24).toList();
+    List<double> temperatureData = tiempoHoras.temperature2M.take(24).toList();
+    List<double> windSpeedData = tiempoHoras.windSpeed10M.take(24).toList();
+    List<double> windGustData = tiempoHoras.windGusts10M.take(24).toList();
+    List<double> snowCmData = tiempoHoras.snowfall.take(24).toList();
+
+    // Calculamos el nivel más alto de cada categoría
+    int nivelLluvia = 0;
+    if (amountRainData.any((e) => e >= 60))
+      nivelLluvia = 3;
+    else if (amountRainData.any((e) => e >= 30))
+      nivelLluvia = 2;
+    else if (amountRainData.any((e) => e >= 15))
+      nivelLluvia = 1;
+
+    int nivelTempAlta = 0;
+    if (temperatureData.any((e) => e.round() > 44))
+      nivelTempAlta = 3;
+    else if (temperatureData.any((e) => e.round() >= 39))
+      nivelTempAlta = 2;
+    else if (temperatureData.any((e) => e.round() >= 36))
+      nivelTempAlta = 1;
+
+    int nivelTempBaja = 0;
+    if (temperatureData.any((e) => e.round() < -15))
+      nivelTempBaja = 3;
+    else if (temperatureData.any((e) => e.round() <= -10))
+      nivelTempBaja = 2;
+    else if (temperatureData.any((e) => e.round() <= -5))
+      nivelTempBaja = 1;
+
+    int nivelWindSpeed = 0;
+    if (windSpeedData.any((e) => e.round() >= 90))
+      nivelWindSpeed = 3;
+    else if (windSpeedData.any((e) => e.round() >= 70))
+      nivelWindSpeed = 2;
+    else if (windSpeedData.any((e) => e.round() >= 50))
+      nivelWindSpeed = 1;
+
+    int nivelWindGust = 0;
+    if (windGustData.any((e) => e.round() >= 120))
+      nivelWindGust = 3;
+    else if (windGustData.any((e) => e.round() >= 90))
+      nivelWindGust = 2;
+    else if (windGustData.any((e) => e.round() >= 70))
+      nivelWindGust = 1;
+
+    int nivelSnowAlert = 0;
+    if (snowCmData.any((e) => e.round() > 20))
+      nivelSnowAlert = 3;
+    else if (snowCmData.any((e) => e.round() >= 10))
+      nivelSnowAlert = 2;
+    else if (snowCmData.any((e) => e.round() >= 5))
+      nivelSnowAlert = 1;
+
+    // AVISOS RAYOS UVA
+    if (uvData.any((e) => e.round() >= 8)) {
+      NotificationService.mostrarNotificacion(
+        titulo: Utils.stringAlertTitleRedUV(idioma),
+        cuerpo: Utils.stringAlertUV8(idioma),
+        id: 2,
+      );
+    }
+
+    // LÓGICA AVISOS NIVEL LLUVIA
+    if (nivelLluvia == 1)
+      NotificationService.mostrarNotificacion(
+        titulo: Utils.stringAlertTitleYellowRain(idioma),
+        cuerpo: Utils.stringAlertRainAmount15to30(idioma),
+        id: 3,
+      );
+    if (nivelLluvia == 2)
+      NotificationService.mostrarNotificacion(
+        titulo: Utils.stringAlertTitleOrangeRain(idioma),
+        cuerpo: Utils.stringAlertRainAmount30to60(idioma),
+        id: 4,
+      );
+    if (nivelLluvia == 3)
+      NotificationService.mostrarNotificacion(
+        titulo: Utils.stringAlertTitleRedRain(idioma),
+        cuerpo: Utils.stringAlertRainAmount60ormore(idioma),
+        id: 5,
+      );
+
+    // LÓGICA AVISOS ALTAS TEMPERATURAS
+    if (nivelTempAlta == 1)
+      NotificationService.mostrarNotificacion(
+        titulo: Utils.stringAlertTitleYellowTemp(idioma),
+        cuerpo: Utils.stringAlertTemperature36to39(idioma),
+        id: 6,
+      );
+    if (nivelTempAlta == 2)
+      NotificationService.mostrarNotificacion(
+        titulo: Utils.stringAlertTitleOrangeTemp(idioma),
+        cuerpo: Utils.stringAlertTemperature40to44(idioma),
+        id: 7,
+      );
+    if (nivelTempAlta == 3)
+      NotificationService.mostrarNotificacion(
+        titulo: Utils.stringAlertTitleRedTemp(idioma),
+        cuerpo: Utils.stringAlertTemperature44ormore(idioma),
+        id: 8,
+      );
+
+    // LÓGICA AVISOS BAJAS TEMPERATURAS
+    if (nivelTempBaja == 1)
+      NotificationService.mostrarNotificacion(
+        titulo: Utils.stringAlertTitleYellowLowTemp(idioma),
+        cuerpo: Utils.stringAlertLowTemperature5to10(idioma),
+        id: 9,
+      );
+    if (nivelTempBaja == 2)
+      NotificationService.mostrarNotificacion(
+        titulo: Utils.stringAlertTitleOrangeLowTemp(idioma),
+        cuerpo: Utils.stringAlertLowTemperature10to15(idioma),
+        id: 10,
+      );
+    if (nivelTempBaja == 3)
+      NotificationService.mostrarNotificacion(
+        titulo: Utils.stringAlertTitleRedLowTemp(idioma),
+        cuerpo: Utils.stringAlertLowTemperature15ormore(idioma),
+        id: 11,
+      );
+
+    // LÓGICA AVISOS VELOCIDAD VIENTO
+    if (nivelWindSpeed == 1)
+      NotificationService.mostrarNotificacion(
+        titulo: Utils.stringAlertTitleYellowWind(idioma),
+        cuerpo: Utils.stringAlertWindSpeedYellow(idioma),
+        id: 12,
+      );
+    if (nivelWindSpeed == 2)
+      NotificationService.mostrarNotificacion(
+        titulo: Utils.stringAlertTitleOrangeWind(idioma),
+        cuerpo: Utils.stringAlertWindSpeedOrange(idioma),
+        id: 13,
+      );
+    if (nivelWindSpeed == 3)
+      NotificationService.mostrarNotificacion(
+        titulo: Utils.stringAlertTitleRedWind(idioma),
+        cuerpo: Utils.stringAlertWindSpeedRed(idioma),
+        id: 14,
+      );
+
+    // LÓGICA AVISOS RACHAS MÁXIMAS DE VIENTO
+    if (nivelWindGust == 1)
+      NotificationService.mostrarNotificacion(
+        titulo: Utils.stringAlertTitleYellowGust(idioma),
+        cuerpo: Utils.stringAlertWindGustsYellow(idioma),
+        id: 15,
+      );
+    if (nivelWindGust == 2)
+      NotificationService.mostrarNotificacion(
+        titulo: Utils.stringAlertTitleOrangeGust(idioma),
+        cuerpo: Utils.stringAlertWindGustsOrange(idioma),
+        id: 16,
+      );
+    if (nivelWindGust == 3)
+      NotificationService.mostrarNotificacion(
+        titulo: Utils.stringAlertTitleRedGust(idioma),
+        cuerpo: Utils.stringAlertWindGustsRed(idioma),
+        id: 17,
+      );
+
+    // LÓGICA NIEVE
+    if (nivelSnowAlert == 1)
+      NotificationService.mostrarNotificacion(
+        titulo: Utils.stringAlertTitleYellowSnow(idioma),
+        cuerpo: Utils.stringAlertSnowYellow(idioma),
+        id: 18,
+      );
+    if (nivelSnowAlert == 2)
+      NotificationService.mostrarNotificacion(
+        titulo: Utils.stringAlertTitleOrangeSnow(idioma),
+        cuerpo: Utils.stringAlertSnowOrange(idioma),
+        id: 19,
+      );
+    if (nivelSnowAlert == 3)
+      NotificationService.mostrarNotificacion(
+        titulo: Utils.stringAlertTitleRedSnow(idioma),
+        cuerpo: Utils.stringAlertSnowRed(idioma),
+        id: 20,
+      );
+  }
+
+  static String getWeatherEmoji(int weatherCode) {
+    switch (weatherCode) {
+      case 0:
+        return '☀️'; // Despejado
+      case 1:
+        return '🌤️'; // Mayormente despejado
+      case 2:
+        return '⛅'; // Parcialmente nublado
+      case 3:
+        return '☁️'; // Nublado
+      case 45:
+      case 48:
+        return '🌫️'; // Niebla
+      case 51:
+      case 53:
+      case 55:
+      case 56:
+      case 57:
+        return '🌦️'; // Llovizna
+      case 61:
+      case 63:
+      case 65:
+      case 66:
+      case 67:
+      case 80:
+      case 81:
+      case 82:
+        return '🌧️'; // Lluvia
+      case 71:
+      case 73:
+      case 75:
+      case 77:
+      case 85:
+      case 86:
+        return '🌨️'; // Nieve
+      case 95:
+      case 96:
+      case 99:
+        return '⛈️'; // Tormenta
+      default:
+        return '🌡️'; // Por defecto si hay un código desconocido
+    }
+  }
+
+  static Future<void> mandarNotificacionTiempoActual(Tiempo tiempoUbi, String nombreCiudad ,String idiomaActual) async{
+    String tituloNotificacion = "${Utils.getWeatherEmoji(tiempoUbi.current.weatherCode)} ${tiempoUbi.current.temperature2M.round()}ºC | ${Utils.obtenerTiempoText(tiempoUbi.current.weatherCode, idiomaActual)} ${Utils.stringIn(idiomaActual)} $nombreCiudad";
+            String cuerpoNotificacion = "MAX☀️: ${tiempoUbi.current.temperature2MMax.round()} / MIN❄️: ${tiempoUbi.current.temperature2MMin.round()} (${Utils.stringOnlyLocalTime(idiomaActual)}: ${Utils.formatearHora(DateTime.parse(tiempoUbi.current.time))})";
+            await NotificationService.mostrarNotificacion(titulo: tituloNotificacion, cuerpo: cuerpoNotificacion, id: 1);
+  }
 }

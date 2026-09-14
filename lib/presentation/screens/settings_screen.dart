@@ -66,6 +66,19 @@ class SettingsScreen extends StatelessWidget {
                     trailing: Switch(value: configProvider.isDarkTheme, onChanged: (value) => configProvider.changeTheme(value)),
                   ),
                 ),
+                SizedBox(height: 15,),
+                Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: configProvider.isDarkTheme ? Colors.grey[800] : Color.fromARGB(255, 205, 206, 255)
+                  ),
+                  child: ListTile(
+                    leading: Icon(Icons.notifications),
+                    title: Text(Utils.stringNotifications(configProvider.idiomaActual)),
+                    trailing: Switch(value: configProvider.isNotificationsActive, onChanged: (value) => configProvider.changeNotifications(value)),
+                  ),
+                ),
               ],
             )
           

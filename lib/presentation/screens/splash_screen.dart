@@ -11,6 +11,7 @@ import 'package:manule_weather/presentation/widgets/home_widget/home_screen_widg
 import 'package:manule_weather/providers/config_provider.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
 import 'package:manule_weather/services/localizacion_service.dart';
+import 'package:manule_weather/services/notification_service.dart';
 import 'package:manule_weather/services/tiempo_service.dart';
 import 'package:manule_weather/services/version_service.dart';
 import 'package:manule_weather/utils/Utils.dart';
@@ -39,6 +40,8 @@ class _SplashScreenState extends State<SplashScreen> {
     await configProvider.comprobarModoOscuro();
 
     await configProvider.cargarHistorialBusqueda();
+
+    await configProvider.comprobarNotificaciones();
 
     //Antes de hacer toda la logica principal avisamos al usuario en el caso de que haya actualizacion
     await VersionService().comprobarActualizacion(
@@ -97,6 +100,15 @@ class _SplashScreenState extends State<SplashScreen> {
     //Quiero hacer el await aquí y que luego siga con lo demás
     if (configProvider.primeraVez) {
       await context.push('/onboarding');
+    }
+
+    if (!await NotificationService.estanPermitidas()) {
+      //Habilitamos notificaciones y pedimos el permiso para estas:
+      await NotificationService.init();
+      //Si el usuario no las habilita lo ponemos para que luego las pueda activar si quiere
+      await configProvider.changeNotifications(
+        await NotificationService.estanPermitidas(),
+      );
     }
 
     // Tenemos permiso, ya podemos obtener la posición
@@ -163,6 +175,12 @@ class _SplashScreenState extends State<SplashScreen> {
       weatherProvider.eliminarHorasPasadas(elementosAEliminar);
       weatherProvider.cambiarFaseLunar();
       configProvider.cambiarValorLineaDeCarga(100);
+
+      await Utils.mandarNotificacionTiempoActual(
+        tiempoUbi,
+        nombreCiudad,
+        configProvider.idiomaActual,
+      );
 
       if (mounted) {
         context.go('/home');
