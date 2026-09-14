@@ -5451,10 +5451,10 @@ class Utils {
     return '🔴 Red snow alert 🔴';
   }
 
-  static void devolverNotificacionesAvisos(
+  static Future<void> devolverNotificacionesAvisos(
     String idioma,
     TiempoHoras tiempoHoras,
-  ) {
+  ) async {
     List<double> uvData = tiempoHoras.uvIndex.take(24).toList();
     List<double> amountRainData = tiempoHoras.precipitation.take(24).toList();
     List<double> temperatureData = tiempoHoras.temperature2M.take(24).toList();
@@ -5513,7 +5513,7 @@ class Utils {
 
     // AVISOS RAYOS UVA
     if (uvData.any((e) => e.round() >= 8)) {
-      NotificationService.mostrarNotificacion(
+      await NotificationService.mostrarNotificacion(
         titulo: Utils.stringAlertTitleRedUV(idioma),
         cuerpo: Utils.stringAlertUV8(idioma),
         id: 2,
@@ -5522,19 +5522,19 @@ class Utils {
 
     // LÓGICA AVISOS NIVEL LLUVIA
     if (nivelLluvia == 1)
-      NotificationService.mostrarNotificacion(
+      await NotificationService.mostrarNotificacion(
         titulo: Utils.stringAlertTitleYellowRain(idioma),
         cuerpo: Utils.stringAlertRainAmount15to30(idioma),
         id: 3,
       );
     if (nivelLluvia == 2)
-      NotificationService.mostrarNotificacion(
+      await NotificationService.mostrarNotificacion(
         titulo: Utils.stringAlertTitleOrangeRain(idioma),
         cuerpo: Utils.stringAlertRainAmount30to60(idioma),
         id: 4,
       );
     if (nivelLluvia == 3)
-      NotificationService.mostrarNotificacion(
+      await NotificationService.mostrarNotificacion(
         titulo: Utils.stringAlertTitleRedRain(idioma),
         cuerpo: Utils.stringAlertRainAmount60ormore(idioma),
         id: 5,
@@ -5542,19 +5542,19 @@ class Utils {
 
     // LÓGICA AVISOS ALTAS TEMPERATURAS
     if (nivelTempAlta == 1)
-      NotificationService.mostrarNotificacion(
+      await NotificationService.mostrarNotificacion(
         titulo: Utils.stringAlertTitleYellowTemp(idioma),
         cuerpo: Utils.stringAlertTemperature36to39(idioma),
         id: 6,
       );
     if (nivelTempAlta == 2)
-      NotificationService.mostrarNotificacion(
+      await NotificationService.mostrarNotificacion(
         titulo: Utils.stringAlertTitleOrangeTemp(idioma),
         cuerpo: Utils.stringAlertTemperature40to44(idioma),
         id: 7,
       );
     if (nivelTempAlta == 3)
-      NotificationService.mostrarNotificacion(
+      await NotificationService.mostrarNotificacion(
         titulo: Utils.stringAlertTitleRedTemp(idioma),
         cuerpo: Utils.stringAlertTemperature44ormore(idioma),
         id: 8,
@@ -5562,19 +5562,19 @@ class Utils {
 
     // LÓGICA AVISOS BAJAS TEMPERATURAS
     if (nivelTempBaja == 1)
-      NotificationService.mostrarNotificacion(
+      await NotificationService.mostrarNotificacion(
         titulo: Utils.stringAlertTitleYellowLowTemp(idioma),
         cuerpo: Utils.stringAlertLowTemperature5to10(idioma),
         id: 9,
       );
     if (nivelTempBaja == 2)
-      NotificationService.mostrarNotificacion(
+      await NotificationService.mostrarNotificacion(
         titulo: Utils.stringAlertTitleOrangeLowTemp(idioma),
         cuerpo: Utils.stringAlertLowTemperature10to15(idioma),
         id: 10,
       );
     if (nivelTempBaja == 3)
-      NotificationService.mostrarNotificacion(
+      await NotificationService.mostrarNotificacion(
         titulo: Utils.stringAlertTitleRedLowTemp(idioma),
         cuerpo: Utils.stringAlertLowTemperature15ormore(idioma),
         id: 11,
@@ -5582,19 +5582,19 @@ class Utils {
 
     // LÓGICA AVISOS VELOCIDAD VIENTO
     if (nivelWindSpeed == 1)
-      NotificationService.mostrarNotificacion(
+      await NotificationService.mostrarNotificacion(
         titulo: Utils.stringAlertTitleYellowWind(idioma),
         cuerpo: Utils.stringAlertWindSpeedYellow(idioma),
         id: 12,
       );
     if (nivelWindSpeed == 2)
-      NotificationService.mostrarNotificacion(
+      await NotificationService.mostrarNotificacion(
         titulo: Utils.stringAlertTitleOrangeWind(idioma),
         cuerpo: Utils.stringAlertWindSpeedOrange(idioma),
         id: 13,
       );
     if (nivelWindSpeed == 3)
-      NotificationService.mostrarNotificacion(
+      await NotificationService.mostrarNotificacion(
         titulo: Utils.stringAlertTitleRedWind(idioma),
         cuerpo: Utils.stringAlertWindSpeedRed(idioma),
         id: 14,
@@ -5602,19 +5602,19 @@ class Utils {
 
     // LÓGICA AVISOS RACHAS MÁXIMAS DE VIENTO
     if (nivelWindGust == 1)
-      NotificationService.mostrarNotificacion(
+      await NotificationService.mostrarNotificacion(
         titulo: Utils.stringAlertTitleYellowGust(idioma),
         cuerpo: Utils.stringAlertWindGustsYellow(idioma),
         id: 15,
       );
     if (nivelWindGust == 2)
-      NotificationService.mostrarNotificacion(
+      await NotificationService.mostrarNotificacion(
         titulo: Utils.stringAlertTitleOrangeGust(idioma),
         cuerpo: Utils.stringAlertWindGustsOrange(idioma),
         id: 16,
       );
     if (nivelWindGust == 3)
-      NotificationService.mostrarNotificacion(
+      await NotificationService.mostrarNotificacion(
         titulo: Utils.stringAlertTitleRedGust(idioma),
         cuerpo: Utils.stringAlertWindGustsRed(idioma),
         id: 17,
@@ -5622,19 +5622,19 @@ class Utils {
 
     // LÓGICA NIEVE
     if (nivelSnowAlert == 1)
-      NotificationService.mostrarNotificacion(
+      await NotificationService.mostrarNotificacion(
         titulo: Utils.stringAlertTitleYellowSnow(idioma),
         cuerpo: Utils.stringAlertSnowYellow(idioma),
         id: 18,
       );
     if (nivelSnowAlert == 2)
-      NotificationService.mostrarNotificacion(
+      await NotificationService.mostrarNotificacion(
         titulo: Utils.stringAlertTitleOrangeSnow(idioma),
         cuerpo: Utils.stringAlertSnowOrange(idioma),
         id: 19,
       );
     if (nivelSnowAlert == 3)
-      NotificationService.mostrarNotificacion(
+      await NotificationService.mostrarNotificacion(
         titulo: Utils.stringAlertTitleRedSnow(idioma),
         cuerpo: Utils.stringAlertSnowRed(idioma),
         id: 20,

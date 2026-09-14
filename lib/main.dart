@@ -121,7 +121,7 @@ void callbackDispatcher() {
             }
 
             //TODO: NOTIFICACIONES DE ALERTAS
-            Utils.devolverNotificacionesAvisos(idiomaActual, tiempoHoras!);
+            await Utils.devolverNotificacionesAvisos(idiomaActual, tiempoHoras!);
           }
           break;
       }
