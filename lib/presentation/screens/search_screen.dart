@@ -9,6 +9,7 @@ import 'package:manule_weather/models/localizacion_model.dart';
 import 'package:manule_weather/models/tiempo_dias_response_model.dart';
 import 'package:manule_weather/models/tiempo_horas_model.dart';
 import 'package:manule_weather/models/tiempo_model.dart';
+import 'package:manule_weather/presentation/widgets/home_widget/home_screen_widget_manager.dart';
 import 'package:manule_weather/providers/config_provider.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
 import 'package:manule_weather/services/localizacion_service.dart';
@@ -233,6 +234,29 @@ class _widgetUbicacion extends StatelessWidget {
                 true,
                 position.latitude,
                 position.longitude,
+              );
+              //Cambiamos los datos en el widget
+              HomeScreenWidgetManager.actualizarDatos(
+                ciudad: weatherProvider.nombreUbi,
+                idioma: configProvider.idiomaActual,
+                fondoOscuro: configProvider.isDarkTheme,
+                tiempoActual: tiempoUbi,
+                hayNieve: tiempoHoras.weatherCode
+                    .take(8)
+                    .any((code) => Utils.isNevando(code)),
+                rainData: Utils.getRainLevelData(null, tiempoHoras),
+                snowData: Utils.getSnowLevelData(null, tiempoHoras),
+              );
+              //Actualizamos la notificacion de tiempo actual
+              //Temperatura maxima y minima
+              int tempMax = tiempoDias.temperature2MMax[0].round();
+              int tempMin = tiempoDias.temperature2MMin[0].round();
+              await Utils.mandarNotificacionTiempoActual(
+                tempMax,
+                tempMin,
+                tiempoUbi,
+                weatherProvider.nombreUbi,
+                configProvider.idiomaActual,
               );
             } on TimeoutException {
               ScaffoldMessenger.of(context).showSnackBar(

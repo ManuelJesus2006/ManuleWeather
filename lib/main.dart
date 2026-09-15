@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -89,7 +90,18 @@ void callbackDispatcher() {
             );
 
             //TODO: NOTIFICACIONES DE TIEMPO ACTUAL
+            //Buscamos la temperatura maxima e minima en el tiempoHoras para no tener que hacer otra petición
+            int tempMax = tiempoHoras.temperature2M
+                .sublist(0, 24)
+                .reduce(max)
+                .round();
+            int tempMin = tiempoHoras.temperature2M
+                .sublist(0, 24)
+                .reduce(min)
+                .round();
             Utils.mandarNotificacionTiempoActual(
+              tempMax,
+              tempMin,
               tiempoUbi,
               nombreCiudad,
               idiomaActual,
@@ -121,7 +133,10 @@ void callbackDispatcher() {
             }
 
             //TODO: NOTIFICACIONES DE ALERTAS
-            await Utils.devolverNotificacionesAvisos(idiomaActual, tiempoHoras!);
+            await Utils.devolverNotificacionesAvisos(
+              idiomaActual,
+              tiempoHoras!,
+            );
           }
           break;
       }

@@ -177,6 +177,8 @@ class _SplashScreenState extends State<SplashScreen> {
       configProvider.cambiarValorLineaDeCarga(100);
 
       await Utils.mandarNotificacionTiempoActual(
+        weatherProvider.tiempoDias!.temperature2MMax[0].round(),
+        weatherProvider.tiempoDias!.temperature2MMin[0].round(),
         tiempoUbi,
         nombreCiudad,
         configProvider.idiomaActual,
@@ -200,7 +202,7 @@ class _SplashScreenState extends State<SplashScreen> {
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(Utils.stringErrorApp(configProvider.idiomaActual)),
+            content: Text(Utils.stringErrorApp(configProvider.idiomaActual) + e.toString()),
           ),
         );
       }

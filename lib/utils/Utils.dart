@@ -5685,9 +5685,9 @@ class Utils {
     }
   }
 
-  static Future<void> mandarNotificacionTiempoActual(Tiempo tiempoUbi, String nombreCiudad ,String idiomaActual) async{
+  static Future<void> mandarNotificacionTiempoActual(int tempMax, int tempMin,Tiempo tiempoUbi, String nombreCiudad ,String idiomaActual) async{
     String tituloNotificacion = "${Utils.getWeatherEmoji(tiempoUbi.current.weatherCode)} ${tiempoUbi.current.temperature2M.round()}ºC | ${Utils.obtenerTiempoText(tiempoUbi.current.weatherCode, idiomaActual)} ${Utils.stringIn(idiomaActual)} $nombreCiudad";
-            String cuerpoNotificacion = "MAX☀️: ${tiempoUbi.current.temperature2MMax.round()} / MIN❄️: ${tiempoUbi.current.temperature2MMin.round()} (${Utils.stringOnlyLocalTime(idiomaActual)}: ${Utils.formatearHora(DateTime.parse(tiempoUbi.current.time))})";
+            String cuerpoNotificacion = "MAX☀️: $tempMax / MIN❄️: $tempMin (${Utils.stringOnlyLocalTime(idiomaActual)}: ${Utils.formatearHora(DateTime.parse(tiempoUbi.current.time))})";
             await NotificationService.mostrarNotificacion(titulo: tituloNotificacion, cuerpo: cuerpoNotificacion, id: 1);
   }
 }

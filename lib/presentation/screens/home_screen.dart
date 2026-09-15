@@ -299,7 +299,7 @@ class HomeScreen extends StatelessWidget {
                             ),
                             SizedBox(height: screenHeight * 0.01),
                             Text(
-                              '${weatherProvider.tiempoActual!.current.temperature2MMax.round()}ºC',
+                              '${weatherProvider.tiempoDias!.temperature2MMax[0].round()}ºC',
                               style: TextStyle(
                                 fontSize: screenWidth * 0.05,
                                 color: Colors.white,
@@ -327,7 +327,7 @@ class HomeScreen extends StatelessWidget {
                             ),
                             SizedBox(height: screenHeight * 0.01),
                             Text(
-                              '${weatherProvider.tiempoActual!.current.temperature2MMin.round()}ºC',
+                              '${weatherProvider.tiempoDias!.temperature2MMin[0].round()}ºC',
                               style: TextStyle(
                                 fontSize: screenWidth * 0.05,
                                 color: Colors.white,

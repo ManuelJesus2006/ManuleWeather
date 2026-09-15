@@ -8,7 +8,7 @@ class NotificationService {
   static Future<void> init({bool pedirPermisos = true}) async {
     // Usa el icono por defecto de tu app
     const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('ic_notifications');
 
     // Si tuvieras iOS, lo añadirías aquí. De momento solo Android.
     const InitializationSettings settings = InitializationSettings(
@@ -42,6 +42,7 @@ class NotificationService {
         importance: Importance.max,
         priority: Priority.high,
         onlyAlertOnce: true,
+        icon: 'ic_notifications_small',
         ongoing: id == 1, //Solo la notificacion del tiempo actual será la que se quede activa, las demás el usuario las podrá descartar
         autoCancel: id == 1 //La notificación del tiempo actual si se toca no se borrará automáticamente
       );

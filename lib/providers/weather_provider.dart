@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:manule_weather/models/tiempo_dias_response_model.dart';
 import 'package:manule_weather/models/tiempo_horas_model.dart';
 import 'package:manule_weather/models/tiempo_model.dart';
+import 'package:manule_weather/presentation/widgets/home_widget/home_screen_widget_manager.dart';
 import 'package:manule_weather/services/localizacion_service.dart';
 import 'package:manule_weather/services/tiempo_service.dart';
 import 'package:manule_weather/utils/Utils.dart';
@@ -30,7 +31,7 @@ class WeatherProvider with ChangeNotifier {
   double faseLunar = 0; //Número del 0 al 1, 0 = luna nueva / 0.5 = luna llena / 1 = fin fase y luna nueva otra vez
   DateTime fechaProximaLunaNueva = DateTime.now();
   DateTime fechaProximaLunaLlena = DateTime.now();
-  
+
   cambiarDatos(
     Tiempo tiempo,
     String localizacion,
@@ -39,7 +40,7 @@ class WeatherProvider with ChangeNotifier {
     bool isUbicacionUser,
     double latitude,
     double longitude,
-  ) async{
+  ) async {
     this.tiempoActual = tiempo;
     this.localizacion = localizacion;
     this.tiempoHoras = tiempoHoras;
@@ -47,7 +48,8 @@ class WeatherProvider with ChangeNotifier {
     this.tiempoDias = tiempoDias;
     latitudActual = latitude;
     longitudActual = longitude;
-    if (isUbicacionUser){ //Si el cambio de data es de la ubicación actual, los guardamos para las notificaciones y el widget
+    if (isUbicacionUser) {
+      //Si el cambio de data es de la ubicación actual, los guardamos para las notificaciones y el widget
       final preferences = await SharedPreferences.getInstance();
       await preferences.setDouble('last_latitude', latitudActual);
       await preferences.setDouble('last_longitude', longitudActual);
@@ -167,6 +169,29 @@ class WeatherProvider with ChangeNotifier {
         inicializarTiempoDias(idioma);
         int elementosAEliminar = ahoraCiudad.hour;
         eliminarHorasPasadas(elementosAEliminar);
+        //Cambiamos los datos en el widget
+        HomeScreenWidgetManager.actualizarDatos(
+          ciudad: nombreCiudad,
+          idioma: idioma,
+          fondoOscuro: preferences.getBool('modoOscuro') ?? false,
+          tiempoActual: tiempoUbi,
+          hayNieve: tiempoHoras.weatherCode
+              .take(8)
+              .any((code) => Utils.isNevando(code)),
+          rainData: Utils.getRainLevelData(null, tiempoHoras),
+          snowData: Utils.getSnowLevelData(null, tiempoHoras),
+        );
+        //Actualizamos la notificacion de tiempo actual
+        //Temperatura maxima y minima
+        int tempMax = tiempoDias.temperature2MMax[0].round();
+        int tempMin = tiempoDias.temperature2MMin[0].round();
+        await Utils.mandarNotificacionTiempoActual(
+          tempMax,
+          tempMin,
+          tiempoUbi,
+          nombreCiudad,
+          idioma,
+        );
       }
     } else {
       final resultadosPeticion = await Future.wait([
@@ -202,24 +227,29 @@ class WeatherProvider with ChangeNotifier {
 
     //Para obtener los datos de las proximas lunas llena y nueva volvemos a usar lo mismo que el método anterior pero sin hacer lo mismo
     DateTime lunaLlenaReferencia = DateTime(2000, 1, 6); // Luna llena conocida
-    double diasDesde = ahoraCiudad.difference(lunaLlenaReferencia).inSeconds / 86400;
+    double diasDesde =
+        ahoraCiudad.difference(lunaLlenaReferencia).inSeconds / 86400;
 
     // El ciclo lunar exacto en días
     const double cicloLunar = 29.530588;
-    
+
     double faseActualDias = diasDesde % cicloLunar;
 
     // Días que faltan para la próxima Luna Nueva (final del ciclo)
     double diasParaNueva = cicloLunar - faseActualDias;
-    
+
     // Días que faltan para la próxima Luna Llena (mitad del ciclo)
-    double diasParaLlena = faseActualDias < (cicloLunar / 2) 
-        ? (cicloLunar / 2) - faseActualDias 
+    double diasParaLlena = faseActualDias < (cicloLunar / 2)
+        ? (cicloLunar / 2) - faseActualDias
         : cicloLunar - (faseActualDias - (cicloLunar / 2));
 
     // Sumamos esos días a la fecha que le pasaste y devolvemos las dos fechas
-    fechaProximaLunaLlena = ahoraCiudad.add(Duration(seconds: (diasParaLlena * 86400).round()));
-    fechaProximaLunaNueva = ahoraCiudad.add(Duration(seconds: (diasParaNueva * 86400).round()));
+    fechaProximaLunaLlena = ahoraCiudad.add(
+      Duration(seconds: (diasParaLlena * 86400).round()),
+    );
+    fechaProximaLunaNueva = ahoraCiudad.add(
+      Duration(seconds: (diasParaNueva * 86400).round()),
+    );
     notifyListeners();
   }
 }
