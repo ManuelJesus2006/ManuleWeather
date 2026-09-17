@@ -76,7 +76,7 @@ class SettingsScreen extends StatelessWidget {
                   child: ListTile(
                     leading: Icon(Icons.notifications),
                     title: Text(Utils.stringNotifications(configProvider.idiomaActual)),
-                    trailing: Switch(value: configProvider.isNotificationsActive, onChanged: (value) => configProvider.changeNotifications(value)),
+                    trailing: Switch(value: configProvider.isNotificationsActive, onChanged: (value) => configProvider.changeNotifications(value,context)),
                   ),
                 ),
               ],

@@ -91,16 +91,23 @@ class WeatherProvider with ChangeNotifier {
   }
 
   void comprobarNocheDia() {
+    ahoraCiudad = DateTime.parse(tiempoActual!.current.time);
+    isDeDia = tiempoActual!.current.isDay == 1;
+
+    // Protegemos el sol (por si estás en los polos y es noche/día polar)
     sunrise = DateTime.parse(tiempoDias!.sunrise[0]);
 
     sunset = DateTime.parse(tiempoDias!.sunset[0]);
 
-    moonrise = DateTime.parse(tiempoDias!.moonrise[0]!);
+    // Protegemos la luna (la verdadera culpable, no sale todos los días)
+    moonrise = tiempoDias!.moonrise[0] != null 
+        ? DateTime.parse(tiempoDias!.moonrise[0]!) 
+        : ahoraCiudad;
 
-    moonset = DateTime.parse(tiempoDias!.moonset[0]!);
+    moonset = tiempoDias!.moonset[0] != null 
+        ? DateTime.parse(tiempoDias!.moonset[0]!) 
+        : ahoraCiudad;
 
-    ahoraCiudad = DateTime.parse(tiempoActual!.current.time);
-    isDeDia = tiempoActual!.current.isDay == 1 ? true : false;
     notifyListeners();
   }
 
@@ -175,12 +182,15 @@ class WeatherProvider with ChangeNotifier {
           idioma: idioma,
           fondoOscuro: preferences.getBool('modoOscuro') ?? false,
           tiempoActual: tiempoUbi,
+          rainData: Utils.getRainLevelData(null, tiempoHoras),
+          snowData: Utils.getSnowLevelData(null, tiempoHoras),
           hayNieve: tiempoHoras.weatherCode
               .take(8)
               .any((code) => Utils.isNevando(code)),
-          rainData: Utils.getRainLevelData(null, tiempoHoras),
-          snowData: Utils.getSnowLevelData(null, tiempoHoras),
-        );
+              hayLluvia: tiempoHoras.weatherCode
+              .take(8)
+              .any((code) => Utils.isLloviendo(code),
+        ));
         //Actualizamos la notificacion de tiempo actual
         //Temperatura maxima y minima
         int tempMax = tiempoDias.temperature2MMax[0].round();

@@ -66,80 +66,70 @@ void callbackDispatcher() {
       Tiempo? tiempoUbi = resultadosPeticion[0] as Tiempo?;
       String? nombreCiudad = resultadosPeticion[1] as String?;
       TiempoHoras? tiempoHoras = resultadosPeticion[2] as TiempoHoras?;
+      printHelloSonny(); //;)
 
-      //
+      //Comprobación de nulos en la petición
       if (tiempoUbi == null && tiempoHoras == null) {
         return Future.value(
           false,
         ); // Matamos la tarea con error porque ha fallado
       }
 
-      switch (taskName) {
-        case "actualizarTiempoActualWidgetNotificationTask":
-          {
-            await HomeScreenWidgetManager.actualizarDatos(
-              ciudad: nombreCiudad!,
-              idioma: idiomaActual,
-              fondoOscuro: fondoOscuro,
-              tiempoActual: tiempoUbi!,
-              hayNieve: tiempoHoras!.weatherCode
-                  .take(8)
-                  .any((code) => Utils.isNevando(code)),
-              rainData: Utils.getRainLevelData(null, tiempoHoras),
-              snowData: Utils.getSnowLevelData(null, tiempoHoras),
-            );
+      await HomeScreenWidgetManager.actualizarDatos(
+        ciudad: nombreCiudad!,
+        idioma: idiomaActual,
+        fondoOscuro: fondoOscuro,
+        tiempoActual: tiempoUbi!,
+        rainData: Utils.getRainLevelData(null, tiempoHoras),
+        snowData: Utils.getSnowLevelData(null, tiempoHoras),
+        hayNieve: tiempoHoras!.weatherCode
+            .take(8)
+            .any((code) => Utils.isNevando(code)),
+        hayLluvia: tiempoHoras.weatherCode
+            .take(8)
+            .any((code) => Utils.isLloviendo(code)),
+      );
 
-            //TODO: NOTIFICACIONES DE TIEMPO ACTUAL
-            //Buscamos la temperatura maxima e minima en el tiempoHoras para no tener que hacer otra petición
-            int tempMax = tiempoHoras.temperature2M
-                .sublist(0, 24)
-                .reduce(max)
-                .round();
-            int tempMin = tiempoHoras.temperature2M
-                .sublist(0, 24)
-                .reduce(min)
-                .round();
-            Utils.mandarNotificacionTiempoActual(
-              tempMax,
-              tempMin,
-              tiempoUbi,
-              nombreCiudad,
-              idiomaActual,
-            );
-          }
-          break;
-        case "actualizarUpdatesAlertsNotificationsTask":
-          {
-            // Notificacion nueva version
-            final responseAppVersion = await get(
-              Uri.parse(Environment.url_version),
-            );
+      //NOTIFICACIONES DE TIEMPO ACTUAL
+      //Buscamos la temperatura maxima e minima en el tiempoHoras para no tener que hacer otra petición
+      int tempMax = tiempoHoras.temperature2M
+          .sublist(0, 24)
+          .reduce(max)
+          .round();
+      int tempMin = tiempoHoras.temperature2M
+          .sublist(0, 24)
+          .reduce(min)
+          .round();
+      Utils.mandarNotificacionTiempoActual(
+        tempMax,
+        tempMin,
+        tiempoUbi,
+        nombreCiudad,
+        idiomaActual,
+      );
 
-            if (responseAppVersion.statusCode == 200) {
-              final data = jsonDecode(responseAppVersion.body);
-              final versionServer = data['version'];
-              final whatisnew = data['whatisnew'];
+      // Notificacion nueva version
+      final responseAppVersion = await get(Uri.parse(Environment.url_version));
 
-              final info = await PackageInfo.fromPlatform();
-              final versionActual = info.version;
+      if (responseAppVersion.statusCode == 200) {
+        final data = jsonDecode(responseAppVersion.body);
+        final versionServer = data['version'];
+        final whatisnew = data['whatisnew'];
 
-              if (versionServer != versionActual) {
-                await NotificationService.mostrarNotificacion(
-                  titulo: Utils.stringNewUpdate(idiomaActual, versionServer),
-                  cuerpo: whatisnew,
-                  id: 0,
-                );
-              }
-            }
+        final info = await PackageInfo.fromPlatform();
+        final versionActual = info.version;
 
-            //TODO: NOTIFICACIONES DE ALERTAS
-            await Utils.devolverNotificacionesAvisos(
-              idiomaActual,
-              tiempoHoras!,
-            );
-          }
-          break;
+        if (versionServer != versionActual) {
+          await NotificationService.mostrarNotificacion(
+            titulo: Utils.stringNewUpdate(idiomaActual, versionServer),
+            cuerpo: whatisnew,
+            id: 0,
+          );
+        }
       }
+
+      //NOTIFICACIONES DE ALERTAS
+      await Utils.devolverNotificacionesAvisos(idiomaActual, tiempoHoras!);
 
       return Future.value(true);
     } catch (e) {
@@ -149,6 +139,10 @@ void callbackDispatcher() {
       ); // Devuelve false para que Android intente repetirlo más tarde
     }
   });
+}
+
+void printHelloSonny() {
+  print('Hola Sonny :)');
 }
 
 void main() async {
@@ -164,20 +158,10 @@ void main() async {
   //Bucle de tiempo actual para el widget y la notificacion
   await Workmanager().registerPeriodicTask(
     "bucle_tiempoActual_widget_notification",
-    "actualizarTiempoActualWidgetNotificationTask",
+    "actualizarWidgetAndNotificationTask",
     frequency: const Duration(
       minutes: 15,
     ), // Mínimo permitido por Android: 15 min
-    constraints: Constraints(
-      networkType: NetworkType.connected, // Solo con internet
-    ),
-  );
-
-  //Bucle de notificaciones variadas (actualizaciones, alertas entre otros...)
-  await Workmanager().registerPeriodicTask(
-    "bucle_otherNotifications",
-    "actualizarUpdatesAlertsNotificationsTask",
-    frequency: const Duration(hours: 1),
     constraints: Constraints(
       networkType: NetworkType.connected, // Solo con internet
     ),

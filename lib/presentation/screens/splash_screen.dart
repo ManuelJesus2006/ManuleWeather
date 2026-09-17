@@ -108,6 +108,7 @@ class _SplashScreenState extends State<SplashScreen> {
       //Si el usuario no las habilita lo ponemos para que luego las pueda activar si quiere
       await configProvider.changeNotifications(
         await NotificationService.estanPermitidas(),
+        context
       );
     }
 
@@ -162,11 +163,14 @@ class _SplashScreenState extends State<SplashScreen> {
         idioma: configProvider.idiomaActual,
         fondoOscuro: configProvider.isDarkTheme,
         tiempoActual: weatherProvider.tiempoActual!,
+        rainData: Utils.getRainLevelData(weatherProvider, null),
+        snowData: Utils.getSnowLevelData(weatherProvider, null),
         hayNieve: weatherProvider.tiempoHoras!.weatherCode
             .take(8)
             .any((code) => Utils.isNevando(code)),
-        rainData: Utils.getRainLevelData(weatherProvider, null),
-        snowData: Utils.getSnowLevelData(weatherProvider, null),
+        hayLluvia: weatherProvider.tiempoHoras!.weatherCode
+            .take(8)
+            .any((code) => Utils.isLloviendo(code)),
       );
 
       weatherProvider.comprobarNocheDia();
@@ -202,7 +206,9 @@ class _SplashScreenState extends State<SplashScreen> {
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(Utils.stringErrorApp(configProvider.idiomaActual) + e.toString()),
+            content: Text(
+              Utils.stringErrorApp(configProvider.idiomaActual) + e.toString(),
+            ),
           ),
         );
       }

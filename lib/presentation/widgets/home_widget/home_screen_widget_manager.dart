@@ -16,8 +16,9 @@ class HomeScreenWidgetManager {
     required bool fondoOscuro,
     required Tiempo tiempoActual,
     required List<LluviaLevelModel> rainData,
-    required bool hayNieve,
     required List<SnowLevelModel> snowData,
+    required bool hayNieve,
+    required bool hayLluvia,
   }) async {
     try {
       // 1. Renderizamos el Widget de Flutter como una imagen
@@ -122,7 +123,7 @@ class HomeScreenWidgetManager {
                         Text(
                           hayNieve
                               ? Utils.mensajeSnowDinamico(snowData, idioma)
-                              : Utils.mensajeLluviaDinamico(rainData, idioma),
+                              : hayLluvia ? Utils.mensajeLluviaDinamico(rainData, idioma) : '',
                         ),
                         SizedBox(height: 10),
                         Text(

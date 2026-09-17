@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:manule_weather/models/localizacion_model.dart';
 import 'package:manule_weather/services/notification_service.dart';
+import 'package:manule_weather/utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ConfigProvider with ChangeNotifier {
   String idiomaActual = Platform.localeName.substring(
@@ -64,26 +67,60 @@ class ConfigProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  changeNotifications(bool newValue) async {
-    if (newValue == true) {
-      if (!await NotificationService.estanPermitidas()) {
-        await NotificationService.init();
-        isNotificationsActive = await NotificationService.estanPermitidas();
-        final preferences = await SharedPreferences.getInstance();
-        await preferences.setBool('notifications', isNotificationsActive);
-      } else {
-        isNotificationsActive = newValue;
-        final preferences = await SharedPreferences.getInstance();
-        await preferences.setBool('notifications', isNotificationsActive);
+  changeNotifications(bool newValue, BuildContext context) async {
+  if (newValue == true) {
+    bool permitidas = await NotificationService.estanPermitidas();
+    
+    if (!permitidas) {
+      await NotificationService.init(); 
+      permitidas = await NotificationService.estanPermitidas();
+      
+      if (!permitidas) {
+        // En lugar de enviarlo de golpe, le explicamos por qué:
+        if (context.mounted) {
+          bool? irAjustes = await showDialog<bool>(
+            context: context,
+            builder: (BuildContext dialogContext) {
+              return AlertDialog(
+                title: Text(Utils.stringTituloPermisoDialogNotifications(idiomaActual)),
+                content: Text(Utils.stringCuerpoPermisoDialogNotifications(idiomaActual)),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(dialogContext, false),
+                    child: Text(Utils.stringCancelarDialogNotifications(idiomaActual)),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(dialogContext, true),
+                    child: Text(Utils.stringIrAjustesDialogNotifications(idiomaActual)),
+                  ),
+                ],
+              );
+            },
+          );
+
+          if (irAjustes == true) {
+            await openAppSettings();
+          }
+        }
+        return; // Salimos y dejamos el switch en off hasta que vuelva con el permiso
       }
-    } else {
-      isNotificationsActive = newValue;
-      await NotificationService.borrarTodasLasNotificaciones();
-      final preferences = await SharedPreferences.getInstance();
-      await preferences.setBool('notifications', isNotificationsActive);
     }
-    notifyListeners();
+    
+    // Si hay permiso, activamos todo normal...
+    isNotificationsActive = true;
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setBool('notifications', true);
+    
+  } else {
+    // Lógica de apagado normal...
+    isNotificationsActive = false;
+    await NotificationService.borrarTodasLasNotificaciones();
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setBool('notifications', false);
   }
+  
+  notifyListeners();
+}
 
   void changeTheme(bool newValue) async {
     isDarkTheme = newValue;

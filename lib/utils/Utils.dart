@@ -5690,4 +5690,72 @@ class Utils {
             String cuerpoNotificacion = "MAX☀️: $tempMax / MIN❄️: $tempMin (${Utils.stringOnlyLocalTime(idiomaActual)}: ${Utils.formatearHora(DateTime.parse(tiempoUbi.current.time))})";
             await NotificationService.mostrarNotificacion(titulo: tituloNotificacion, cuerpo: cuerpoNotificacion, id: 1);
   }
+
+  static String stringTituloPermisoDialogNotifications(String idioma) {
+    if (idioma == 'es') return 'Permiso denegado';
+    if (idioma == 'fr') return 'Permission refusée';
+    if (idioma == 'it') return 'Permesso negato';
+    if (idioma == 'de') return 'Berechtigung verweigert';
+    if (idioma == 'ru') return 'В доступе отказано';
+    if (idioma == 'pt') return 'Permissão negada';
+    if (idioma == 'ca') return 'Permís denegat';
+    if (idioma == 'he') return 'ההרשאה נדחתה';
+    if (idioma == 'uk') return 'У доступі відмовлено';
+    if (idioma == 'ar') return 'تم رفض الإذن';
+    if (idioma == 'zh') return '权限被拒绝';
+    if (idioma == 'ko') return '권한 거부됨';
+    if (idioma == 'ja') return 'アクセスが拒否されました';
+    return 'Permission denied';
+  }
+
+  static String stringCuerpoPermisoDialogNotifications(String idioma) {
+    if (idioma == 'es') return 'Para recibir alertas del tiempo, necesitas activar las notificaciones en los ajustes de tu móvil.';
+    if (idioma == 'fr') return 'Pour recevoir les alertes météo, vous devez activer les notifications dans les paramètres de votre appareil.';
+    if (idioma == 'it') return 'Per ricevere gli avvisi meteo, devi attivare le notifiche nelle impostazioni del tuo dispositivo.';
+    if (idioma == 'de') return 'Um Wetterwarnungen zu erhalten, müssen Sie die Benachrichtigungen in den Geräteeinstellungen aktivieren.';
+    if (idioma == 'ru') return 'Чтобы получать оповещения о погоде, необходимо включить уведомления в настройках вашего устройства.';
+    if (idioma == 'pt') return 'Para receber alertas meteorológicos, você precisa ativar as notificações nas configurações do seu dispositivo.';
+    if (idioma == 'ca') return "Per rebre alertes del temps, has d'activar les notificacions a la configuració del teu mòbil.";
+    if (idioma == 'he') return 'כדי לקבל התראות מזג אוויר, עליך להפעיל התראות בהגדרות המכשיר שלך.';
+    if (idioma == 'uk') return 'Щоб отримувати сповіщення про погоду, потрібно ввімкнути їх у налаштуваннях вашого пристрою.';
+    if (idioma == 'ar') return 'لتلقي تنبيهات الطقس، تحتاج إلى تمكين الإشعارات في إعدادات جهازك.';
+    if (idioma == 'zh') return '要接收天气警报，您需要在设备设置中开启通知。';
+    if (idioma == 'ko') return '날씨 알림을 받으려면 기기 설정에서 알림을 활성화해야 합니다.';
+    if (idioma == 'ja') return '天気アラートを受け取るには、デバイスの設定で通知を有効にする必要があります。';
+    return 'To receive weather alerts, you need to enable notifications in your device settings.';
+  }
+
+  static String stringCancelarDialogNotifications(String idioma) {
+    if (idioma == 'es') return 'Cancelar';
+    if (idioma == 'fr') return 'Annuler';
+    if (idioma == 'it') return 'Annulla';
+    if (idioma == 'de') return 'Abbrechen';
+    if (idioma == 'ru') return 'Отмена';
+    if (idioma == 'pt') return 'Cancelar';
+    if (idioma == 'ca') return 'Cancel·lar';
+    if (idioma == 'he') return 'ביטול';
+    if (idioma == 'uk') return 'Скасувати';
+    if (idioma == 'ar') return 'إلغاء';
+    if (idioma == 'zh') return '取消';
+    if (idioma == 'ko') return '취소';
+    if (idioma == 'ja') return 'キャンセル';
+    return 'Cancel';
+  }
+
+  static String stringIrAjustesDialogNotifications(String idioma) {
+    if (idioma == 'es') return 'Ir a Ajustes';
+    if (idioma == 'fr') return 'Aller aux paramètres';
+    if (idioma == 'it') return 'Vai alle impostazioni';
+    if (idioma == 'de') return 'Zu den Einstellungen';
+    if (idioma == 'ru') return 'Перейти в настройки';
+    if (idioma == 'pt') return 'Ir para Configurações';
+    if (idioma == 'ca') return 'Anar a Configuració';
+    if (idioma == 'he') return 'עבור להגדרות';
+    if (idioma == 'uk') return 'Перейти до налаштувань';
+    if (idioma == 'ar') return 'الذهاب إلى الإعدادات';
+    if (idioma == 'zh') return '前往设置';
+    if (idioma == 'ko') return '설정으로 이동';
+    if (idioma == 'ja') return '設定に移動';
+    return 'Go to Settings';
+  }
 }

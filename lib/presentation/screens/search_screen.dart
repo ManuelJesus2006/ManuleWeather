@@ -241,11 +241,15 @@ class _widgetUbicacion extends StatelessWidget {
                 idioma: configProvider.idiomaActual,
                 fondoOscuro: configProvider.isDarkTheme,
                 tiempoActual: tiempoUbi,
+
+                rainData: Utils.getRainLevelData(null, tiempoHoras),
+                snowData: Utils.getSnowLevelData(null, tiempoHoras),
                 hayNieve: tiempoHoras.weatherCode
                     .take(8)
                     .any((code) => Utils.isNevando(code)),
-                rainData: Utils.getRainLevelData(null, tiempoHoras),
-                snowData: Utils.getSnowLevelData(null, tiempoHoras),
+                hayLluvia: tiempoHoras.weatherCode
+                    .take(8)
+                    .any((code) => Utils.isLloviendo(code)),
               );
               //Actualizamos la notificacion de tiempo actual
               //Temperatura maxima y minima
@@ -284,7 +288,7 @@ class _widgetUbicacion extends StatelessWidget {
                 );
               }
             }
-
+          
             weatherProvider.comprobarNocheDia();
             weatherProvider.inicializarTiempoDias(configProvider.idiomaActual);
             int elementosAEliminar = weatherProvider.ahoraCiudad.hour;
