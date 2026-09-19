@@ -61,6 +61,9 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                   Expanded(
                     child: TextField(
+                      onChanged: (value) {
+                        setState(() {});
+                      },
                       controller: controladorBusqueda,
                       decoration: InputDecoration(
                         hintText: Utils.stringInputSearch(
@@ -72,13 +75,13 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  /*const SizedBox(width: 8),
                   IconButton(
                     onPressed: () {
                       setState(() {});
                     },
                     icon: const Icon(Icons.search),
-                  ),
+                  ),*/
                 ],
               ),
             ),
@@ -138,6 +141,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           ? MostrarResultados(
                               lugares: snapshot.data!,
                               isUbicacionUser: weatherProvider.isUbicacionUser!,
+                              controladorBusqueda: controladorBusqueda,
                             )
                           : Center(child: CircularProgressIndicator());
                     },
@@ -154,10 +158,12 @@ class MostrarResultados extends StatefulWidget {
     super.key,
     required this.lugares,
     required this.isUbicacionUser,
+    required this.controladorBusqueda,
   });
 
   final List<Localizacion> lugares;
   final bool isUbicacionUser;
+  final TextEditingController controladorBusqueda;
 
   @override
   State<MostrarResultados> createState() => _MostrarResultadosState();
@@ -166,15 +172,34 @@ class MostrarResultados extends StatefulWidget {
 class _MostrarResultadosState extends State<MostrarResultados> {
   @override
   Widget build(BuildContext context) {
+    final configProvider = Provider.of<ConfigProvider>(context);
     return Expanded(
-      child: ListView.builder(
-        itemCount: widget.lugares.length,
-        itemBuilder: (context, i) {
-          final lugar = widget.lugares[i];
-          return !lugar.placeName!.contains(RegExp(r'\d'))
-              ? _widgetLugarBusqueda(lugar: lugar, isHistorial: false)
-              : Container();
-        },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            child: Text(
+              '${Utils.stringShowingResultsFor(configProvider.idiomaActual)}: ${widget.controladorBusqueda.text}',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: configProvider.isDarkTheme ? Colors.white : Colors.black,
+              ),
+            ),
+          ),
+          Expanded( //OBLIGATORIO para que el ListView no crashee la pantalla
+            child: ListView.builder(
+              itemCount: widget.lugares.length,
+              itemBuilder: (context, i) {
+                final lugar = widget.lugares[i];
+                return !lugar.placeName!.contains(RegExp(r'\d'))
+                    ? _widgetLugarBusqueda(lugar: lugar, isHistorial: false)
+                    : const SizedBox.shrink(); // SizedBox.shrink() es más eficiente que Container() vacío
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -288,7 +313,7 @@ class _widgetUbicacion extends StatelessWidget {
                 );
               }
             }
-          
+
             weatherProvider.comprobarNocheDia();
             weatherProvider.inicializarTiempoDias(configProvider.idiomaActual);
             int elementosAEliminar = weatherProvider.ahoraCiudad.hour;
@@ -576,6 +601,7 @@ class SearchHistoryModalBottomSheet extends StatelessWidget {
                 child: Text(
                   Utils.stringLimitSearchHistoryAdvisory(
                     configProvider.idiomaActual,
+                    configProvider.limitSearchHistory
                   ),
                 ),
               ),

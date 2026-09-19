@@ -156,7 +156,7 @@ class HomeScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                       color: weatherProvider.isDeDia
                           ? Colors.blue
-                          : Colors.grey[900],
+                          : Colors.blueGrey[900],
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min, //Para que el contenedor con el color y el borderRadius se modifiquen según el tamaño del Row
@@ -523,7 +523,7 @@ class HomeScreen extends StatelessWidget {
             padding: EdgeInsets.only(bottom: 20),
             decoration: BoxDecoration(
               color: configProvider.isDarkTheme
-                  ? Colors.grey[900]
+                  ? Colors.blueGrey[900]
                   : Colors.blue,
               borderRadius: BorderRadius.circular(20),
             ),

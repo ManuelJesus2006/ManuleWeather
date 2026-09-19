@@ -35,6 +35,7 @@ class ConfigProvider with ChangeNotifier {
   bool isDarkTheme = false;
   List<Localizacion> historialBusqueda = [];
   bool isNotificationsActive = false;
+  final int limitSearchHistory = 8;
 
   comprobarIdiomaYPrimeraVez() async {
     final preferences = await SharedPreferences.getInstance();
@@ -162,9 +163,9 @@ class ConfigProvider with ChangeNotifier {
     //Borramos si ya existía para evitar duplicados y por si se cambia de idioma
     historialBusqueda.removeWhere((lugar) => lugar.id == lugarNuevo.id);
 
-    //Si ya hay 5 elementos, echamos al más viejo
+    //Si ya hay 8 elementos, echamos al más viejo
     //Al hacer removeAt(0), el resto de elementos suben una posición automáticamente
-    if (historialBusqueda.length >= 5) {
+    if (historialBusqueda.length >= limitSearchHistory) {
       historialBusqueda.removeAt(0);
     }
     //Añadimos el nuevo siempre al final de la lista

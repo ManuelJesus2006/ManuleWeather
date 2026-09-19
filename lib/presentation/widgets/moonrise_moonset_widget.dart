@@ -43,7 +43,7 @@ class MoonRiseMoonSetWidget extends StatelessWidget {
                 borderRadius: BorderRadius.all(Radius.circular(20)),
                 color: configProvider.isDarkTheme
                     ? Colors.grey[900]
-                    : Colors.grey[300],
+                    : Colors.grey[200],
               ),
               child: Column(
                 children: [
@@ -84,7 +84,7 @@ class MoonRiseMoonSetWidget extends StatelessWidget {
                 borderRadius: BorderRadius.all(Radius.circular(20)),
                 color: configProvider.isDarkTheme
                     ? Colors.grey[900]
-                    : Colors.grey[300],
+                    : Colors.grey[200],
               ),
               child: Column(
                 children: [

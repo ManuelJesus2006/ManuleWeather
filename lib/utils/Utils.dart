@@ -2683,21 +2683,21 @@ class Utils {
     return 'You have not searched any place yet';
   }
 
-  static String stringLimitSearchHistoryAdvisory(String idioma) {
-    if (idioma == 'es') return "El historial está limitado a 5 lugares";
-    if (idioma == 'fr') return "L'historique est limité à 5 lieux";
-    if (idioma == 'it') return "La cronologia è limitata a 5 luoghi";
-    if (idioma == 'de') return "Der Verlauf ist auf 5 Orte begrenzt";
-    if (idioma == 'ru') return "История ограничена 5 местами";
-    if (idioma == 'pt') return "O histórico está limitado a 5 lugares";
-    if (idioma == 'ca') return "L'historial està limitat a 5 llocs";
-    if (idioma == 'he') return "היסטוריית החיפוש מוגבלת ל-5 מקומות";
-    if (idioma == 'uk') return "Історія обмежена 5 місцями";
-    if (idioma == 'ar') return "سجل البحث محدود بـ 5 مواقع فقط";
-    if (idioma == 'zh') return "历史记录最多限制为5个地点";
-    if (idioma == 'ko') return "검색 기록은 5개 위치로 제한됩니다";
-    if (idioma == 'ja') return "検索履歴は5件に制限されています";
-    return "The search history is limited to 5 places";
+  static String stringLimitSearchHistoryAdvisory(String idioma, limitSearchHistory) {
+    if (idioma == 'es') return "El historial está limitado a $limitSearchHistory lugares";
+    if (idioma == 'fr') return "L'historique est limité à $limitSearchHistory lieux";
+    if (idioma == 'it') return "La cronologia è limitata a $limitSearchHistory luoghi";
+    if (idioma == 'de') return "Der Verlauf ist auf $limitSearchHistory Orte begrenzt";
+    if (idioma == 'ru') return "История ограничена $limitSearchHistory местами";
+    if (idioma == 'pt') return "O histórico está limitado a $limitSearchHistory lugares";
+    if (idioma == 'ca') return "L'historial està limitat a $limitSearchHistory llocs";
+    if (idioma == 'he') return "היסטוריית החיפוש מוגבלת ל-$limitSearchHistory מקומות";
+    if (idioma == 'uk') return "Історія обмежена $limitSearchHistory місцями";
+    if (idioma == 'ar') return "سجل البحث محدود بـ $limitSearchHistory مواقع فقط";
+    if (idioma == 'zh') return "历史记录最多限制为$limitSearchHistory个地点";
+    if (idioma == 'ko') return "검색 기록은 $limitSearchHistory개 위치로 제한됩니다";
+    if (idioma == 'ja') return "検索履歴は$limitSearchHistory件に制限されています";
+    return "The search history is limited to $limitSearchHistory places";
   }
 
   static devolverCardAvisos(
@@ -5757,5 +5757,22 @@ class Utils {
     if (idioma == 'ko') return '설정으로 이동';
     if (idioma == 'ja') return '設定に移動';
     return 'Go to Settings';
+  }
+
+  static String stringShowingResultsFor(String idioma) {
+    if (idioma == 'es') return 'Mostrando resultados de';
+    if (idioma == 'fr') return 'Affichage des résultats pour';
+    if (idioma == 'it') return 'Mostrando i risultati per';
+    if (idioma == 'de') return 'Zeige Ergebnisse für';
+    if (idioma == 'ru') return 'Показаны результаты для';
+    if (idioma == 'pt') return 'Mostrando resultados para';
+    if (idioma == 'ca') return 'Mostrant resultats de';
+    if (idioma == 'he') return 'מציג תוצאות עבור';
+    if (idioma == 'uk') return 'Показані результати для';
+    if (idioma == 'ar') return 'عرض النتائج لـ';
+    if (idioma == 'zh') return '正在显示以下结果：';
+    if (idioma == 'ko') return '다음의 결과 표시:';
+    if (idioma == 'ja') return '次の結果を表示中:';
+    return 'Showing results for';
   }
 }
