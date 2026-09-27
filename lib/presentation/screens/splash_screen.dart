@@ -165,12 +165,7 @@ class _SplashScreenState extends State<SplashScreen> {
         tiempoActual: weatherProvider.tiempoActual!,
         rainData: Utils.getRainLevelData(weatherProvider, null),
         snowData: Utils.getSnowLevelData(weatherProvider, null),
-        hayNieve: weatherProvider.tiempoHoras!.weatherCode
-            .take(8)
-            .any((code) => Utils.isNevando(code)),
-        hayLluvia: weatherProvider.tiempoHoras!.weatherCode
-            .take(8)
-            .any((code) => Utils.isLloviendo(code)),
+        tiempoHoras: tiempoHoras
       );
 
       weatherProvider.comprobarNocheDia();

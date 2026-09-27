@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:manule_weather/models/lluvia_level_model.dart';
 import 'package:manule_weather/models/snow_level_model.dart';
+import 'package:manule_weather/models/tiempo_horas_model.dart';
 import 'package:manule_weather/models/tiempo_model.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
 import 'package:manule_weather/utils/Utils.dart';
@@ -17,8 +18,7 @@ class HomeScreenWidgetManager {
     required Tiempo tiempoActual,
     required List<LluviaLevelModel> rainData,
     required List<SnowLevelModel> snowData,
-    required bool hayNieve,
-    required bool hayLluvia,
+    required TiempoHoras tiempoHoras,
   }) async {
     try {
       // 1. Renderizamos el Widget de Flutter como una imagen
@@ -31,9 +31,16 @@ class HomeScreenWidgetManager {
             // pero ahora el contenedor se pinta directamente con tus colores planos.
             future: Future.value(true),
             builder: (context, snapshot) {
+              final avisos = Utils.devolverWidgetCardAvisos(idioma, tiempoHoras);
+              final hayNieve = tiempoHoras.weatherCode
+                  .take(8)
+                  .any((code) => Utils.isNevando(code));
+              final hayLluvia = tiempoHoras.weatherCode
+                  .take(8)
+                  .any((code) => Utils.isLloviendo(code));
               return Container(
-                width: 300,
-                height: 300,
+                width: 500,
+                height: 500,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(
@@ -61,7 +68,7 @@ class HomeScreenWidgetManager {
                                 color: fondoOscuro
                                     ? Colors.white
                                     : Colors.black87,
-                                size: 14,
+                                size: 24,
                               ),
                             ),
                             Text(
@@ -72,7 +79,7 @@ class HomeScreenWidgetManager {
                                 color: fondoOscuro
                                     ? Colors.white
                                     : Colors.black87,
-                                fontSize: 15,
+                                fontSize: 25,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -85,7 +92,7 @@ class HomeScreenWidgetManager {
                             color: fondoOscuro
                                 ? Colors.white.withOpacity(0.6)
                                 : Colors.black54,
-                            fontSize: 11,
+                            fontSize: 21,
                           ),
                         ),
                       ],
@@ -99,7 +106,7 @@ class HomeScreenWidgetManager {
                         Text(
                           '${tiempoActual.current.temperature2M.round()}ºC',
                           style: TextStyle(
-                            fontSize: 54,
+                            fontSize: 84,
                             fontWeight: FontWeight.w600,
                             color: fondoOscuro ? Colors.white : Colors.black,
                           ),
@@ -111,7 +118,7 @@ class HomeScreenWidgetManager {
                             false,
                             tiempoActual.current.isDay == 0 ? false : true,
                           ),
-                          size: 42,
+                          size: 72,
                           color: fondoOscuro ? Colors.white : Colors.black87,
                         ),
                       ],
@@ -123,7 +130,13 @@ class HomeScreenWidgetManager {
                         Text(
                           hayNieve
                               ? Utils.mensajeSnowDinamico(snowData, idioma)
-                              : hayLluvia ? Utils.mensajeLluviaDinamico(rainData, idioma) : '',
+                              : hayLluvia
+                              ? Utils.mensajeLluviaDinamico(rainData, idioma)
+                              : '',
+                          style: TextStyle(
+                            fontSize: 26,
+                            color: fondoOscuro ? Colors.white : Colors.black,
+                          ),
                         ),
                         SizedBox(height: 10),
                         Text(
@@ -135,7 +148,7 @@ class HomeScreenWidgetManager {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: fondoOscuro ? Colors.white : Colors.black87,
-                            fontSize: 20,
+                            fontSize: 35,
                             letterSpacing: 0.5,
                           ),
                         ),
@@ -149,7 +162,7 @@ class HomeScreenWidgetManager {
                                 color: fondoOscuro
                                     ? Colors.white.withOpacity(0.7)
                                     : Colors.black54,
-                                fontSize: 12,
+                                fontSize: 27,
                               ),
                             ),
                             Text(
@@ -158,13 +171,23 @@ class HomeScreenWidgetManager {
                                 color: fondoOscuro
                                     ? Colors.white
                                     : Colors.black87,
-                                fontSize: 12,
+                                fontSize: 27,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 16), // Separación extra antes de los avisos
+                    if (avisos.isNotEmpty)
+                    Wrap(
+                      spacing: 8.0, // Espacio horizontal entre las tarjetas
+                      runSpacing:
+                          8.0, // Espacio vertical cuando salta a la línea de abajo
+                      alignment: WrapAlignment
+                          .center, // Centra las tarjetas si sobran huecos
+                      children: avisos
                     ),
                   ],
                 ),
@@ -173,7 +196,7 @@ class HomeScreenWidgetManager {
           ),
         ),
         key: 'ManuleWeather_Widget',
-        logicalSize: const Size(300, 300),
+        logicalSize: const Size(500, 500),
       );
 
       // 2. Le pegamos el toque al sistema operativo para que refresque la pantalla

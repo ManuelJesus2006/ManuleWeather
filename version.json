@@ -1,5 +1,5 @@
 {
-    "version": "1.0.0",
+    "version": "1.0.1",
   "url": "https://drive.google.com/file/d/1B1Ojsb_gF4Tw8oFm28FiFDGhux1T0b1H/view?usp=sharing",
-  "whatisnew": "Actualización menor, cambios en algunos colores de algunos elementos de la app, historial aumentado hasta 8 lugares y ahora en la pantalla de búsqueda el botón para buscar no es necesario y a sido eliminado"
+  "whatisnew": "Adición de una nueva notificación de Superluna, avisos agregados al Widget para la pantalla de inicio en estilo píldora y agregación de la posición orbital de luna respecto a la tierra SIN API (BETA)"
 }

@@ -29,6 +29,7 @@ class WeatherProvider with ChangeNotifier {
   double latitudActual = 0;
   double longitudActual = 0;
   double faseLunar = 0; //Número del 0 al 1, 0 = luna nueva / 0.5 = luna llena / 1 = fin fase y luna nueva otra vez
+  double faseOrbitaLunar = 0; //Número del 0 al 1, 0 = Perigeo / 0.5 = Apogeo / 1 = Fin orbita y perigeo otra vez
   DateTime fechaProximaLunaNueva = DateTime.now();
   DateTime fechaProximaLunaLlena = DateTime.now();
 
@@ -184,13 +185,8 @@ class WeatherProvider with ChangeNotifier {
           tiempoActual: tiempoUbi,
           rainData: Utils.getRainLevelData(null, tiempoHoras),
           snowData: Utils.getSnowLevelData(null, tiempoHoras),
-          hayNieve: tiempoHoras.weatherCode
-              .take(8)
-              .any((code) => Utils.isNevando(code)),
-              hayLluvia: tiempoHoras.weatherCode
-              .take(8)
-              .any((code) => Utils.isLloviendo(code),
-        ));
+          tiempoHoras: tiempoHoras
+        );
         //Actualizamos la notificacion de tiempo actual
         //Temperatura maxima y minima
         int tempMax = tiempoDias.temperature2MMax[0].round();
@@ -234,6 +230,9 @@ class WeatherProvider with ChangeNotifier {
   void cambiarFaseLunar() {
     //Para calcular simplemente la fase actual utilizamos un método aparte que reutilizo para el tiempoDias
     faseLunar = Utils.calcularFaseLunarByFecha(ahoraCiudad);
+
+    //Calculamos la posición en la orbita de la luna (apogeo y perigeo)
+    faseOrbitaLunar = Utils.obtenerPosicionOrbitaLunarByFecha(ahoraCiudad);
 
     //Para obtener los datos de las proximas lunas llena y nueva volvemos a usar lo mismo que el método anterior pero sin hacer lo mismo
     DateTime lunaLlenaReferencia = DateTime(2000, 1, 6); // Luna llena conocida

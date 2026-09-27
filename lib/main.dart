@@ -82,12 +82,7 @@ void callbackDispatcher() {
         tiempoActual: tiempoUbi!,
         rainData: Utils.getRainLevelData(null, tiempoHoras),
         snowData: Utils.getSnowLevelData(null, tiempoHoras),
-        hayNieve: tiempoHoras!.weatherCode
-            .take(8)
-            .any((code) => Utils.isNevando(code)),
-        hayLluvia: tiempoHoras.weatherCode
-            .take(8)
-            .any((code) => Utils.isLloviendo(code)),
+        tiempoHoras: tiempoHoras!,
       );
 
       //NOTIFICACIONES DE TIEMPO ACTUAL
@@ -130,6 +125,22 @@ void callbackDispatcher() {
 
       //NOTIFICACIONES DE ALERTAS
       await Utils.devolverNotificacionesAvisos(idiomaActual, tiempoHoras!);
+
+      //NOTIFICACIÓN SUPER LUNA LLENA (caso raro)
+      double faseLunarActual = Utils.calcularFaseLunarByFecha(
+        DateTime.parse(tiempoUbi.current.time),
+      );
+      double faseOrbitaLunarActual = Utils.obtenerPosicionOrbitaLunarByFecha(
+        DateTime.parse(tiempoUbi.current.time),
+      );
+      if ((faseLunarActual >= 0.485 && faseLunarActual <= 0.515) &&
+          (faseOrbitaLunarActual <= 0.05 || faseOrbitaLunarActual >= 0.95) && tiempoUbi.current.weatherCode < 3) {
+        await NotificationService.mostrarNotificacion(
+          titulo: Utils.stringSuperFullMoonAdvisory(idiomaActual),
+          cuerpo: Utils.stringSuperFullMoonDetailNotification(idiomaActual),
+          id: 21,
+        );
+      }
 
       return Future.value(true);
     } catch (e) {

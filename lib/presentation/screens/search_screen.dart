@@ -269,12 +269,7 @@ class _widgetUbicacion extends StatelessWidget {
 
                 rainData: Utils.getRainLevelData(null, tiempoHoras),
                 snowData: Utils.getSnowLevelData(null, tiempoHoras),
-                hayNieve: tiempoHoras.weatherCode
-                    .take(8)
-                    .any((code) => Utils.isNevando(code)),
-                hayLluvia: tiempoHoras.weatherCode
-                    .take(8)
-                    .any((code) => Utils.isLloviendo(code)),
+                tiempoHoras: tiempoHoras
               );
               //Actualizamos la notificacion de tiempo actual
               //Temperatura maxima y minima

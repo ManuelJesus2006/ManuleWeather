@@ -10,11 +10,13 @@ class FaseLunarWidget extends StatelessWidget {
     required this.screenWidth,
     required this.screenHeight,
     required this.faseLunarAPintar,
+    required this.faseOrbitaAPintar,
   });
 
   final double screenWidth;
   final double screenHeight;
   final double faseLunarAPintar;
+  final double faseOrbitaAPintar;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +36,9 @@ class FaseLunarWidget extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            faseLunarAPintar == weatherProvider.faseLunar ? Utils.stringActualMoonPhase(configProvider.idiomaActual) : Utils.stringMoonPhase(configProvider.idiomaActual),
+            faseLunarAPintar == weatherProvider.faseLunar
+                ? Utils.stringActualMoonPhase(configProvider.idiomaActual)
+                : Utils.stringMoonPhase(configProvider.idiomaActual),
             style: TextStyle(
               fontSize: screenWidth * 0.05,
               color: configProvider.isDarkTheme ? Colors.white : Colors.black,
@@ -43,24 +47,54 @@ class FaseLunarWidget extends StatelessWidget {
           ),
           SizedBox(height: screenHeight * 0.01),
           SizedBox(
-            //Tamaño cuadrado perfecto para que no se deforme el radio
             width: 150,
             height: 150,
             child: LunaWidget2D(fase: faseLunarAPintar),
           ),
           SizedBox(height: screenHeight * 0.01),
           Text(
-            Utils.stringFaseLunarDinamica(
-              faseLunarAPintar,
-              configProvider.idiomaActual,
-            ),
+            '${(faseOrbitaAPintar <= 0.05 || faseOrbitaAPintar >= 0.95) ? Utils.stringSuper(configProvider.idiomaActual) + " " : ""}${Utils.stringFaseLunarDinamica(faseLunarAPintar, configProvider.idiomaActual)}',
             style: TextStyle(
               fontSize: screenWidth * 0.04,
               color: configProvider.isDarkTheme ? Colors.white : Colors.black,
               fontWeight: FontWeight.bold,
             ),
           ),
-          //Si es la faseActual y no es la de tiempoDias ponemos la fecha de la próxima luna llena o nueva
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                Utils.stringDistanciaLunarDinamica(
+                  faseOrbitaAPintar,
+                  configProvider.idiomaActual,
+                ),
+                style: TextStyle(
+                  fontSize: screenWidth * 0.04,
+                  color: configProvider.isDarkTheme ? Colors.white : Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              icon: Icon(
+                Icons.info_outline,
+                size: screenWidth * 0.05,
+                color: configProvider.isDarkTheme ? Colors.white : Colors.black,
+              ),
+              onPressed: () {
+                showDialog(context: context, builder: (context) => AlertDialog(
+                  title: Text(Utils.stringQuestionWhatArePerigeeApogee(configProvider.idiomaActual)),
+                  content: Text(Utils.stringExplanationPerigeeApogee(configProvider.idiomaActual)),
+                  actions: [
+                    TextButton(onPressed: () {Navigator.pop(context);}, child: Text(Utils.stringUnderstood(configProvider.idiomaActual)))
+                  ],
+                ));
+              },
+            ),
+            ],
+          ),
           if (faseLunarAPintar == weatherProvider.faseLunar)
             Text(
               Utils.adviseOfTheNextFullOrNewMoon(

@@ -188,8 +188,7 @@ class HomeScreen extends StatelessWidget {
                 Utils.devolverCardAvisos(
                   screenWidth,
                   weatherProvider,
-                  configProvider.idiomaActual,
-                  false
+                  configProvider.idiomaActual
                 ),
                 SizedBox(height: screenHeight * 0.01),
                 Text(
@@ -413,6 +412,7 @@ class HomeScreen extends StatelessWidget {
                   screenWidth: screenWidth,
                   screenHeight: screenHeight,
                   faseLunarAPintar: weatherProvider.faseLunar,
+                  faseOrbitaAPintar: weatherProvider.faseOrbitaLunar,
                 ),
                 SizedBox(height: screenHeight * 0.01),
                 MoonRiseMoonSetWidget(screenWidth: screenWidth, screenHeight: screenHeight, indexDay: 0,),
@@ -1177,7 +1177,8 @@ class _tiempoDiaIndividualCards extends StatelessWidget {
     double mmLluvia =
         weatherProvider.tiempoDias!.precipitationSum[indiceActual];
     double cmSnow = weatherProvider.tiempoDias!.snowfallSum[indiceActual];
-    double faseLunarDelDia = Utils.calcularFaseLunarByFecha(fecha);
+    double faseLunarDelDia = Utils.calcularFaseLunarByFecha(fecha.add(Duration(hours: 12)));
+    double faseOrbitaLunarDelDia = Utils.obtenerPosicionOrbitaLunarByFecha(fecha.add(Duration(hours: 12)));
     return SingleChildScrollView(
       padding: EdgeInsets.all(20),
       child: Column(
@@ -1286,6 +1287,7 @@ class _tiempoDiaIndividualCards extends StatelessWidget {
             screenWidth: screenWidth,
             screenHeight: screenHeight,
             faseLunarAPintar: faseLunarDelDia,
+            faseOrbitaAPintar: faseOrbitaLunarDelDia,
           ),
           SizedBox(height: 10),
           MoonRiseMoonSetWidget(screenWidth: screenWidth, screenHeight: screenHeight, indexDay: indiceActual,)

@@ -9,6 +9,7 @@ import 'package:manule_weather/models/snow_level_model.dart';
 import 'package:manule_weather/models/tiempo_horas_model.dart';
 import 'package:manule_weather/models/tiempo_model.dart';
 import 'package:manule_weather/presentation/widgets/card_alert_widget.dart';
+import 'package:manule_weather/presentation/widgets/card_homewidget_alert_widget.dart';
 import 'package:manule_weather/providers/weather_provider.dart';
 import 'package:manule_weather/services/notification_service.dart';
 
@@ -1919,20 +1920,20 @@ class Utils {
   }
 
   static String stringFeelsLike(String idioma) {
-    if (idioma == 'es') return 'Sensación térmica:';
-    if (idioma == 'fr') return 'Température ressentie :';
-    if (idioma == 'it') return 'Percepita:';
-    if (idioma == 'de') return 'Gefühlt:';
-    if (idioma == 'ru') return 'Ощущается как:';
-    if (idioma == 'pt') return 'Sensação térmica:';
-    if (idioma == 'ca') return 'Sensació tèrmica:';
-    if (idioma == 'he') return 'מרגיש כמו:';
-    if (idioma == 'uk') return 'Відчувається як:';
-    if (idioma == 'ar') return 'الحرارة المحسوسة:';
-    if (idioma == 'zh') return '体感温度：';
-    if (idioma == 'ko') return '체감 온도:';
-    if (idioma == 'ja') return '体感温度:';
-    return 'Feels like:';
+    if (idioma == 'es') return 'Sensación térmica';
+    if (idioma == 'fr') return 'Température ressentie';
+    if (idioma == 'it') return 'Percepita';
+    if (idioma == 'de') return 'Gefühlt';
+    if (idioma == 'ru') return 'Ощущается как';
+    if (idioma == 'pt') return 'Sensação térmica';
+    if (idioma == 'ca') return 'Sensació tèrmica';
+    if (idioma == 'he') return 'מרגיש כמו';
+    if (idioma == 'uk') return 'Відчувається як';
+    if (idioma == 'ar') return 'الحرارة المحسوسة';
+    if (idioma == 'zh') return '体感温度';
+    if (idioma == 'ko') return '체감 온도';
+    if (idioma == 'ja') return '体感温度';
+    return 'Feels like';
   }
 
   static String stringAmountOfRain(String idioma) {
@@ -1993,14 +1994,14 @@ class Utils {
     if (idioma == 'pt') return 'de';
     if (idioma == 'ca') return 'de';
     if (idioma == 'de') return 'von';
-    if (idioma == 'ru') return 'из'; 
+    if (idioma == 'ru') return 'из';
     if (idioma == 'uk') return 'з';
     if (idioma == 'he') return 'של';
     if (idioma == 'ar') return 'من';
     if (idioma == 'zh') return '的';
     if (idioma == 'ko') return '의';
     if (idioma == 'ja') return 'の';
-    
+
     return 'of';
   }
 
@@ -2011,14 +2012,14 @@ class Utils {
     if (idioma == 'pt') return 'em';
     if (idioma == 'ca') return 'en';
     if (idioma == 'de') return 'in';
-    if (idioma == 'ru') return 'в'; 
+    if (idioma == 'ru') return 'в';
     if (idioma == 'uk') return 'в';
     if (idioma == 'he') return 'ב';
     if (idioma == 'ar') return 'في';
     if (idioma == 'zh') return '在';
     if (idioma == 'ko') return '에';
     if (idioma == 'ja') return 'に';
-    
+
     return 'in';
   }
 
@@ -2278,7 +2279,7 @@ class Utils {
     if (idioma == 'zh') return '当地时间';
     if (idioma == 'ko') return '현지 시간';
     if (idioma == 'ja') return '現地時間';
-    
+
     return 'Local time';
   }
 
@@ -2683,17 +2684,28 @@ class Utils {
     return 'You have not searched any place yet';
   }
 
-  static String stringLimitSearchHistoryAdvisory(String idioma, limitSearchHistory) {
-    if (idioma == 'es') return "El historial está limitado a $limitSearchHistory lugares";
-    if (idioma == 'fr') return "L'historique est limité à $limitSearchHistory lieux";
-    if (idioma == 'it') return "La cronologia è limitata a $limitSearchHistory luoghi";
-    if (idioma == 'de') return "Der Verlauf ist auf $limitSearchHistory Orte begrenzt";
+  static String stringLimitSearchHistoryAdvisory(
+    String idioma,
+    limitSearchHistory,
+  ) {
+    if (idioma == 'es')
+      return "El historial está limitado a $limitSearchHistory lugares";
+    if (idioma == 'fr')
+      return "L'historique est limité à $limitSearchHistory lieux";
+    if (idioma == 'it')
+      return "La cronologia è limitata a $limitSearchHistory luoghi";
+    if (idioma == 'de')
+      return "Der Verlauf ist auf $limitSearchHistory Orte begrenzt";
     if (idioma == 'ru') return "История ограничена $limitSearchHistory местами";
-    if (idioma == 'pt') return "O histórico está limitado a $limitSearchHistory lugares";
-    if (idioma == 'ca') return "L'historial està limitat a $limitSearchHistory llocs";
-    if (idioma == 'he') return "היסטוריית החיפוש מוגבלת ל-$limitSearchHistory מקומות";
+    if (idioma == 'pt')
+      return "O histórico está limitado a $limitSearchHistory lugares";
+    if (idioma == 'ca')
+      return "L'historial està limitat a $limitSearchHistory llocs";
+    if (idioma == 'he')
+      return "היסטוריית החיפוש מוגבלת ל-$limitSearchHistory מקומות";
     if (idioma == 'uk') return "Історія обмежена $limitSearchHistory місцями";
-    if (idioma == 'ar') return "سجل البحث محدود بـ $limitSearchHistory مواقع فقط";
+    if (idioma == 'ar')
+      return "سجل البحث محدود بـ $limitSearchHistory مواقع فقط";
     if (idioma == 'zh') return "历史记录最多限制为$limitSearchHistory个地点";
     if (idioma == 'ko') return "검색 기록은 $limitSearchHistory개 위치로 제한됩니다";
     if (idioma == 'ja') return "検索履歴は$limitSearchHistory件に制限されています";
@@ -2704,7 +2716,6 @@ class Utils {
     double screenWidth,
     WeatherProvider weatherProvider,
     String idioma,
-    bool isNotification,
   ) {
     List<double> uvData = weatherProvider.tiempoHoras!.uvIndex
         .take(24)
@@ -4997,6 +5008,109 @@ class Utils {
     ][i];
   }
 
+  static String stringDistanciaLunarDinamica(double fase, String idioma) {
+    print(fase);
+    // 1. Convertimos el valor (0.0 a 1.0) en un índice del 0 al 3.
+    int i;
+    // Damos un margen del 5% para considerar que está "en" el punto exacto
+    if (fase <= 0.05 || fase >= 0.95) {
+      i = 0; // Perigeo
+    } else if (fase > 0.05 && fase < 0.45) {
+      i = 1; // DE 0.05 A 0.45: Alejándose del perigeo / Aproximándose al apogeo
+    } else if (fase >= 0.45 && fase <= 0.55) {
+      i = 2; // Apogeo
+    } else {
+      // fase > 0.55 && fase < 0.95
+      i = 3; // DE 0.55 A 0.95: Alejándose del apogeo / Aproximándose al perigeo
+    }
+
+    // 2. Devolvemos el array correspondiente a cada idioma en base a ese índice
+    if (idioma == 'es')
+      return [
+        'Perigeo',
+        'Aproximándose al apogeo',
+        'Apogeo',
+        'Aproximándose al perigeo',
+      ][i];
+    if (idioma == 'fr')
+      return [
+        'Périgée',
+        'Approchant de l\'apogée',
+        'Apogée',
+        'Approchant du périgée',
+      ][i];
+    if (idioma == 'it')
+      return [
+        'Perigeo',
+        'In avvicinamento all\'apogeo',
+        'Apogeo',
+        'In avvicinamento al perigeo',
+      ][i];
+    if (idioma == 'de')
+      return [
+        'Perigäum',
+        'Annäherung ans Apogäum',
+        'Apogäum',
+        'Annäherung ans Perigäum',
+      ][i];
+    if (idioma == 'ru')
+      return [
+        'Перигей',
+        'Приближение к апогею',
+        'Апогей',
+        'Приближение к перигею',
+      ][i];
+    if (idioma == 'pt')
+      return [
+        'Perigeu',
+        'Aproximando-se do apogeu',
+        'Apogeu',
+        'Aproximando-se do perigeu',
+      ][i];
+    if (idioma == 'ca')
+      return [
+        'Perigeu',
+        'Aproximant-se a l\'apogeu',
+        'Apogeu',
+        'Aproximant-se al perigeu',
+      ][i];
+    if (idioma == 'he')
+      return [
+        'פריגיאה',
+        'מתקרב לאפוגיאה',
+        'אפוגיאה',
+        'מתקרב לפריגיאה',
+      ][i];
+    if (idioma == 'uk')
+      return [
+        'Перигей',
+        'Наближення до апогею',
+        'Апогей',
+        'Наближення до перигею',
+      ][i];
+    if (idioma == 'ar')
+      return [
+        'الحضيض',
+        'يقترب من الأوج',
+        'الأوج',
+        'يقترب من الحضيض',
+      ][i];
+    if (idioma == 'zh')
+      return ['近地点', '接近远地点', '远地点', '接近近地点'][i];
+    if (idioma == 'ko')
+      return ['근지점', '원지점 접근 중', '원지점', '근지점 접근 중'][i];
+    if (idioma == 'ja')
+      return ['近地点', '遠地点に接近中', '遠地点', '近地点に接近中'][i];
+
+    // Fallback por defecto (Inglés)
+    return [
+      'Perigee',
+      'Approaching apogee',
+      'Apogee',
+      'Approaching perigee',
+    ][i];
+  }
+
   static double calcularFaseLunarByFecha(DateTime fecha) {
     DateTime lunaLlenaReferencia = DateTime(2000, 1, 6); // Luna llena conocida
     // Calculamos los días exactos con decimales usando los segundos para máxima precisión
@@ -5007,6 +5121,27 @@ class Utils {
     //Calculamos la fase del 0-1
     return (diasDesde % cicloLunar) / cicloLunar;
   }
+
+  static double obtenerPosicionOrbitaLunarByFecha(DateTime fechaActual) {
+    const double cicloAnomalistico = 27.55455; // Duración del ciclo en días
+    
+    // Cambiamos a un perigeo real muy cercano para eliminar el desfase acumulado
+    DateTime perigeoConocido = DateTime.utc(2026, 9, 6, 6, 9); // 6 de Septiembre de 2026 a las 06:09 UTC
+    
+    // Tu misma lógica exacta
+    int diferenciaMilisegundos = fechaActual.difference(perigeoConocido).inMilliseconds;
+    double diasTranscurridos = diferenciaMilisegundos / (1000 * 60 * 60 * 24);
+    
+    // Evitamos problemas si la fecha consultada es anterior al nuevo perigeo de referencia
+    if (diasTranscurridos < 0) {
+        diasTranscurridos = cicloAnomalistico + (diasTranscurridos % cicloAnomalistico);
+    }
+    
+    double diasDesdeUltimoPerigeo = diasTranscurridos % cicloAnomalistico;
+    double posicionOrbital = diasDesdeUltimoPerigeo / cicloAnomalistico;
+    
+    return posicionOrbital;
+}
 
   static String adviseOfTheNextFullOrNewMoon(
     double fase,
@@ -5685,10 +5820,22 @@ class Utils {
     }
   }
 
-  static Future<void> mandarNotificacionTiempoActual(int tempMax, int tempMin,Tiempo tiempoUbi, String nombreCiudad ,String idiomaActual) async{
-    String tituloNotificacion = "${Utils.getWeatherEmoji(tiempoUbi.current.weatherCode)} ${tiempoUbi.current.temperature2M.round()}ºC | ${Utils.obtenerTiempoText(tiempoUbi.current.weatherCode, idiomaActual)} ${Utils.stringIn(idiomaActual)} $nombreCiudad";
-            String cuerpoNotificacion = "MAX☀️: $tempMax / MIN❄️: $tempMin (${Utils.stringOnlyLocalTime(idiomaActual)}: ${Utils.formatearHora(DateTime.parse(tiempoUbi.current.time))})";
-            await NotificationService.mostrarNotificacion(titulo: tituloNotificacion, cuerpo: cuerpoNotificacion, id: 1);
+  static Future<void> mandarNotificacionTiempoActual(
+    int tempMax,
+    int tempMin,
+    Tiempo tiempoUbi,
+    String nombreCiudad,
+    String idiomaActual,
+  ) async {
+    String tituloNotificacion =
+        "${Utils.getWeatherEmoji(tiempoUbi.current.weatherCode)} ${tiempoUbi.current.temperature2M.round()}ºC | ${Utils.obtenerTiempoText(tiempoUbi.current.weatherCode, idiomaActual)} ${Utils.stringIn(idiomaActual)} $nombreCiudad";
+    String cuerpoNotificacion =
+        "MAX☀️: $tempMax / MIN❄️: $tempMin (${Utils.stringOnlyLocalTime(idiomaActual)}: ${Utils.formatearHora(DateTime.parse(tiempoUbi.current.time))})";
+    await NotificationService.mostrarNotificacion(
+      titulo: tituloNotificacion,
+      cuerpo: cuerpoNotificacion,
+      id: 1,
+    );
   }
 
   static String stringTituloPermisoDialogNotifications(String idioma) {
@@ -5709,16 +5856,26 @@ class Utils {
   }
 
   static String stringCuerpoPermisoDialogNotifications(String idioma) {
-    if (idioma == 'es') return 'Para recibir alertas del tiempo, necesitas activar las notificaciones en los ajustes de tu móvil.';
-    if (idioma == 'fr') return 'Pour recevoir les alertes météo, vous devez activer les notifications dans les paramètres de votre appareil.';
-    if (idioma == 'it') return 'Per ricevere gli avvisi meteo, devi attivare le notifiche nelle impostazioni del tuo dispositivo.';
-    if (idioma == 'de') return 'Um Wetterwarnungen zu erhalten, müssen Sie die Benachrichtigungen in den Geräteeinstellungen aktivieren.';
-    if (idioma == 'ru') return 'Чтобы получать оповещения о погоде, необходимо включить уведомления в настройках вашего устройства.';
-    if (idioma == 'pt') return 'Para receber alertas meteorológicos, você precisa ativar as notificações nas configurações do seu dispositivo.';
-    if (idioma == 'ca') return "Per rebre alertes del temps, has d'activar les notificacions a la configuració del teu mòbil.";
-    if (idioma == 'he') return 'כדי לקבל התראות מזג אוויר, עליך להפעיל התראות בהגדרות המכשיר שלך.';
-    if (idioma == 'uk') return 'Щоб отримувати сповіщення про погоду, потрібно ввімкнути їх у налаштуваннях вашого пристрою.';
-    if (idioma == 'ar') return 'لتلقي تنبيهات الطقس، تحتاج إلى تمكين الإشعارات في إعدادات جهازك.';
+    if (idioma == 'es')
+      return 'Para recibir alertas del tiempo, necesitas activar las notificaciones en los ajustes de tu móvil.';
+    if (idioma == 'fr')
+      return 'Pour recevoir les alertes météo, vous devez activer les notifications dans les paramètres de votre appareil.';
+    if (idioma == 'it')
+      return 'Per ricevere gli avvisi meteo, devi attivare le notifiche nelle impostazioni del tuo dispositivo.';
+    if (idioma == 'de')
+      return 'Um Wetterwarnungen zu erhalten, müssen Sie die Benachrichtigungen in den Geräteeinstellungen aktivieren.';
+    if (idioma == 'ru')
+      return 'Чтобы получать оповещения о погоде, необходимо включить уведомления в настройках вашего устройства.';
+    if (idioma == 'pt')
+      return 'Para receber alertas meteorológicos, você precisa ativar as notificações nas configurações do seu dispositivo.';
+    if (idioma == 'ca')
+      return "Per rebre alertes del temps, has d'activar les notificacions a la configuració del teu mòbil.";
+    if (idioma == 'he')
+      return 'כדי לקבל התראות מזג אוויר, עליך להפעיל התראות בהגדרות המכשיר שלך.';
+    if (idioma == 'uk')
+      return 'Щоб отримувати сповіщення про погоду, потрібно ввімкнути їх у налаштуваннях вашого пристрою.';
+    if (idioma == 'ar')
+      return 'لتلقي تنبيهات الطقس، تحتاج إلى تمكين الإشعارات في إعدادات جهازك.';
     if (idioma == 'zh') return '要接收天气警报，您需要在设备设置中开启通知。';
     if (idioma == 'ko') return '날씨 알림을 받으려면 기기 설정에서 알림을 활성화해야 합니다.';
     if (idioma == 'ja') return '天気アラートを受け取るには、デバイスの設定で通知を有効にする必要があります。';
@@ -5775,4 +5932,276 @@ class Utils {
     if (idioma == 'ja') return '次の結果を表示中:';
     return 'Showing results for';
   }
+
+  static List<Widget> devolverWidgetCardAvisos(String idioma, TiempoHoras tiempoHoras) {
+    List<double> uvData = tiempoHoras.uvIndex.take(24).toList();
+    List<double> amountRainData = tiempoHoras.precipitation.take(24).toList();
+    List<double> temperatureData = tiempoHoras.temperature2M.take(24).toList();
+    List<double> windSpeedData = tiempoHoras.windSpeed10M.take(24).toList();
+    List<double> windGustData = tiempoHoras.windGusts10M.take(24).toList();
+    List<double> snowCmData = tiempoHoras.snowfall.take(24).toList();
+
+    // Calculamos el nivel más alto de cada categoría
+    int nivelLluvia = 0;
+    if (amountRainData.any((e) => e >= 60)) nivelLluvia = 3;
+    else if (amountRainData.any((e) => e >= 30)) nivelLluvia = 2;
+    else if (amountRainData.any((e) => e >= 15)) nivelLluvia = 1;
+
+    int nivelTempAlta = 0;
+    if (temperatureData.any((e) => e.round() > 44)) nivelTempAlta = 3;
+    else if (temperatureData.any((e) => e.round() >= 39)) nivelTempAlta = 2;
+    else if (temperatureData.any((e) => e.round() >= 36)) nivelTempAlta = 1;
+
+    int nivelTempBaja = 0;
+    if (temperatureData.any((e) => e.round() < -15)) nivelTempBaja = 3;
+    else if (temperatureData.any((e) => e.round() <= -10)) nivelTempBaja = 2;
+    else if (temperatureData.any((e) => e.round() <= -5)) nivelTempBaja = 1;
+
+    int nivelWindSpeed = 0;
+    if (windSpeedData.any((e) => e.round() >= 90)) nivelWindSpeed = 3;
+    else if (windSpeedData.any((e) => e.round() >= 70)) nivelWindSpeed = 2;
+    else if (windSpeedData.any((e) => e.round() >= 50)) nivelWindSpeed = 1;
+
+    int nivelWindGust = 0;
+    if (windGustData.any((e) => e.round() >= 120)) nivelWindGust = 3;
+    else if (windGustData.any((e) => e.round() >= 90)) nivelWindGust = 2;
+    else if (windGustData.any((e) => e.round() >= 70)) nivelWindGust = 1;
+
+    int nivelSnowAlert = 0;
+    if (snowCmData.any((e) => e.round() > 20)) nivelSnowAlert = 3;
+    else if (snowCmData.any((e) => e.round() >= 10)) nivelSnowAlert = 2;
+    else if (snowCmData.any((e) => e.round() >= 5)) nivelSnowAlert = 1;
+
+    List<Widget> avisos = [];
+
+    // AVISOS RAYOS UVA
+    if (uvData.any((e) => e.round() >= 8))
+      avisos.add(CardHomeWidgetAlertWidget(
+        cuerpo: Utils.stringUVRays(idioma),
+        color: Colors.red,
+      ));
+
+    // LÓGICA AVISOS NIVEL LLUVIA
+    if (nivelLluvia == 1)
+      avisos.add(CardHomeWidgetAlertWidget(cuerpo: Utils.stringRain(idioma), color: Colors.yellow));
+    
+    if (nivelLluvia == 2)
+      avisos.add(CardHomeWidgetAlertWidget(cuerpo: Utils.stringRain(idioma), color: Colors.orange));
+    
+    if (nivelLluvia == 3)
+      avisos.add(CardHomeWidgetAlertWidget(cuerpo: Utils.stringRain(idioma), color: Colors.red));
+    
+    // LÓGICA AVISOS ALTAS TEMPERATURAS
+    if (nivelTempAlta == 1)
+      avisos.add(CardHomeWidgetAlertWidget(cuerpo: Utils.stringHighTemperatures(idioma), color: Colors.yellow));
+    
+    if (nivelTempAlta == 2)
+      avisos.add(CardHomeWidgetAlertWidget(cuerpo: Utils.stringHighTemperatures(idioma), color: Colors.orange));
+    
+    if (nivelTempAlta == 3)
+      avisos.add(CardHomeWidgetAlertWidget(cuerpo: Utils.stringHighTemperatures(idioma), color: Colors.red));
+    
+    // LÓGICA AVISOS BAJAS TEMPERATURAS
+    if (nivelTempBaja == 1)
+      avisos.add(CardHomeWidgetAlertWidget(cuerpo: Utils.stringLowTemperatures(idioma), color: Colors.yellow));
+    
+    if (nivelTempBaja == 2)
+      avisos.add(CardHomeWidgetAlertWidget(cuerpo: Utils.stringLowTemperatures(idioma), color: Colors.orange));
+    
+    if (nivelTempBaja == 3)
+      avisos.add(CardHomeWidgetAlertWidget(cuerpo: Utils.stringLowTemperatures(idioma), color: Colors.red));
+    
+    // LÓGICA AVISOS VELOCIDAD VIENTO
+    if (nivelWindSpeed == 1)
+      avisos.add(CardHomeWidgetAlertWidget(cuerpo: Utils.stringWind(idioma), color: Colors.yellow));
+    
+    if (nivelWindSpeed == 2)
+      avisos.add(CardHomeWidgetAlertWidget(cuerpo: Utils.stringWind(idioma), color: Colors.orange));
+    
+    if (nivelWindSpeed == 3)
+      avisos.add(CardHomeWidgetAlertWidget(cuerpo: Utils.stringWind(idioma), color: Colors.red));
+    
+    // LÓGICA AVISOS RACHAS MÁXIMAS DE VIENTO
+    if (nivelWindGust == 1)
+      avisos.add(CardHomeWidgetAlertWidget(cuerpo: Utils.stringWindGusts(idioma), color: Colors.yellow));
+    
+    if (nivelWindGust == 2)
+      avisos.add(CardHomeWidgetAlertWidget(cuerpo: Utils.stringWindGusts(idioma), color: Colors.orange));
+    
+    if (nivelWindGust == 3)
+      avisos.add(CardHomeWidgetAlertWidget(cuerpo: Utils.stringWindGusts(idioma), color: Colors.red));
+    
+    // LÓGICA NIEVE
+    if (nivelSnowAlert == 1)
+      avisos.add(CardHomeWidgetAlertWidget(cuerpo: Utils.stringSnow(idioma), color: Colors.yellow));
+    
+    if (nivelSnowAlert == 2)
+      avisos.add(CardHomeWidgetAlertWidget(cuerpo: Utils.stringSnow(idioma), color: Colors.orange));
+    
+    if (nivelSnowAlert == 3)
+      avisos.add(CardHomeWidgetAlertWidget(cuerpo: Utils.stringSnow(idioma), color: Colors.red));
+    
+    return avisos;
+  }
+
+  static String stringHighTemperatures(String idioma) {
+    if (idioma == 'es') return 'Altas temperaturas';
+    if (idioma == 'fr') return 'Températures élevées';
+    if (idioma == 'it') return 'Alte temperature';
+    if (idioma == 'de') return 'Hohe Temperaturen';
+    if (idioma == 'ru') return 'Высокие температуры';
+    if (idioma == 'pt') return 'Altas temperaturas';
+    if (idioma == 'ca') return 'Altes temperatures';
+    if (idioma == 'he') return 'טמפרטורות גבוהות';
+    if (idioma == 'uk') return 'Високі температури';
+    if (idioma == 'ar') return 'درجات حرارة مرتفعة';
+    if (idioma == 'zh') return '高温';
+    if (idioma == 'ko') return '고온';
+    if (idioma == 'ja') return '高温';
+    return 'High temperatures';
+  }
+
+  static String stringLowTemperatures(String idioma) {
+    if (idioma == 'es') return 'Bajas temperaturas';
+    if (idioma == 'fr') return 'Basses températures';
+    if (idioma == 'it') return 'Basse temperature';
+    if (idioma == 'de') return 'Niedrige Temperaturen';
+    if (idioma == 'ru') return 'Низкие температуры';
+    if (idioma == 'pt') return 'Baixas temperaturas';
+    if (idioma == 'ca') return 'Baixes temperatures';
+    if (idioma == 'he') return 'טמפרטורות נמוכות';
+    if (idioma == 'uk') return 'Низькі температури';
+    if (idioma == 'ar') return 'درجات حرارة منخفضة';
+    if (idioma == 'zh') return '低温';
+    if (idioma == 'ko') return '저온';
+    if (idioma == 'ja') return '低温';
+    return 'Low temperatures';
+  }
+
+  static String stringWindGusts(String idioma) {
+    if (idioma == 'es') return 'Rachas de viento';
+    if (idioma == 'fr') return 'Rafales de vent';
+    if (idioma == 'it') return 'Raffiche di vento';
+    if (idioma == 'de') return 'Windböen';
+    if (idioma == 'ru') return 'Порывы ветра';
+    if (idioma == 'pt') return 'Rajadas de vento';
+    if (idioma == 'ca') return 'Ratxes de vent';
+    if (idioma == 'he') return 'משבי רוח';
+    if (idioma == 'uk') return 'Пориви вітру';
+    if (idioma == 'ar') return 'هبات الرياح';
+    if (idioma == 'zh') return '阵风';
+    if (idioma == 'ko') return '돌풍';
+    if (idioma == 'ja') return '突風';
+    return 'Wind gusts';
+  }
+
+  static String stringSuper(String idioma) {
+    if (idioma == 'es') return 'Súper';
+    if (idioma == 'fr') return 'Super';
+    if (idioma == 'it') return 'Super';
+    if (idioma == 'de') return 'Super';
+    if (idioma == 'ru') return 'Супер';
+    if (idioma == 'pt') return 'Super';
+    if (idioma == 'ca') return 'Súper';
+    if (idioma == 'he') return 'סופר';
+    if (idioma == 'uk') return 'Супер';
+    if (idioma == 'ar') return 'سوبر'; // transliteración común, o 'رائع' (genial)
+    if (idioma == 'zh') return '超级';
+    if (idioma == 'ko') return '슈퍼';
+    if (idioma == 'ja') return 'スーパー';
+    return 'Super';
+  }
+
+  static String stringSuperFullMoonAdvisory(String idioma) {
+    if (idioma == 'es') return '¡Súper luna llena visible solo hoy!';
+    if (idioma == 'fr') return 'Super pleine lune visible seulement aujourd\'hui !';
+    if (idioma == 'it') return 'Super luna piena visibile solo oggi!';
+    if (idioma == 'de') return 'Supervollmond nur heute sichtbar!';
+    if (idioma == 'ru') return 'Суперполнолуние видно только сегодня!';
+    if (idioma == 'pt') return 'Superlua cheia visível apenas hoje!';
+    if (idioma == 'ca') return 'Súper lluna plena visible només avui!';
+    if (idioma == 'he') return 'סופר ירח מלא גלוי רק היום!';
+    if (idioma == 'uk') return 'Суперповня видима лише сьогодні!';
+    if (idioma == 'ar') return 'بدر عملاق مرئي اليوم فقط!';
+    if (idioma == 'zh') return '超级满月仅限今日可见！';
+    if (idioma == 'ko') return '슈퍼 보름달은 오늘만 볼 수 있습니다!';
+    if (idioma == 'ja') return 'スーパー満月が見られるのは今日だけ！';
+    
+    // Fallback por defecto (Inglés)
+    return 'Super full moon visible only today!';
+  }
+
+  static String stringSuperFullMoonDetailNotification(String idioma) {
+    if (idioma == 'es') return 'Disfruta de una súper luna llena. Se verá más grande y brillante de lo habitual.';
+    if (idioma == 'fr') return 'Profitez d\'une super pleine lune. Elle paraîtra plus grande et plus brillante que d\'habitude.';
+    if (idioma == 'it') return 'Goditi una super luna piena. Apparirà più grande e luminosa del solito.';
+    if (idioma == 'de') return 'Genieße einen Supervollmond. Er wird größer und heller als gewöhnlich erscheinen.';
+    if (idioma == 'ru') return 'Наслаждайтесь суперполнолунием. Луна будет казаться больше и ярче, чем обычно.';
+    if (idioma == 'pt') return 'Desfrute de uma superlua cheia. Ela parecerá maior e mais brilhante que o normal.';
+    if (idioma == 'ca') return 'Gaudeix d\'una súper lluna plena. Es veurà més gran i brillant de l\'habitual.';
+    if (idioma == 'he') return 'תיהנו מסופר ירח מלא. הוא ייראה גדול ובהיר מהרגיל.';
+    if (idioma == 'uk') return 'Насолоджуйтесь суперповнею. Місяць здаватиметься більшим і яскравішим, ніж зазвичай.';
+    if (idioma == 'ar') return 'استمتع ببدر عملاق. سيبدو القمر أكبر وأكثر إشراقاً من المعتاد.';
+    if (idioma == 'zh') return '欣赏超级满月。它会比平时看起来更大更亮。';
+    if (idioma == 'ko') return '슈퍼 보름달을 즐겨보세요. 평소보다 더 크고 밝게 보일 것입니다.';
+    if (idioma == 'ja') return 'スーパー満月をお楽しみください。普段より大きく明るく見えます。';
+    
+    return 'Enjoy a super full moon. It will appear larger and brighter than usual.';
+  }
+
+  static String stringQuestionWhatArePerigeeApogee(String idioma) {
+    if (idioma == 'es') return '¿Qué son el perigeo y el apogeo?';
+    if (idioma == 'fr') return 'Que sont le périgée et l\'apogée ?';
+    if (idioma == 'it') return 'Cosa sono il perigeo e l\'apogeo?';
+    if (idioma == 'de') return 'Was sind Perigäum und Apogäum?';
+    if (idioma == 'ru') return 'Что такое перигей и апогей?';
+    if (idioma == 'pt') return 'O que são o perigeu e o apogeu?';
+    if (idioma == 'ca') return 'Què són el perigeu i l\'apogeu?';
+    if (idioma == 'he') return 'מהם פריגיאה ואפוגיאה?';
+    if (idioma == 'uk') return 'Що таке перигей і апогей?';
+    if (idioma == 'ar') return 'ما هو الحضيض والأوج؟';
+    if (idioma == 'zh') return '什么是近地点和远地点？';
+    if (idioma == 'ko') return '근지점과 원지점이란 무엇인가요?';
+    if (idioma == 'ja') return '近地点と遠地点とは何ですか？';
+    
+    return 'What are perigee and apogee?';
+  }
+
+  static String stringExplanationPerigeeApogee(String idioma) {
+    if (idioma == 'es') return 'La órbita de la Luna no es un círculo perfecto, sino una elipse. El perigeo es el punto donde la Luna está más cerca de la Tierra y se ve más grande y brillante. El apogeo es el punto donde está más lejos. Si el perigeo coincide con la luna llena, se produce una "súper luna".';
+    if (idioma == 'fr') return 'L\'orbite de la Lune n\'est pas un cercle parfait, mais une ellipse. Le périgée est le point où la Lune est la plus proche de la Terre, paraissant plus grande et plus brillante. L\'apogée est le point où elle est la plus éloignée. Si le périgée coïncide avec la pleine lune, on l\'appelle une "super lune".';
+    if (idioma == 'it') return 'L\'orbita della Luna non è un cerchio perfetto, ma un\'ellisse. Il perigeo è il punto in cui la Luna è più vicina alla Terra, apparendo più grande e luminosa. L\'apogeo è il punto in cui è più lontana. Se il perigeo coincide con la luna piena, si verifica una "super luna".';
+    if (idioma == 'de') return 'Die Umlaufbahn des Mondes ist kein perfekter Kreis, sondern eine Ellipse. Das Perigäum ist der Punkt, an dem der Mond der Erde am nächsten ist und größer und heller erscheint. Das Apogäum ist der Punkt, an dem er am weitesten entfernt ist. Fällt das Perigäum mit dem Vollmond zusammen, spricht man von einem "Supervollmond".';
+    if (idioma == 'ru') return 'Орбита Луны — не идеальный круг, а эллипс. Перигей — это точка, где Луна находится ближе всего к Земле и кажется больше и ярче. Апогей — точка, где она находится дальше всего. Если перигей совпадает с полнолунием, происходит «суперлуние».';
+    if (idioma == 'pt') return 'A órbita da Lua não é um círculo perfeito, mas uma elipse. O perigeu é o ponto onde a Lua está mais próxima da Terra, parecendo maior e mais brilhante. O apogeu é o ponto onde está mais distante. Se o perigeu coincide com a lua cheia, ocorre uma "superlua".';
+    if (idioma == 'ca') return 'L\'òrbita de la Lluna no és un cercle perfecte, sinó una el·lipse. El perigeu és el punt on la Lluna està més a prop de la Terra i es veu més gran i brillant. L\'apogeu és el punt on està més lluny. Si el perigeu coincideix amb la lluna plena, es produeix una "súper lluna".';
+    if (idioma == 'he') return 'מסלול הירח אינו מעגל מושלם, אלא אליפסה. פריגיאה היא הנקודה שבה הירח קרוב ביותר לכדור הארץ ונראה גדול ובהיר יותר. אפוגיאה היא הנקודה שבה הוא רחוק ביותר. אם הפריגיאה חופפת לירח מלא, מתרחש "סופר ירח".';
+    if (idioma == 'uk') return 'Орбіта Місяця — не ідеальне коло, а еліпс. Перигей — це точка, де Місяць знаходиться найближче до Землі і здається більшим та яскравішим. Апогей — точка, де він знаходиться найдалі. Якщо перигей збігається з повнею, виникає «супермісяць».';
+    if (idioma == 'ar') return 'مدار القمر ليس دائرة مثالية، بل شكل بيضاوي. الحضيض هو النقطة التي يكون فيها القمر أقرب إلى الأرض ويبدو أكبر وأكثر إشراقاً. الأوج هو النقطة التي يكون فيها أبعد ما يمكن. إذا تزامن الحضيض مع اكتمال القمر، يحدث ما يسمى "القمر العملاق".';
+    if (idioma == 'zh') return '月球的轨道不是一个完美的圆，而是一个椭圆。近地点是月球离地球最近的点，看起来更大更亮。远地点是月球离地球最远的点。如果近地点碰巧遇上满月，就会出现“超级满月”。';
+    if (idioma == 'ko') return '달의 궤도는 완벽한 원이 아니라 타원입니다. 근지점은 달이 지구와 가장 가까운 지점으로, 더 크고 밝게 보입니다. 원지점은 가장 먼 지점입니다. 근지점이 보름달과 겹치면 \'슈퍼문\'이 발생합니다.';
+    if (idioma == 'ja') return '月の軌道は完全な円ではなく楕円です。近地点は月が地球に最も近づく点であり、より大きく明るく見えます。遠地点は最も遠ざかる点です。近地点と満月が重なると「スーパームーン」になります。';
+    
+    return 'The Moon\'s orbit is not a perfect circle, but an ellipse. Perigee is the point where the Moon is closest to Earth, appearing larger and brighter. Apogee is the point where it is farthest. If perigee coincides with a full moon, a "supermoon" occurs.';
+  }
+
+  static String stringUnderstood(String idioma) {
+    if (idioma == 'es') return 'Entendido';
+    if (idioma == 'fr') return 'Compris';
+    if (idioma == 'it') return 'Capito';
+    if (idioma == 'de') return 'Verstanden';
+    if (idioma == 'ru') return 'Понятно';
+    if (idioma == 'pt') return 'Entendi';
+    if (idioma == 'ca') return 'Entès';
+    if (idioma == 'he') return 'מובן';
+    if (idioma == 'uk') return 'Зрозуміло';
+    if (idioma == 'ar') return 'مفهوم';
+    if (idioma == 'zh') return '明白';
+    if (idioma == 'ko') return '이해함';
+    if (idioma == 'ja') return '了解';
+    
+    return 'Understood';
+  }
+
+  
 }
