@@ -1,9 +1,13 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:manule_weather/presentation/widgets/fase_lunar_widget.dart';
 import 'package:manule_weather/presentation/widgets/moonrise_moonset_widget.dart';
+import 'package:manule_weather/presentation/widgets/sunrise_sunset_widget.dart';
 import 'package:manule_weather/presentation/widgets/weather_hour_detail.dart';
 import 'package:manule_weather/providers/config_provider.dart';
 import 'package:manule_weather/providers/navigation_provider.dart';
@@ -77,7 +81,7 @@ class HomeScreen extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    final puntosUVA = Utils.getPuntosRayosUva(weatherProvider);
+    final puntosUVA = weatherProvider.tiempoActual!.current.uvIndex != null ? Utils.getPuntosRayosUva(weatherProvider) : [];
     bool hayNieve = weatherProvider.tiempoHoras!.weatherCode
         .take(8)
         .any((code) => Utils.isNevando(code));
@@ -124,7 +128,36 @@ class HomeScreen extends StatelessWidget {
       child: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
-            await weatherProvider.actualizarDatos(configProvider.idiomaActual);
+            try {
+              await weatherProvider.actualizarDatos(
+                configProvider.idiomaActual,
+              );
+            } on TimeoutException {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    Utils.stringErrorTimeout(configProvider.idiomaActual),
+                  ),
+                ),
+              );
+            } catch (e) {
+              if (context.mounted && e is HttpException) {
+                context.go(
+                  '/error',
+                  extra: Utils.stringErrorServerDown(
+                    configProvider.idiomaActual,
+                  ),
+                );
+              } else if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      Utils.stringErrorApp(configProvider.idiomaActual),
+                    ),
+                  ),
+                );
+              }
+            }
           },
           child: SingleChildScrollView(
             physics: AlwaysScrollableScrollPhysics(),
@@ -149,7 +182,9 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.045),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.045,
+                  ),
                   child: Container(
                     padding: EdgeInsets.all(15),
                     decoration: BoxDecoration(
@@ -159,7 +194,8 @@ class HomeScreen extends StatelessWidget {
                           : Colors.blueGrey[900],
                     ),
                     child: Row(
-                      mainAxisSize: MainAxisSize.min, //Para que el contenedor con el color y el borderRadius se modifiquen según el tamaño del Row
+                      mainAxisSize: MainAxisSize
+                          .min, //Para que el contenedor con el color y el borderRadius se modifiquen según el tamaño del Row
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         if (weatherProvider.isUbicacionUser!)
@@ -188,7 +224,7 @@ class HomeScreen extends StatelessWidget {
                 Utils.devolverCardAvisos(
                   screenWidth,
                   weatherProvider,
-                  configProvider.idiomaActual
+                  configProvider.idiomaActual,
                 ),
                 SizedBox(height: screenHeight * 0.01),
                 Text(
@@ -250,20 +286,14 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.03),
-                if (Utils.isLloviendo(
-                      weatherProvider.tiempoActual!.current.weatherCode,
-                    ) &&
-                    hayLluvia)
-                  Utils.devolverPrevisionGraficaLluvia(
+                if (hayNieve || Utils.isNevando(weatherProvider.tiempoActual!.current.weatherCode))
+                  Utils.devolverPrevisionGraficaNieve(
                     screenWidth,
                     weatherProvider,
                     configProvider.idiomaActual,
                   )
-                else if (Utils.isNevando(
-                      weatherProvider.tiempoActual!.current.weatherCode,
-                    ) &&
-                    hayNieve)
-                  Utils.devolverPrevisionGraficaNieve(
+                else if (hayLluvia || Utils.isLloviendo(weatherProvider.tiempoActual!.current.weatherCode))
+                  Utils.devolverPrevisionGraficaLluvia(
                     screenWidth,
                     weatherProvider,
                     configProvider.idiomaActual,
@@ -339,73 +369,10 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.03),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.07),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(screenWidth * 0.03),
-                        width: screenWidth * 0.4,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
-                          color: Colors.grey.withOpacity(0.5),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              Utils.stringSunrise(configProvider.idiomaActual),
-                              style: TextStyle(
-                                fontSize: screenWidth * 0.045,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            SizedBox(height: screenHeight * 0.01),
-                            Text(
-                              Utils.formatearHora(weatherProvider.sunrise),
-                              style: TextStyle(
-                                fontSize: screenWidth * 0.05,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(screenWidth * 0.03),
-                        width: screenWidth * 0.4,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
-                          color: Colors.grey.withOpacity(0.5),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              Utils.stringSunset(configProvider.idiomaActual),
-                              style: TextStyle(
-                                fontSize: screenWidth * 0.045,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            SizedBox(height: screenHeight * 0.01),
-                            Text(
-                              Utils.formatearHora(weatherProvider.sunset),
-                              style: TextStyle(
-                                fontSize: screenWidth * 0.05,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                SunriseSunsetWidget(screenWidth: screenWidth, screenHeight: screenHeight),
                 SizedBox(height: screenHeight * 0.02),
-
-                UV_home_widget(screenWidth: screenWidth, puntosUVA: puntosUVA),
+                
+                puntosUVA.isNotEmpty ? UV_home_widget(screenWidth: screenWidth, puntosUVA: puntosUVA as List<FlSpot>) : const SizedBox.shrink(),
 
                 SizedBox(height: screenHeight * 0.02),
                 FaseLunarWidget(
@@ -415,7 +382,11 @@ class HomeScreen extends StatelessWidget {
                   faseOrbitaAPintar: weatherProvider.faseOrbitaLunar,
                 ),
                 SizedBox(height: screenHeight * 0.01),
-                MoonRiseMoonSetWidget(screenWidth: screenWidth, screenHeight: screenHeight, indexDay: 0,),
+                MoonRiseMoonSetWidget(
+                  screenWidth: screenWidth,
+                  screenHeight: screenHeight,
+                  indexDay: 0,
+                ),
                 SizedBox(height: screenHeight * 0.02),
                 _infoCard(
                   titulo: Utils.stringWind(configProvider.idiomaActual),
@@ -576,9 +547,36 @@ class HomeScreen extends StatelessWidget {
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {
-                await weatherProvider.actualizarDatos(
-                  configProvider.idiomaActual,
-                );
+                try {
+                  await weatherProvider.actualizarDatos(
+                    configProvider.idiomaActual,
+                  );
+                } on TimeoutException {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        Utils.stringErrorTimeout(configProvider.idiomaActual),
+                      ),
+                    ),
+                  );
+                } catch (e) {
+                  if (context.mounted && e is HttpException) {
+                    context.go(
+                      '/error',
+                      extra: Utils.stringErrorServerDown(
+                        configProvider.idiomaActual,
+                      ),
+                    );
+                  } else if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          Utils.stringErrorApp(configProvider.idiomaActual),
+                        ),
+                      ),
+                    );
+                  }
+                }
               },
               child: ListView.builder(
                 itemCount: weatherProvider.tiempoHoras!.time.length,
@@ -668,7 +666,35 @@ class HomeScreen extends StatelessWidget {
     return SafeArea(
       child: RefreshIndicator(
         onRefresh: () async {
-          await weatherProvider.actualizarDatos(configProvider.idiomaActual);
+          try{
+            await weatherProvider.actualizarDatos(configProvider.idiomaActual);
+          }on TimeoutException {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    Utils.stringErrorTimeout(configProvider.idiomaActual),
+                  ),
+                ),
+              );
+            } catch (e) {
+              if (context.mounted && e is HttpException) {
+                context.go(
+                  '/error',
+                  extra: Utils.stringErrorServerDown(
+                    configProvider.idiomaActual,
+                  ),
+                );
+              } else if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      Utils.stringErrorApp(configProvider.idiomaActual),
+                    ),
+                  ),
+                );
+              }
+            }
+          
         },
         child: CustomScrollView(
           slivers: [
@@ -926,7 +952,7 @@ class UV_home_widget extends StatelessWidget {
                   topRight: Radius.circular(20),
                 ),
                 color: Utils.obtenerColorUV(
-                  weatherProvider.tiempoActual!.current.uvIndex.round(),
+                  weatherProvider.tiempoActual!.current.uvIndex!.round(),
                 ).withOpacity(0.85),
               ),
               child: Column(
@@ -941,7 +967,7 @@ class UV_home_widget extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    weatherProvider.tiempoActual!.current.uvIndex
+                    weatherProvider.tiempoActual!.current.uvIndex!
                         .round()
                         .toString(),
                     style: TextStyle(
@@ -953,7 +979,7 @@ class UV_home_widget extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     Utils.stringUvLevel(
-                      weatherProvider.tiempoActual!.current.uvIndex.round(),
+                      weatherProvider.tiempoActual!.current.uvIndex!.round(),
                       configProvider.idiomaActual,
                     ),
                     style: TextStyle(
@@ -1177,8 +1203,12 @@ class _tiempoDiaIndividualCards extends StatelessWidget {
     double mmLluvia =
         weatherProvider.tiempoDias!.precipitationSum[indiceActual];
     double cmSnow = weatherProvider.tiempoDias!.snowfallSum[indiceActual];
-    double faseLunarDelDia = Utils.calcularFaseLunarByFecha(fecha.add(Duration(hours: 12)));
-    double faseOrbitaLunarDelDia = Utils.obtenerPosicionOrbitaLunarByFecha(fecha.add(Duration(hours: 12)));
+    double faseLunarDelDia = Utils.calcularFaseLunarByFecha(
+      fecha.add(Duration(hours: 12)),
+    );
+    double faseOrbitaLunarDelDia = Utils.obtenerPosicionOrbitaLunarByFecha(
+      fecha.add(Duration(hours: 12)),
+    );
     return SingleChildScrollView(
       padding: EdgeInsets.all(20),
       child: Column(
@@ -1290,7 +1320,11 @@ class _tiempoDiaIndividualCards extends StatelessWidget {
             faseOrbitaAPintar: faseOrbitaLunarDelDia,
           ),
           SizedBox(height: 10),
-          MoonRiseMoonSetWidget(screenWidth: screenWidth, screenHeight: screenHeight, indexDay: indiceActual,)
+          MoonRiseMoonSetWidget(
+            screenWidth: screenWidth,
+            screenHeight: screenHeight,
+            indexDay: indiceActual,
+          ),
         ],
       ),
     );

@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:manule_weather/models/tiempo_dias_response_model.dart';
@@ -28,8 +31,10 @@ class WeatherProvider with ChangeNotifier {
   TiempoDias? tiempoDias;
   double latitudActual = 0;
   double longitudActual = 0;
-  double faseLunar = 0; //Número del 0 al 1, 0 = luna nueva / 0.5 = luna llena / 1 = fin fase y luna nueva otra vez
-  double faseOrbitaLunar = 0; //Número del 0 al 1, 0 = Perigeo / 0.5 = Apogeo / 1 = Fin orbita y perigeo otra vez
+  double faseLunar =
+      0; //Número del 0 al 1, 0 = luna nueva / 0.5 = luna llena / 1 = fin fase y luna nueva otra vez
+  double faseOrbitaLunar =
+      0; //Número del 0 al 1, 0 = Perigeo / 0.5 = Apogeo / 1 = Fin orbita y perigeo otra vez
   DateTime fechaProximaLunaNueva = DateTime.now();
   DateTime fechaProximaLunaLlena = DateTime.now();
 
@@ -64,24 +69,35 @@ class WeatherProvider with ChangeNotifier {
     tempUbi = 0;
     estadoUbi = '';
     Position position = await Geolocator.getCurrentPosition();
+    Tiempo tiempoUbiReq;
 
-    Tiempo? tiempoUbi = await TiempoService().getTiempoLatLon(
-      position.latitude,
-      position.longitude,
-    );
-    String? nombreCiudad = await LocalizacionService().getNombreCiudadByCords(
-      position.longitude,
-      position.latitude,
-      idioma,
-    );
-    nombreUbi = nombreCiudad!;
-    tempUbi = tiempoUbi!.current.temperature2M;
-    //estadoUbi = Utils.obtenerTiempoText(tiempoUbi.current.weatherCode);
-    iconoUbi = Utils.obtenerSimbolo(
-      tiempoUbi.current.weatherCode,
-      false,
-      tiempoUbi.current.isDay == 1 ? true : false,
-    );
+    try {
+      final resultadosPeticion = await Future.wait([
+        TiempoService().getTiempoLatLon(position.latitude, position.longitude),
+        LocalizacionService().getNombreCiudadByCords(
+          position.longitude,
+          position.latitude,
+          idioma,
+        ),
+      ]).timeout(Duration(seconds: 10));
+      
+      tiempoUbiReq = resultadosPeticion[0] as Tiempo;
+      nombreUbi = resultadosPeticion[1] as String;
+      tempUbi = tiempoUbiReq.current.temperature2M;
+      //estadoUbi = Utils.obtenerTiempoText(tiempoUbi.current.weatherCode);
+      iconoUbi = Utils.obtenerSimbolo(
+        tiempoUbiReq.current.weatherCode,
+        false,
+        tiempoUbiReq.current.isDay == 1 ? true : false,
+      );
+    } on TimeoutException {
+      //Si tarda en hacer la petición ponemos estos valores para condicionar un error en pantalla
+      nombreUbi = "N/A";
+      tempUbi = -100;
+    } catch (e) {
+      rethrow; //Lanzamos la excepción para cachearla fuera del método
+    }
+
     geolocalizacion = position;
     notifyListeners();
   }
@@ -101,12 +117,12 @@ class WeatherProvider with ChangeNotifier {
     sunset = DateTime.parse(tiempoDias!.sunset[0]);
 
     // Protegemos la luna (la verdadera culpable, no sale todos los días)
-    moonrise = tiempoDias!.moonrise[0] != null 
-        ? DateTime.parse(tiempoDias!.moonrise[0]!) 
+    moonrise = tiempoDias!.moonrise[0] != null
+        ? DateTime.parse(tiempoDias!.moonrise[0]!)
         : ahoraCiudad;
 
-    moonset = tiempoDias!.moonset[0] != null 
-        ? DateTime.parse(tiempoDias!.moonset[0]!) 
+    moonset = tiempoDias!.moonset[0] != null
+        ? DateTime.parse(tiempoDias!.moonset[0]!)
         : ahoraCiudad;
 
     notifyListeners();
@@ -144,85 +160,99 @@ class WeatherProvider with ChangeNotifier {
       Position position = await Geolocator.getCurrentPosition();
       print("Latitud: ${position.latitude}, Longitud: ${position.longitude}");
 
-      final resultadosPeticion = await Future.wait([
-        TiempoService().getTiempoLatLon(position.latitude, position.longitude),
-        LocalizacionService().getNombreCiudadByCords(
-          position.longitude,
-          position.latitude,
-          idioma,
-        ),
-        TiempoService().getTiempoPorHoras(
-          position.latitude,
-          position.longitude,
-        ),
-        TiempoService().getTiempoPorDias(position.latitude, position.longitude),
-      ]);
+      try {
+        final resultadosPeticion = await Future.wait([
+          TiempoService().getTiempoLatLon(
+            position.latitude,
+            position.longitude,
+          ),
+          LocalizacionService().getNombreCiudadByCords(
+            position.longitude,
+            position.latitude,
+            idioma,
+          ),
+          TiempoService().getTiempoPorHoras(
+            position.latitude,
+            position.longitude,
+          ),
+          TiempoService().getTiempoPorDias(
+            position.latitude,
+            position.longitude,
+          ),
+        ]).timeout(Duration(seconds: 10));
 
-      Tiempo? tiempoUbi = resultadosPeticion[0] as Tiempo;
-      String? nombreCiudad = resultadosPeticion[1] as String;
-      TiempoHoras? tiempoHoras = resultadosPeticion[2] as TiempoHoras;
-      TiempoDias? tiempoDias = resultadosPeticion[3] as TiempoDias;
+        Tiempo? tiempoUbi = resultadosPeticion[0] as Tiempo;
+        String? nombreCiudad = resultadosPeticion[1] as String;
+        TiempoHoras? tiempoHoras = resultadosPeticion[2] as TiempoHoras;
+        TiempoDias? tiempoDias = resultadosPeticion[3] as TiempoDias;
 
-      if (tiempoUbi != null && nombreCiudad != null && tiempoHoras != null) {
+        if (tiempoUbi != null && nombreCiudad != null && tiempoHoras != null) {
+          cambiarDatos(
+            tiempoUbi,
+            nombreCiudad,
+            tiempoHoras,
+            tiempoDias,
+            true,
+            position.latitude,
+            position.longitude,
+          );
+          comprobarNocheDia();
+          inicializarTiempoDias(idioma);
+          int elementosAEliminar = ahoraCiudad.hour;
+          eliminarHorasPasadas(elementosAEliminar);
+          //Cambiamos los datos en el widget
+          HomeScreenWidgetManager.actualizarDatos(
+            ciudad: nombreCiudad,
+            idioma: idioma,
+            fondoOscuro: preferences.getBool('modoOscuro') ?? false,
+            tiempoActual: tiempoUbi,
+            rainData: Utils.getRainLevelData(null, tiempoHoras),
+            snowData: Utils.getSnowLevelData(null, tiempoHoras),
+            tiempoHoras: tiempoHoras,
+          );
+          //Actualizamos la notificacion de tiempo actual
+          //Temperatura maxima y minima
+          int tempMax = tiempoDias.temperature2MMax[0].round();
+          int tempMin = tiempoDias.temperature2MMin[0].round();
+          await Utils.mandarNotificacionTiempoActual(
+            tempMax,
+            tempMin,
+            tiempoUbi,
+            nombreCiudad,
+            idioma,
+          );
+        }
+      } catch (e) {
+        rethrow; //Lanzamos la excepción para cachearla fuera del método
+      }
+    } else {
+      try {
+        final resultadosPeticion = await Future.wait([
+          TiempoService().getTiempoLatLon(latitudActual, longitudActual),
+          TiempoService().getTiempoPorHoras(latitudActual, longitudActual),
+          TiempoService().getTiempoPorDias(latitudActual, longitudActual),
+        ]);
+
+        Tiempo? tiempoUbi = resultadosPeticion[0] as Tiempo;
+        TiempoHoras? tiempoHoras = resultadosPeticion[1] as TiempoHoras;
+        TiempoDias? tiempoDias = resultadosPeticion[2] as TiempoDias;
         cambiarDatos(
           tiempoUbi,
-          nombreCiudad,
+          localizacion!,
           tiempoHoras,
           tiempoDias,
-          true,
-          position.latitude,
-          position.longitude,
+          false,
+          latitudActual,
+          longitudActual,
         );
         comprobarNocheDia();
         inicializarTiempoDias(idioma);
         int elementosAEliminar = ahoraCiudad.hour;
         eliminarHorasPasadas(elementosAEliminar);
-        //Cambiamos los datos en el widget
-        HomeScreenWidgetManager.actualizarDatos(
-          ciudad: nombreCiudad,
-          idioma: idioma,
-          fondoOscuro: preferences.getBool('modoOscuro') ?? false,
-          tiempoActual: tiempoUbi,
-          rainData: Utils.getRainLevelData(null, tiempoHoras),
-          snowData: Utils.getSnowLevelData(null, tiempoHoras),
-          tiempoHoras: tiempoHoras
-        );
-        //Actualizamos la notificacion de tiempo actual
-        //Temperatura maxima y minima
-        int tempMax = tiempoDias.temperature2MMax[0].round();
-        int tempMin = tiempoDias.temperature2MMin[0].round();
-        await Utils.mandarNotificacionTiempoActual(
-          tempMax,
-          tempMin,
-          tiempoUbi,
-          nombreCiudad,
-          idioma,
-        );
+        cambiarFaseLunar();
+      } catch (e) {
+        rethrow; //Lanzamos la excepción para cachearla fuera del método
       }
-    } else {
-      final resultadosPeticion = await Future.wait([
-        TiempoService().getTiempoLatLon(latitudActual, longitudActual),
-        TiempoService().getTiempoPorHoras(latitudActual, longitudActual),
-        TiempoService().getTiempoPorDias(latitudActual, longitudActual),
-      ]);
-
-      Tiempo? tiempoUbi = resultadosPeticion[0] as Tiempo;
-      TiempoHoras? tiempoHoras = resultadosPeticion[1] as TiempoHoras;
-      TiempoDias? tiempoDias = resultadosPeticion[2] as TiempoDias;
-      cambiarDatos(
-        tiempoUbi,
-        localizacion!,
-        tiempoHoras,
-        tiempoDias,
-        false,
-        latitudActual,
-        longitudActual,
-      );
-      comprobarNocheDia();
-      inicializarTiempoDias(idioma);
-      int elementosAEliminar = ahoraCiudad.hour;
-      eliminarHorasPasadas(elementosAEliminar);
-      cambiarFaseLunar();
     }
     notifyListeners();
   }

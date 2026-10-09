@@ -33,9 +33,29 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
-    widget.weatherProvider.buscarUbicacionActual(
-      widget.configProvider.idiomaActual,
-    );
+    try {
+      widget.weatherProvider.buscarUbicacionActual(
+        widget.configProvider.idiomaActual,
+      );
+    } catch (e) {
+      if (context.mounted && e is HttpException) {
+        context.go(
+          '/error',
+          extra: Utils.stringErrorServerDown(
+            widget.configProvider.idiomaActual,
+          ),
+        );
+      } else if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              Utils.stringErrorApp(widget.configProvider.idiomaActual),
+            ),
+          ),
+        );
+      }
+    }
+
     super.initState();
   }
 
@@ -188,7 +208,8 @@ class _MostrarResultadosState extends State<MostrarResultados> {
               ),
             ),
           ),
-          Expanded( //OBLIGATORIO para que el ListView no crashee la pantalla
+          Expanded(
+            //OBLIGATORIO para que el ListView no crashee la pantalla
             child: ListView.builder(
               itemCount: widget.lugares.length,
               itemBuilder: (context, i) {
@@ -269,7 +290,7 @@ class _widgetUbicacion extends StatelessWidget {
 
                 rainData: Utils.getRainLevelData(null, tiempoHoras),
                 snowData: Utils.getSnowLevelData(null, tiempoHoras),
-                tiempoHoras: tiempoHoras
+                tiempoHoras: tiempoHoras,
               );
               //Actualizamos la notificacion de tiempo actual
               //Temperatura maxima y minima
@@ -370,6 +391,53 @@ class _widgetUbicacion extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+        ),
+      );
+    } else if (weatherProvider.nombreUbi == "N/A" &&
+        weatherProvider.tempUbi == -100) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        child: Container(
+          padding: EdgeInsets.all(13),
+          decoration: BoxDecoration(
+            color: configProvider.isDarkTheme
+                ? Colors.grey[800]
+                : Colors.grey[300],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Icon(LucideIcons.navigation),
+                  Text(
+                    Utils.stringCurrentLocation(configProvider.idiomaActual),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Icon(Icons.cloud_off, size: 30, color: Colors.white),
+                  SizedBox(width: 8),
+                  Text(
+                    '--ºC',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      Utils.stringErrorTimeoutUbiSearchScreen(
+                        configProvider.idiomaActual,
+                      ),
+                      style: TextStyle(fontSize: 17),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       );
@@ -501,37 +569,62 @@ class _widgetLugarBusqueda extends StatelessWidget {
           child: Row(
             children: [
               FutureBuilder(
-                future: TiempoService().getTiempoLatLon(
-                  lugar.center![1],
-                  lugar.center![0],
-                ),
+                future: TiempoService()
+                    .getTiempoLatLon(lugar.center![1], lugar.center![0])
+                    .timeout(Duration(seconds: 10)),
                 builder: (BuildContext context, snapshot) {
-                  return snapshot.hasData
-                      ? Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Utils.obtenerSimbolo(
-                                snapshot.data!.current.weatherCode,
-                                false,
-                                snapshot.data!.current.isDay == 1
-                                    ? true
-                                    : false,
-                              ),
-                              size: 30,
-                              color: Colors.white,
+                  if (snapshot.connectionState == ConnectionState.waiting)
+                    return CircularProgressIndicator();
+                  else if (snapshot.hasData) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Utils.obtenerSimbolo(
+                            snapshot.data!.current.weatherCode,
+                            false,
+                            snapshot.data!.current.isDay == 1 ? true : false,
+                          ),
+                          size: 30,
+                          color: Colors.white,
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          '${snapshot.data!.current.temperature2M.round().toString()}ºC',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    );
+                  } else if (snapshot.hasError) {
+                    final e = snapshot.error;
+                    if (e is TimeoutException) {
+                      return _generalWeatherStatusNotAvailable();
+                    } else if (context.mounted && e is HttpException) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (context.mounted) {
+                          context.go(
+                            '/error',
+                            extra: Utils.stringErrorServerDown(
+                              configProvider.idiomaActual,
                             ),
-                            SizedBox(width: 8),
-                            Text(
-                              '${snapshot.data!.current.temperature2M.round().toString()}ºC',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        )
-                      : CircularProgressIndicator();
+                          );
+                        }
+                      });
+                      return const SizedBox.shrink(); // Devuelve un widget invisible para que el build termine feliz
+                    } else if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            Utils.stringErrorApp(configProvider.idiomaActual),
+                          ),
+                        ),
+                      );
+                    }
+                  }
+                  return _generalWeatherStatusNotAvailable(); // siempre un return final
                 },
               ),
               SizedBox(width: 10),
@@ -569,6 +662,30 @@ class _widgetLugarBusqueda extends StatelessWidget {
   }
 }
 
+class _generalWeatherStatusNotAvailable extends StatelessWidget {
+  const _generalWeatherStatusNotAvailable({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.cloud_off, size: 30, color: Colors.white),
+        SizedBox(width: 8),
+        Text(
+          '--ºC',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class SearchHistoryModalBottomSheet extends StatelessWidget {
   const SearchHistoryModalBottomSheet({super.key});
 
@@ -596,7 +713,7 @@ class SearchHistoryModalBottomSheet extends StatelessWidget {
                 child: Text(
                   Utils.stringLimitSearchHistoryAdvisory(
                     configProvider.idiomaActual,
-                    configProvider.limitSearchHistory
+                    configProvider.limitSearchHistory,
                   ),
                 ),
               ),

@@ -60,8 +60,6 @@ class Current {
     String time;
     int interval;
     double temperature2M;
-    double temperature2MMin;
-    double temperature2MMax;
     double apparentTemperature;
     int weatherCode;
     double windSpeed10M;
@@ -73,15 +71,13 @@ class Current {
     double pressureMsl;
     int isDay;
     double visibility;
-    double uvIndex;
+    double? uvIndex;
     double snowfall;
 
     Current({
         required this.time,
         required this.interval,
         required this.temperature2M,
-        required this.temperature2MMin,
-        required this.temperature2MMax,
         required this.apparentTemperature,
         required this.weatherCode,
         required this.windSpeed10M,
@@ -101,8 +97,6 @@ class Current {
         time: json["time"],
         interval: json["interval"],
         temperature2M: json["temperature_2m"]?.toDouble(),
-        temperature2MMin: json["temperature_2m_min"]?.toDouble(),
-        temperature2MMax: json["temperature_2m_max"]?.toDouble(),
         apparentTemperature: json["apparent_temperature"]?.toDouble(),
         weatherCode: json["weather_code"],
         windSpeed10M: json["wind_speed_10m"]?.toDouble(),

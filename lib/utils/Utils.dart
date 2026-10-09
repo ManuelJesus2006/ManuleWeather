@@ -3500,7 +3500,7 @@ class Utils {
     for (var i = 0; i < totalHoras; i++) {
       if (i == 0) {
         puntosRayosUva.add(
-          FlSpot(i.toDouble(), weatherProvider.tiempoActual!.current.uvIndex),
+          FlSpot(i.toDouble(), weatherProvider.tiempoActual!.current.uvIndex!),
         );
       } else {
         puntosRayosUva.add(
@@ -6202,6 +6202,23 @@ class Utils {
     
     return 'Understood';
   }
+
+  static String stringErrorTimeoutUbiSearchScreen(String idioma) {
+  if (idioma == 'es') return 'No se pudo obtener la ubicación';
+  if (idioma == 'fr') return 'Impossible d\'obtenir la position';
+  if (idioma == 'it') return 'Impossibile ottenere la posizione';
+  if (idioma == 'de') return 'Standort konnte nicht abgerufen werden';
+  if (idioma == 'ru') return 'Не удалось получить местоположение';
+  if (idioma == 'pt') return 'Não foi possível obter a localização';
+  if (idioma == 'ca') return 'No s\'ha pogut obtenir la ubicació';
+  if (idioma == 'he') return 'לא ניתן היה לקבל את המיקום';
+  if (idioma == 'uk') return 'Не вдалося отримати місцезнаходження';
+  if (idioma == 'ar') return 'تعذر الحصول على الموقع';
+  if (idioma == 'zh') return '无法获取位置';
+  if (idioma == 'ko') return '위치를 가져올 수 없습니다';
+  if (idioma == 'ja') return '位置情報を取得できませんでした';
+  return 'Could not get the location';
+}
 
   
 }

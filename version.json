@@ -1,5 +1,5 @@
 {
-    "version": "1.0.1",
+    "version": "1.0.2",
   "url": "https://drive.google.com/file/d/1B1Ojsb_gF4Tw8oFm28FiFDGhux1T0b1H/view?usp=sharing",
-  "whatisnew": "Adición de una nueva notificación de Superluna, avisos agregados al Widget para la pantalla de inicio en estilo píldora y agregación de la posición orbital de luna respecto a la tierra SIN API (BETA)"
+  "whatisnew": "Arreglos de manejo de errores de la app (pero mejorar la fluidez un poco) y mejora de algoritmo de detección de lluvia (aún pueden contener errores)"
 }
