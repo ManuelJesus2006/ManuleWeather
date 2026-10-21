@@ -32,7 +32,7 @@ Future<Position?> _obtenerUbicacionBackground(SharedPreferences prefs) async {
     if (permission != LocationPermission.denied &&
         permission != LocationPermission.deniedForever) {
       
-      // 1. Intentar GPS en vivo rápido
+      //Intentar GPS en vivo rápido
       try {
         final pos = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.medium,
@@ -43,7 +43,7 @@ Future<Position?> _obtenerUbicacionBackground(SharedPreferences prefs) async {
         return pos;
       } on TimeoutException catch (_) {}
 
-      // 2. Fallback: última posición conocida por el sistema
+      //Fallback: última posición conocida por el sistema
       final lastKnown = await Geolocator.getLastKnownPosition();
       if (lastKnown != null) {
         await prefs.setDouble('last_latitude', lastKnown.latitude);

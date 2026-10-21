@@ -63,44 +63,48 @@ class WeatherProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void buscarUbicacionActual(String idioma) async {
-    //Reseteamos los valores para que muestre el CircularProgressIndicator en la ubicación
-    nombreUbi = '';
-    tempUbi = 0;
-    estadoUbi = '';
-    Position position = await Geolocator.getCurrentPosition();
-    Tiempo tiempoUbiReq;
+  Future<void> buscarUbicacionActual(String idioma) async {
+  nombreUbi = '';
+  tempUbi = 0;
+  estadoUbi = '';
+  notifyListeners(); // Notifica para que la UI pinte la rueda de carga
 
-    try {
-      final resultadosPeticion = await Future.wait([
-        TiempoService().getTiempoLatLon(position.latitude, position.longitude),
-        LocalizacionService().getNombreCiudadByCords(
-          position.longitude,
-          position.latitude,
-          idioma,
-        ),
-      ]).timeout(Duration(seconds: 10));
-      
-      tiempoUbiReq = resultadosPeticion[0] as Tiempo;
-      nombreUbi = resultadosPeticion[1] as String;
-      tempUbi = tiempoUbiReq.current.temperature2M;
-      //estadoUbi = Utils.obtenerTiempoText(tiempoUbi.current.weatherCode);
-      iconoUbi = Utils.obtenerSimbolo(
-        tiempoUbiReq.current.weatherCode,
-        false,
-        tiempoUbiReq.current.isDay == 1 ? true : false,
-      );
-    } on TimeoutException {
-      //Si tarda en hacer la petición ponemos estos valores para condicionar un error en pantalla
-      nombreUbi = "N/A";
-      tempUbi = -100;
-    } catch (e) {
-      rethrow; //Lanzamos la excepción para cachearla fuera del método
-    }
+  try {
+    // Ubicación protegida con timeout de 8 segundos
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.medium,
+      timeLimit: const Duration(seconds: 8),
+    );
 
+    // 2. Peticiones de datos
+    final resultadosPeticion = await Future.wait([
+      TiempoService().getTiempoLatLon(position.latitude, position.longitude),
+      LocalizacionService().getNombreCiudadByCords(
+        position.longitude,
+        position.latitude,
+        idioma,
+      ),
+    ]).timeout(const Duration(seconds: 10));
+
+    Tiempo tiempoUbiReq = resultadosPeticion[0] as Tiempo;
+    nombreUbi = resultadosPeticion[1] as String;
+    tempUbi = tiempoUbiReq.current.temperature2M;
+    iconoUbi = Utils.obtenerSimbolo(
+      tiempoUbiReq.current.weatherCode,
+      false,
+      tiempoUbiReq.current.isDay == 1,
+    );
     geolocalizacion = position;
-    notifyListeners();
+  } on TimeoutException {
+    nombreUbi = "N/A";
+    tempUbi = -100;
+  } catch (e) {
+    nombreUbi = "N/A";
+    tempUbi = -100;
   }
+  print(nombreUbi + " " + tempUbi.toString());
+  notifyListeners();
+}
 
   void comprobarUbicacionUser() {
     isUbicacionUser = localizacion!.toLowerCase() == nombreUbi.toLowerCase();

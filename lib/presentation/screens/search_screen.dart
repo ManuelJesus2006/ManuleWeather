@@ -33,30 +33,14 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
-    try {
+    super.initState(); // SIN async
+
+    // Espera a que termine de pintarse la pantalla antes de pedir los datos y notificar
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.weatherProvider.buscarUbicacionActual(
         widget.configProvider.idiomaActual,
       );
-    } catch (e) {
-      if (context.mounted && e is HttpException) {
-        context.go(
-          '/error',
-          extra: Utils.stringErrorServerDown(
-            widget.configProvider.idiomaActual,
-          ),
-        );
-      } else if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              Utils.stringErrorApp(widget.configProvider.idiomaActual),
-            ),
-          ),
-        );
-      }
-    }
-
-    super.initState();
+    });
   }
 
   final TextEditingController controladorBusqueda = TextEditingController();
@@ -233,11 +217,10 @@ class _widgetUbicacion extends StatelessWidget {
   void mostrarCargando(BuildContext context) {
     showDialog(
       context: context,
-      barrierDismissible: false, // No se puede quitar tocando fuera
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(
-          color: Colors.white, // O el color que prefieras
-        ),
+      barrierDismissible: false, // Bloquea toques fuera
+      builder: (context) => const PopScope(
+        canPop: false, // Bloquea el botón/gesto de atrás
+        child: Center(child: CircularProgressIndicator(color: Colors.white)),
       ),
     );
   }
@@ -245,7 +228,9 @@ class _widgetUbicacion extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final configProvider = Provider.of<ConfigProvider>(context);
-    if (weatherProvider.nombreUbi != '' && weatherProvider.tempUbi != 0) {
+    if ((weatherProvider.nombreUbi != '' && weatherProvider.tempUbi != 0) &&
+        (weatherProvider.nombreUbi != "N/A" &&
+            weatherProvider.tempUbi != -100)) {
       return GestureDetector(
         onTap: () async {
           weatherProvider
@@ -420,19 +405,19 @@ class _widgetUbicacion extends StatelessWidget {
               SizedBox(height: 8),
               Row(
                 children: [
-                  Icon(Icons.cloud_off, size: 30, color: Colors.white),
-                  SizedBox(width: 8),
-                  Text(
+                  const Icon(Icons.cloud_off, size: 30, color: Colors.white70),
+                  const SizedBox(width: 8),
+                  const Text(
                     '--ºC',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       Utils.stringErrorTimeoutUbiSearchScreen(
                         configProvider.idiomaActual,
                       ),
-                      style: TextStyle(fontSize: 17),
+                      style: TextStyle(fontSize: 15, color: Colors.amberAccent),
                     ),
                   ),
                 ],
@@ -482,9 +467,11 @@ class _widgetLugarBusqueda extends StatelessWidget {
   void mostrarCargando(BuildContext context) {
     showDialog(
       context: context,
-      barrierDismissible: false,
-      builder: (context) =>
-          const Center(child: CircularProgressIndicator(color: Colors.white)),
+      barrierDismissible: false, // Bloquea toques fuera
+      builder: (context) => const PopScope(
+        canPop: false, // Bloquea el botón/gesto de atrás
+        child: Center(child: CircularProgressIndicator(color: Colors.white)),
+      ),
     );
   }
 
@@ -494,6 +481,7 @@ class _widgetLugarBusqueda extends StatelessWidget {
       context,
     );
     final configProvider = Provider.of<ConfigProvider>(context);
+    bool isError = false;
     return GestureDetector(
       onTap: () async {
         mostrarCargando(context);
@@ -576,6 +564,7 @@ class _widgetLugarBusqueda extends StatelessWidget {
                   if (snapshot.connectionState == ConnectionState.waiting)
                     return CircularProgressIndicator();
                   else if (snapshot.hasData) {
+                    isError = false;
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -601,6 +590,7 @@ class _widgetLugarBusqueda extends StatelessWidget {
                   } else if (snapshot.hasError) {
                     final e = snapshot.error;
                     if (e is TimeoutException) {
+                      isError = true;
                       return _generalWeatherStatusNotAvailable();
                     } else if (context.mounted && e is HttpException) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -615,6 +605,7 @@ class _widgetLugarBusqueda extends StatelessWidget {
                       });
                       return const SizedBox.shrink(); // Devuelve un widget invisible para que el build termine feliz
                     } else if (context.mounted) {
+                      isError = true;
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
@@ -629,28 +620,43 @@ class _widgetLugarBusqueda extends StatelessWidget {
               ),
               SizedBox(width: 10),
               Expanded(
-                child: Row(
-                  //Row principal mantiene el texto y el botón alineados
+                child: Column(
                   children: [
-                    Expanded(
-                      //Forzamos al texto a ocupar SOLO el espacio que sobre
-                      child: Text(
-                        lugar.placeName!,
-                        style: const TextStyle(fontSize: 17),
-                        overflow: TextOverflow
-                            .ellipsis, //Si es muy largo, añade "..." en vez de petar
-                        maxLines:
-                            1, //Evita que salte a otra línea desconfigurando la altura
-                      ),
+                    Row(
+                      //Row principal mantiene el texto y el botón alineados
+                      children: [
+                        Expanded(
+                          //Forzamos al texto a ocupar SOLO el espacio que sobre
+                          child: Text(
+                            lugar.placeName!,
+                            style: const TextStyle(fontSize: 17),
+                            overflow: TextOverflow
+                                .ellipsis, //Si es muy largo, añade "..." en vez de petar
+                            maxLines:
+                                1, //Evita que salte a otra línea desconfigurando la altura
+                          ),
+                        ),
+                        if (isHistorial)
+                          //Botón de eliminar del historial
+                          IconButton(
+                            onPressed: () {
+                              configProvider.eliminarDelHistorial(lugar.id);
+                            },
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                          ),
+                      ],
                     ),
-                    if (isHistorial)
-                      //Botón de eliminar del historial
-                      IconButton(
-                        onPressed: () {
-                          configProvider.eliminarDelHistorial(lugar.id);
-                        },
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                      ),
+                    isError
+                        ? Text(
+                            Utils.stringAdviceNoPreview(
+                              configProvider.idiomaActual,
+                            ),
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.amberAccent,
+                            ),
+                          )
+                        : SizedBox.shrink(),
                   ],
                 ),
               ),
@@ -663,9 +669,7 @@ class _widgetLugarBusqueda extends StatelessWidget {
 }
 
 class _generalWeatherStatusNotAvailable extends StatelessWidget {
-  const _generalWeatherStatusNotAvailable({
-    super.key,
-  });
+  const _generalWeatherStatusNotAvailable({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -676,10 +680,7 @@ class _generalWeatherStatusNotAvailable extends StatelessWidget {
         SizedBox(width: 8),
         Text(
           '--ºC',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ],
     );

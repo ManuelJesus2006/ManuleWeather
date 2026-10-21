@@ -6204,20 +6204,37 @@ class Utils {
   }
 
   static String stringErrorTimeoutUbiSearchScreen(String idioma) {
-  if (idioma == 'es') return 'No se pudo obtener la ubicación';
-  if (idioma == 'fr') return 'Impossible d\'obtenir la position';
-  if (idioma == 'it') return 'Impossibile ottenere la posizione';
-  if (idioma == 'de') return 'Standort konnte nicht abgerufen werden';
-  if (idioma == 'ru') return 'Не удалось получить местоположение';
-  if (idioma == 'pt') return 'Não foi possível obter a localização';
-  if (idioma == 'ca') return 'No s\'ha pogut obtenir la ubicació';
-  if (idioma == 'he') return 'לא ניתן היה לקבל את המיקום';
-  if (idioma == 'uk') return 'Не вдалося отримати місцезнаходження';
-  if (idioma == 'ar') return 'تعذر الحصول على الموقع';
-  if (idioma == 'zh') return '无法获取位置';
-  if (idioma == 'ko') return '위치를 가져올 수 없습니다';
-  if (idioma == 'ja') return '位置情報を取得できませんでした';
-  return 'Could not get the location';
+  if (idioma == 'es') return 'No se puede obtener la ubicación en estos momentos';
+  if (idioma == 'fr') return 'Impossible d\'obtenir la position pour le moment';
+  if (idioma == 'it') return 'Impossibile ottenere la posizione al momento';
+  if (idioma == 'de') return 'Standort kann derzeit nicht abgerufen werden';
+  if (idioma == 'ru') return 'Не удается получить местоположение в данный момент';
+  if (idioma == 'pt') return 'Não é possível obter a localização no momento';
+  if (idioma == 'ca') return 'No es pot obtenir la ubicació en aquests moments';
+  if (idioma == 'he') return 'לא ניתן לקבל את המיקום כעת';
+  if (idioma == 'uk') return 'Наразі неможливо отримати місцезнаходження';
+  if (idioma == 'ar') return 'لا يمكن الحصول على الموقع في الوقت الحالي';
+  if (idioma == 'zh') return '目前无法获取位置';
+  if (idioma == 'ko') return '현재 위치를 가져올 수 없습니다';
+  if (idioma == 'ja') return '現在、位置情報を取得できません';
+  return 'Cannot get the location right now';
+}
+
+  static String stringAdviceNoPreview(String idioma) {
+  if (idioma == 'es') return 'Sin vista previa · Toca para consultar';
+  if (idioma == 'fr') return "Pas d'aperçu · Appuyez pour consulter";
+  if (idioma == 'it') return 'Nessuna anteprima · Tocca per verificare';
+  if (idioma == 'de') return 'Keine Vorschau · Tippen zum Abrufen';
+  if (idioma == 'ru') return 'Нет предпросмотра · Нажмите для проверки';
+  if (idioma == 'pt') return 'Sem pré-visualização · Toque para consultar';
+  if (idioma == 'ca') return 'Sense vista prèvia · Toca per consultar';
+  if (idioma == 'he') return 'אין תצוגה מקדימה · לחץ כדי לבדוק';
+  if (idioma == 'uk') return 'Немає попереднього перегляду · Торкніться, щоб перевірити';
+  if (idioma == 'ar') return 'لا توجد معاينة · انقر للتحقق';
+  if (idioma == 'zh') return '无预览 · 点击查看';
+  if (idioma == 'ko') return '미리보기 없음 · 확인하려면 탭하세요';
+  if (idioma == 'ja') return 'プレビューなし · タップして確認';
+  return 'No preview · Tap to check';
 }
 
   
