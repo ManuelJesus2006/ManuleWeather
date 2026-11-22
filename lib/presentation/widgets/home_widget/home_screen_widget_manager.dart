@@ -71,16 +71,18 @@ class HomeScreenWidgetManager {
                                 size: 24,
                               ),
                             ),
-                            Text(
-                              ciudad,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: fondoOscuro
-                                    ? Colors.white
-                                    : Colors.black87,
-                                fontSize: 25,
-                                fontWeight: FontWeight.w500,
+                            Expanded(
+                              child: Text(
+                                ciudad,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: fondoOscuro
+                                      ? Colors.white
+                                      : Colors.black87,
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
                           ],

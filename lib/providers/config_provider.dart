@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:manule_weather/models/localizacion_model.dart';
 import 'package:manule_weather/services/notification_service.dart';
 import 'package:manule_weather/utils/Utils.dart';
@@ -35,6 +36,7 @@ class ConfigProvider with ChangeNotifier {
   bool isDarkTheme = false;
   List<Localizacion> historialBusqueda = [];
   bool isNotificationsActive = false;
+  bool isUbiActive = false;
   final int limitSearchHistory = 8;
 
   comprobarIdiomaYPrimeraVez() async {
@@ -69,30 +71,138 @@ class ConfigProvider with ChangeNotifier {
   }
 
   changeNotifications(bool newValue, BuildContext context) async {
-  if (newValue == true) {
-    bool permitidas = await NotificationService.estanPermitidas();
-    
-    if (!permitidas) {
-      await NotificationService.init(); 
-      permitidas = await NotificationService.estanPermitidas();
-      
+    if (newValue == true) {
+      bool permitidas = await NotificationService.estanPermitidas();
+
       if (!permitidas) {
-        // En lugar de enviarlo de golpe, le explicamos por qué:
+        await NotificationService.init();
+        permitidas = await NotificationService.estanPermitidas();
+
+        if (!permitidas) {
+          // En lugar de enviarlo de golpe, le explicamos por qué:
+          if (context.mounted) {
+            bool? irAjustes = await showDialog<bool>(
+              context: context,
+              builder: (BuildContext dialogContext) {
+                return AlertDialog(
+                  title: Text(
+                    Utils.stringTituloPermisoDialogNotifications(idiomaActual),
+                  ),
+                  content: Text(
+                    Utils.stringCuerpoPermisoDialogNotifications(idiomaActual),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(dialogContext, false),
+                      child: Text(
+                        Utils.stringCancelarDialog(idiomaActual),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(dialogContext, true),
+                      child: Text(
+                        Utils.stringIrAjustesDialog(idiomaActual),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+
+            if (irAjustes == true) {
+              await openAppSettings();
+            }
+          }
+          return; // Salimos y dejamos el switch en off hasta que vuelva con el permiso
+        }
+      }
+
+      // Si hay permiso, activamos todo normal...
+      isNotificationsActive = true;
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setBool('notifications', true);
+    } else {
+      // Lógica de apagado normal...
+      isNotificationsActive = false;
+      await NotificationService.borrarTodasLasNotificaciones();
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setBool('notifications', false);
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> changeLocation(bool newValue, BuildContext context) async {
+    if (newValue == true) {
+      // 1. Comprobar si el GPS del dispositivo está encendido
+      bool gpsActivo = await Geolocator.isLocationServiceEnabled();
+      if (!gpsActivo) {
+        if (context.mounted) {
+          bool? irAjustesGps = await showDialog<bool>(
+            context: context,
+            builder: (BuildContext dialogContext) {
+              return AlertDialog(
+                title: Text(Utils.stringTituloGpsDialogLocation(idiomaActual)),
+                content: Text(
+                  Utils.stringCuerpoGpsDialogLocation(idiomaActual),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(dialogContext, false),
+                    child: Text(
+                      Utils.stringCancelarDialog(idiomaActual),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(dialogContext, true),
+                    child: Text(
+                      Utils.stringIrAjustesDialog(idiomaActual),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+
+          if (irAjustesGps == true) {
+            await Geolocator.openLocationSettings();
+          }
+        }
+        return;
+      }
+
+      // 2. Comprobar y solicitar el permiso de ubicación de la app
+      LocationPermission permiso = await Geolocator.checkPermission();
+
+      if (permiso == LocationPermission.denied) {
+        permiso = await Geolocator.requestPermission();
+      }
+
+      if (permiso == LocationPermission.denied ||
+          permiso == LocationPermission.deniedForever) {
         if (context.mounted) {
           bool? irAjustes = await showDialog<bool>(
             context: context,
             builder: (BuildContext dialogContext) {
               return AlertDialog(
-                title: Text(Utils.stringTituloPermisoDialogNotifications(idiomaActual)),
-                content: Text(Utils.stringCuerpoPermisoDialogNotifications(idiomaActual)),
+                title: Text(
+                  Utils.stringTituloPermisoDialogLocation(idiomaActual),
+                ),
+                content: Text(
+                  Utils.stringCuerpoPermisoDialogLocation(idiomaActual),
+                ),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(dialogContext, false),
-                    child: Text(Utils.stringCancelarDialogNotifications(idiomaActual)),
+                    child: Text(
+                      Utils.stringCancelarDialog(idiomaActual),
+                    ),
                   ),
                   TextButton(
                     onPressed: () => Navigator.pop(dialogContext, true),
-                    child: Text(Utils.stringIrAjustesDialogNotifications(idiomaActual)),
+                    child: Text(
+                      Utils.stringIrAjustesDialog(idiomaActual),
+                    ),
                   ),
                 ],
               );
@@ -105,23 +215,20 @@ class ConfigProvider with ChangeNotifier {
         }
         return; // Salimos y dejamos el switch en off hasta que vuelva con el permiso
       }
+
+      // Si hay permiso (whileInUse o always), activamos normal
+      isUbiActive = true;
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setBool('ubication', true);
+    } else {
+      // El permiso del sistema no se puede revocar por código; desactivamos su uso en la app
+      isUbiActive = false;
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setBool('ubication', false);
     }
-    
-    // Si hay permiso, activamos todo normal...
-    isNotificationsActive = true;
-    final preferences = await SharedPreferences.getInstance();
-    await preferences.setBool('notifications', true);
-    
-  } else {
-    // Lógica de apagado normal...
-    isNotificationsActive = false;
-    await NotificationService.borrarTodasLasNotificaciones();
-    final preferences = await SharedPreferences.getInstance();
-    await preferences.setBool('notifications', false);
+
+    notifyListeners();
   }
-  
-  notifyListeners();
-}
 
   void changeTheme(bool newValue) async {
     isDarkTheme = newValue;
@@ -141,6 +248,13 @@ class ConfigProvider with ChangeNotifier {
     final preferences = await SharedPreferences.getInstance();
     bool? notificaciones = preferences.getBool('notifications');
     if (notificaciones != null) isNotificationsActive = notificaciones;
+    notifyListeners();
+  }
+
+  comprobarUbicacionActivada() async {
+    final preferences = await SharedPreferences.getInstance();
+    bool? ubiPermission = preferences.getBool('ubication');
+    if (ubiPermission != null) isUbiActive = ubiPermission;
     notifyListeners();
   }
 

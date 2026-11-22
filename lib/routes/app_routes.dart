@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manule_weather/presentation/screens/error_screen.dart';
 import 'package:manule_weather/presentation/screens/home_screen.dart';
 import 'package:manule_weather/presentation/screens/language_selector_screen.dart';
-import 'package:manule_weather/presentation/screens/onboarding_screen.dart';
+import 'package:manule_weather/presentation/screens/onboarding_language_screen.dart';
+import 'package:manule_weather/presentation/screens/location_settings_screen.dart';
 import 'package:manule_weather/presentation/screens/search_screen.dart';
 import 'package:manule_weather/presentation/screens/settings_screen.dart';
 import 'package:manule_weather/presentation/screens/splash_screen.dart';
@@ -58,9 +60,17 @@ final appRouter = GoRouter(
           _buildPageConTransicion(LanguageSelectorScreen(), state),
     ),
     GoRoute(
-      path: '/onboarding',
+      path: '/onboardingLanguage',
       pageBuilder: (context, state) =>
-          _buildPageConTransicion(OnboardingScreen(), state),
+          _buildPageConTransicion(OnboardingLanguageScreen(), state),
+    ),
+    GoRoute(
+      path: '/locationSettings',
+      pageBuilder: (context, state){
+        bool isPrimeraVez = state.extra as bool;
+        return _buildPageConTransicion(LocationSettingsScreen(isPrimeraVez: isPrimeraVez), state);
+      }
+          
     ),
     GoRoute(
       path: '/error',

@@ -5,8 +5,8 @@ import 'package:manule_weather/providers/config_provider.dart';
 import 'package:manule_weather/utils/Utils.dart';
 import 'package:provider/provider.dart';
 
-class OnboardingScreen extends StatelessWidget {
-  const OnboardingScreen({super.key});
+class OnboardingLanguageScreen extends StatelessWidget {
+  const OnboardingLanguageScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +46,6 @@ class OnboardingScreen extends StatelessWidget {
                   return GestureDetector(
                     onTap: () {
                       configProvider.cambiarIdioma(idiomaActualBucle);
-                      configProvider.validarPrimeraVez();
                       context.pop();
                     },
                     child: Container(

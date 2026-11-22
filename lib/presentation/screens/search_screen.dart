@@ -31,11 +31,13 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  final TextEditingController controladorBusqueda = TextEditingController();
+  Future<List<Localizacion>>? _futureBusqueda;
+
   @override
   void initState() {
-    super.initState(); // SIN async
+    super.initState();
 
-    // Espera a que termine de pintarse la pantalla antes de pedir los datos y notificar
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.weatherProvider.buscarUbicacionActual(
         widget.configProvider.idiomaActual,
@@ -43,7 +45,11 @@ class _SearchScreenState extends State<SearchScreen> {
     });
   }
 
-  final TextEditingController controladorBusqueda = TextEditingController();
+  @override
+  void dispose() {
+    controladorBusqueda.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,26 +72,29 @@ class _SearchScreenState extends State<SearchScreen> {
                   Expanded(
                     child: TextField(
                       onChanged: (value) {
-                        setState(() {});
+                        setState(() {
+                          if (value.isNotEmpty) {
+                            _futureBusqueda = LocalizacionService()
+                                .getResultadosBusqueda(
+                                  value,
+                                  configProvider.idiomaActual,
+                                );
+                          } else {
+                            _futureBusqueda = null;
+                          }
+                        });
                       },
                       controller: controladorBusqueda,
                       decoration: InputDecoration(
                         hintText: Utils.stringInputSearch(
                           configProvider.idiomaActual,
                         ),
-                        border: OutlineInputBorder(
+                        border: const OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(30)),
                         ),
                       ),
                     ),
                   ),
-                  /*const SizedBox(width: 8),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {});
-                    },
-                    icon: const Icon(Icons.search),
-                  ),*/
                 ],
               ),
             ),
@@ -104,50 +113,63 @@ class _SearchScreenState extends State<SearchScreen> {
                           context: context,
                           isScrollControlled: true,
                           builder: (BuildContext context) =>
-                              SearchHistoryModalBottomSheet(),
+                              const SearchHistoryModalBottomSheet(),
                         );
                       },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.history),
-                          SizedBox(width: 10),
-                          Text(
-                            Utils.stringShowSearchHistory(
-                              configProvider.idiomaActual,
-                            ),
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
-                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: configProvider.isDarkTheme
                             ? Colors.grey[800]
                             : Colors.blue,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.history),
+                          const SizedBox(width: 10),
+                          Text(
+                            Utils.stringShowSearchHistory(
+                              configProvider.idiomaActual,
+                            ),
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 Divider(thickness: 5, color: Colors.grey[300]),
               ],
             ),
-            if (controladorBusqueda.text.isNotEmpty)
-              FutureBuilder(
-                future: LocalizacionService().getResultadosBusqueda(
-                  controladorBusqueda.text,
-                  configProvider.idiomaActual,
-                ),
+            if (controladorBusqueda.text.isNotEmpty && _futureBusqueda != null)
+              FutureBuilder<List<Localizacion>>(
+                future: _futureBusqueda,
                 builder:
                     (
                       BuildContext context,
                       AsyncSnapshot<List<Localizacion>> snapshot,
                     ) {
-                      return snapshot.hasData
-                          ? MostrarResultados(
-                              lugares: snapshot.data!,
-                              isUbicacionUser: weatherProvider.isUbicacionUser!,
-                              controladorBusqueda: controladorBusqueda,
-                            )
-                          : Center(child: CircularProgressIndicator());
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (snapshot.hasError) {
+                        return Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text(
+                              Utils.stringErrorApp(configProvider.idiomaActual),
+                              style: const TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                        );
+                      }
+                      if (snapshot.hasData) {
+                        return MostrarResultados(
+                          lugares: snapshot.data!,
+                          isUbicacionUser:
+                              weatherProvider.isUbicacionUser ?? false,
+                          controladorBusqueda: controladorBusqueda,
+                        );
+                      }
+                      return const SizedBox.shrink();
                     },
               ),
           ],
@@ -193,14 +215,17 @@ class _MostrarResultadosState extends State<MostrarResultados> {
             ),
           ),
           Expanded(
-            //OBLIGATORIO para que el ListView no crashee la pantalla
             child: ListView.builder(
               itemCount: widget.lugares.length,
               itemBuilder: (context, i) {
                 final lugar = widget.lugares[i];
                 return !lugar.placeName!.contains(RegExp(r'\d'))
-                    ? _widgetLugarBusqueda(lugar: lugar, isHistorial: false)
-                    : const SizedBox.shrink(); // SizedBox.shrink() es más eficiente que Container() vacío
+                    ? _widgetLugarBusqueda(
+                        key: ValueKey('${lugar.id}_${lugar.placeName}'),
+                        lugar: lugar,
+                        isHistorial: false,
+                      )
+                    : const SizedBox.shrink();
               },
             ),
           ),
@@ -214,31 +239,37 @@ class _widgetUbicacion extends StatelessWidget {
   const _widgetUbicacion({super.key, required this.weatherProvider});
 
   final WeatherProvider weatherProvider;
+
   void mostrarCargando(BuildContext context) {
     showDialog(
       context: context,
-      barrierDismissible: false, // Bloquea toques fuera
+      barrierDismissible: false,
       builder: (context) => const PopScope(
-        canPop: false, // Bloquea el botón/gesto de atrás
+        canPop: false,
         child: Center(child: CircularProgressIndicator(color: Colors.white)),
       ),
     );
   }
 
+  
+
   @override
   Widget build(BuildContext context) {
     final configProvider = Provider.of<ConfigProvider>(context);
-    if ((weatherProvider.nombreUbi != '' && weatherProvider.tempUbi != 0) &&
+    bool ubicacionDisponible = (weatherProvider.nombreUbi != '' && weatherProvider.tempUbi != 0) &&
         (weatherProvider.nombreUbi != "N/A" &&
-            weatherProvider.tempUbi != -100)) {
+            weatherProvider.tempUbi != -100);
+    if (ubicacionDisponible) {
       return GestureDetector(
         onTap: () async {
-          weatherProvider
-              .comprobarUbicacionUser(); //Comprueba que la ubicación encontrada sea diferente a
-          //la localización actual
-          if (!weatherProvider.isUbicacionUser!) {
+          weatherProvider.comprobarUbicacionUser();
+          if (weatherProvider.isUbicacionUser != true) {
+            final Position? position = weatherProvider.geolocalizacion;
+            if (position == null) return;
+
             mostrarCargando(context);
-            Position position = weatherProvider.geolocalizacion!;
+            bool exito = false;
+
             try {
               final resultadosPeticion = await Future.wait([
                 TiempoService().getTiempoLatLon(
@@ -254,9 +285,11 @@ class _widgetUbicacion extends StatelessWidget {
                   position.longitude,
                 ),
               ]).timeout(const Duration(seconds: 10));
-              Tiempo? tiempoUbi = resultadosPeticion[0] as Tiempo;
-              TiempoHoras? tiempoHoras = resultadosPeticion[1] as TiempoHoras;
-              TiempoDias? tiempoDias = resultadosPeticion[2] as TiempoDias;
+
+              Tiempo tiempoUbi = resultadosPeticion[0] as Tiempo;
+              TiempoHoras tiempoHoras = resultadosPeticion[1] as TiempoHoras;
+              TiempoDias tiempoDias = resultadosPeticion[2] as TiempoDias;
+
               weatherProvider.cambiarDatos(
                 tiempoUbi,
                 weatherProvider.nombreUbi,
@@ -266,19 +299,17 @@ class _widgetUbicacion extends StatelessWidget {
                 position.latitude,
                 position.longitude,
               );
-              //Cambiamos los datos en el widget
+
               HomeScreenWidgetManager.actualizarDatos(
                 ciudad: weatherProvider.nombreUbi,
                 idioma: configProvider.idiomaActual,
                 fondoOscuro: configProvider.isDarkTheme,
                 tiempoActual: tiempoUbi,
-
                 rainData: Utils.getRainLevelData(null, tiempoHoras),
                 snowData: Utils.getSnowLevelData(null, tiempoHoras),
                 tiempoHoras: tiempoHoras,
               );
-              //Actualizamos la notificacion de tiempo actual
-              //Temperatura maxima y minima
+
               int tempMax = tiempoDias.temperature2MMax[0].round();
               int tempMin = tiempoDias.temperature2MMin[0].round();
               await Utils.mandarNotificacionTiempoActual(
@@ -288,14 +319,18 @@ class _widgetUbicacion extends StatelessWidget {
                 weatherProvider.nombreUbi,
                 configProvider.idiomaActual,
               );
+
+              exito = true;
             } on TimeoutException {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    Utils.stringErrorTimeout(configProvider.idiomaActual),
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      Utils.stringErrorTimeout(configProvider.idiomaActual),
+                    ),
                   ),
-                ),
-              );
+                );
+              }
             } catch (e) {
               if (context.mounted && e is HttpException) {
                 context.go(
@@ -313,7 +348,13 @@ class _widgetUbicacion extends StatelessWidget {
                   ),
                 );
               }
+            } finally {
+              if (context.mounted) {
+                Navigator.of(context, rootNavigator: true).pop();
+              }
             }
+
+            if (!exito || !context.mounted) return;
 
             weatherProvider.comprobarNocheDia();
             weatherProvider.inicializarTiempoDias(configProvider.idiomaActual);
@@ -328,7 +369,7 @@ class _widgetUbicacion extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
           child: Container(
-            padding: EdgeInsets.all(13),
+            padding: const EdgeInsets.all(13),
             decoration: BoxDecoration(
               color: configProvider.isDarkTheme
                   ? Colors.grey[800]
@@ -339,17 +380,17 @@ class _widgetUbicacion extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(LucideIcons.navigation),
+                    const Icon(LucideIcons.navigation),
                     Text(
                       Utils.stringCurrentLocation(configProvider.idiomaActual),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Row(
                   children: [
                     Icon(
@@ -357,19 +398,19 @@ class _widgetUbicacion extends StatelessWidget {
                       size: 30,
                       color: Colors.white,
                     ),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Text(
                       '${weatherProvider.tempUbi.round().toString()}ºC',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         weatherProvider.nombreUbi,
-                        style: TextStyle(fontSize: 17),
+                        style: const TextStyle(fontSize: 17),
                       ),
                     ),
                   ],
@@ -384,7 +425,7 @@ class _widgetUbicacion extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         child: Container(
-          padding: EdgeInsets.all(13),
+          padding: const EdgeInsets.all(13),
           decoration: BoxDecoration(
             color: configProvider.isDarkTheme
                 ? Colors.grey[800]
@@ -395,14 +436,17 @@ class _widgetUbicacion extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(LucideIcons.navigation),
+                  const Icon(LucideIcons.navigation),
                   Text(
                     Utils.stringCurrentLocation(configProvider.idiomaActual),
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Row(
                 children: [
                   const Icon(Icons.cloud_off, size: 30, color: Colors.white70),
@@ -417,7 +461,10 @@ class _widgetUbicacion extends StatelessWidget {
                       Utils.stringErrorTimeoutUbiSearchScreen(
                         configProvider.idiomaActual,
                       ),
-                      style: TextStyle(fontSize: 15, color: Colors.amberAccent),
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: Colors.amberAccent,
+                      ),
                     ),
                   ),
                 ],
@@ -430,7 +477,7 @@ class _widgetUbicacion extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         child: Container(
-          padding: EdgeInsets.all(13),
+          padding: const EdgeInsets.all(13),
           decoration: BoxDecoration(
             color: configProvider.isDarkTheme
                 ? Colors.grey[800]
@@ -442,10 +489,10 @@ class _widgetUbicacion extends StatelessWidget {
             children: [
               Text(
                 Utils.stringObtainingLocation(configProvider.idiomaActual),
-                style: TextStyle(fontSize: 18),
+                style: const TextStyle(fontSize: 18),
               ),
-              SizedBox(width: 30),
-              CircularProgressIndicator(),
+              const SizedBox(width: 30),
+              const CircularProgressIndicator(),
             ],
           ),
         ),
@@ -454,7 +501,7 @@ class _widgetUbicacion extends StatelessWidget {
   }
 }
 
-class _widgetLugarBusqueda extends StatelessWidget {
+class _widgetLugarBusqueda extends StatefulWidget {
   const _widgetLugarBusqueda({
     super.key,
     required this.lugar,
@@ -464,12 +511,68 @@ class _widgetLugarBusqueda extends StatelessWidget {
   final Localizacion lugar;
   final bool isHistorial;
 
+  @override
+  State<_widgetLugarBusqueda> createState() => _widgetLugarBusquedaState();
+}
+
+class _widgetLugarBusquedaState extends State<_widgetLugarBusqueda> {
+  Future<Tiempo>? _futureTiempo;
+  late bool isLoading;
+  bool isError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    isLoading = !widget.isHistorial;
+    if (!widget.isHistorial) {
+      _futureTiempo = _cargarPreview();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant _widgetLugarBusqueda oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.lugar.id != widget.lugar.id ||
+        oldWidget.isHistorial != widget.isHistorial) {
+      isError = false;
+      isLoading = !widget.isHistorial;
+      if (!widget.isHistorial) {
+        _futureTiempo = _cargarPreview();
+      } else {
+        _futureTiempo = null;
+      }
+    }
+  }
+
+  Future<Tiempo> _cargarPreview() async {
+    try {
+      final responsePreview = await TiempoService()
+          .getTiempoLatLon(widget.lugar.center![1], widget.lugar.center![0])
+          .timeout(const Duration(seconds: 10));
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+          isError = false;
+        });
+      }
+      return responsePreview!;
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+          isError = true;
+        });
+      }
+      rethrow;
+    }
+  }
+
   void mostrarCargando(BuildContext context) {
     showDialog(
       context: context,
-      barrierDismissible: false, // Bloquea toques fuera
+      barrierDismissible: false,
       builder: (context) => const PopScope(
-        canPop: false, // Bloquea el botón/gesto de atrás
+        canPop: false,
         child: Center(child: CircularProgressIndicator(color: Colors.white)),
       ),
     );
@@ -479,184 +582,206 @@ class _widgetLugarBusqueda extends StatelessWidget {
   Widget build(BuildContext context) {
     final WeatherProvider weatherProvider = Provider.of<WeatherProvider>(
       context,
+      listen: false,
     );
     final configProvider = Provider.of<ConfigProvider>(context);
-    bool isError = false;
-    return GestureDetector(
-      onTap: () async {
-        mostrarCargando(context);
-        try {
-          final resultadosPeticion = await Future.wait([
-            TiempoService().getTiempoLatLon(lugar.center![1], lugar.center![0]),
-            TiempoService().getTiempoPorHoras(
-              lugar.center![1],
-              lugar.center![0],
-            ),
-            TiempoService().getTiempoPorDias(
-              lugar.center![1],
-              lugar.center![0],
-            ),
-          ]).timeout(const Duration(seconds: 10));
-          Tiempo? tiempoUbi = resultadosPeticion[0] as Tiempo;
-          TiempoHoras? tiempoHoras = resultadosPeticion[1] as TiempoHoras;
-          TiempoDias? tiempoDias = resultadosPeticion[2] as TiempoDias;
-          weatherProvider.cambiarDatos(
-            tiempoUbi,
-            lugar.placeName!,
-            tiempoHoras,
-            tiempoDias,
-            false,
-            lugar.center![1],
-            lugar.center![0],
-          );
-        } on TimeoutException {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                Utils.stringErrorTimeout(configProvider.idiomaActual),
-              ),
-            ),
-          );
-        } catch (e) {
-          if (context.mounted && e is HttpException) {
-            context.go(
-              '/error',
-              extra: Utils.stringErrorServerDown(configProvider.idiomaActual),
-            );
-          } else if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  Utils.stringErrorApp(configProvider.idiomaActual),
-                ),
-              ),
-            );
-          }
-        }
 
-        weatherProvider.comprobarNocheDia();
-        weatherProvider.inicializarTiempoDias(configProvider.idiomaActual);
-        //Lógica previa para obtener el día actual y sobre esa hora limitar el array de tiempo horas
-        int elementosAEliminar = weatherProvider.ahoraCiudad.hour;
-        //Eliminamos las horas pasadas del tiempoHoras
-        weatherProvider.eliminarHorasPasadas(elementosAEliminar);
-        weatherProvider.cambiarFaseLunar();
-        if (!isHistorial) configProvider.actualizarHistorialBusqueda(lugar);
-        context.go('/home');
-      },
+    final bool deshabilitado = isError || isLoading;
+    final Color baseColor = configProvider.isDarkTheme
+        ? Colors.grey[800]!
+        : Colors.grey[300]!;
+    final Color colorContainer = deshabilitado
+        ? baseColor.withValues(alpha: 0.3)
+        : baseColor;
+
+    return GestureDetector(
+      onTap: deshabilitado
+          ? null
+          : () async {
+              mostrarCargando(context);
+              bool exito = false;
+
+              try {
+                final resultadosPeticion = await Future.wait([
+                  TiempoService().getTiempoLatLon(
+                    widget.lugar.center![1],
+                    widget.lugar.center![0],
+                  ),
+                  TiempoService().getTiempoPorHoras(
+                    widget.lugar.center![1],
+                    widget.lugar.center![0],
+                  ),
+                  TiempoService().getTiempoPorDias(
+                    widget.lugar.center![1],
+                    widget.lugar.center![0],
+                  ),
+                ]).timeout(const Duration(seconds: 10));
+
+                Tiempo tiempoUbi = resultadosPeticion[0] as Tiempo;
+                TiempoHoras tiempoHoras = resultadosPeticion[1] as TiempoHoras;
+                TiempoDias tiempoDias = resultadosPeticion[2] as TiempoDias;
+
+                weatherProvider.cambiarDatos(
+                  tiempoUbi,
+                  widget.lugar.placeName!,
+                  tiempoHoras,
+                  tiempoDias,
+                  false,
+                  widget.lugar.center![1],
+                  widget.lugar.center![0],
+                );
+                exito = true;
+              } on TimeoutException {
+                if (mounted) {
+                  setState(() => isError = true);
+                }
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        Utils.stringErrorTimeout(configProvider.idiomaActual),
+                      ),
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  setState(() => isError = true);
+                }
+                if (context.mounted && e is HttpException) {
+                  context.go(
+                    '/error',
+                    extra: Utils.stringErrorServerDown(
+                      configProvider.idiomaActual,
+                    ),
+                  );
+                } else if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        Utils.stringErrorApp(configProvider.idiomaActual),
+                      ),
+                    ),
+                  );
+                }
+              } finally {
+                if (context.mounted) {
+                  Navigator.of(context, rootNavigator: true).pop();
+                }
+              }
+
+              if (!exito || !context.mounted) return;
+
+              weatherProvider.comprobarNocheDia();
+              weatherProvider.inicializarTiempoDias(
+                configProvider.idiomaActual,
+              );
+              int elementosAEliminar = weatherProvider.ahoraCiudad.hour;
+              weatherProvider.eliminarHorasPasadas(elementosAEliminar);
+              weatherProvider.cambiarFaseLunar();
+              if (!widget.isHistorial) {
+                configProvider.actualizarHistorialBusqueda(widget.lugar);
+              }
+              context.go('/home');
+            },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
         child: Container(
-          padding: EdgeInsets.all(13),
+          padding: const EdgeInsets.all(13),
           decoration: BoxDecoration(
-            color: configProvider.isDarkTheme
-                ? Colors.grey[800]
-                : Colors.grey[300],
+            color: colorContainer,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
             children: [
-              FutureBuilder(
-                future: TiempoService()
-                    .getTiempoLatLon(lugar.center![1], lugar.center![0])
-                    .timeout(Duration(seconds: 10)),
-                builder: (BuildContext context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting)
-                    return CircularProgressIndicator();
-                  else if (snapshot.hasData) {
-                    isError = false;
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Utils.obtenerSimbolo(
-                            snapshot.data!.current.weatherCode,
-                            false,
-                            snapshot.data!.current.isDay == 1 ? true : false,
-                          ),
-                          size: 30,
-                          color: Colors.white,
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          '${snapshot.data!.current.temperature2M.round().toString()}ºC',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    );
-                  } else if (snapshot.hasError) {
-                    final e = snapshot.error;
-                    if (e is TimeoutException) {
-                      isError = true;
-                      return _generalWeatherStatusNotAvailable();
-                    } else if (context.mounted && e is HttpException) {
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        if (context.mounted) {
-                          context.go(
-                            '/error',
-                            extra: Utils.stringErrorServerDown(
-                              configProvider.idiomaActual,
+              if (!widget.isHistorial)
+                FutureBuilder<Tiempo>(
+                  future: _futureTiempo,
+                  builder: (BuildContext context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasData) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Utils.obtenerSimbolo(
+                              snapshot.data!.current.weatherCode,
+                              false,
+                              snapshot.data!.current.isDay == 1,
                             ),
-                          );
-                        }
-                      });
-                      return const SizedBox.shrink(); // Devuelve un widget invisible para que el build termine feliz
-                    } else if (context.mounted) {
-                      isError = true;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            Utils.stringErrorApp(configProvider.idiomaActual),
+                            size: 30,
+                            color: Colors.white,
                           ),
-                        ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '${snapshot.data!.current.temperature2M.round().toString()}ºC',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       );
+                    } else if (snapshot.hasError) {
+                      final e = snapshot.error;
+                      if (e is HttpException) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (context.mounted) {
+                            context.go(
+                              '/error',
+                              extra: Utils.stringErrorServerDown(
+                                configProvider.idiomaActual,
+                              ),
+                            );
+                          }
+                        });
+                        return const SizedBox.shrink();
+                      }
+                      return const _generalWeatherStatusNotAvailable();
                     }
-                  }
-                  return _generalWeatherStatusNotAvailable(); // siempre un return final
-                },
-              ),
-              SizedBox(width: 10),
+                    return const _generalWeatherStatusNotAvailable();
+                  },
+                ),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      //Row principal mantiene el texto y el botón alineados
                       children: [
                         Expanded(
-                          //Forzamos al texto a ocupar SOLO el espacio que sobre
                           child: Text(
-                            lugar.placeName!,
+                            widget.lugar.placeName!,
                             style: const TextStyle(fontSize: 17),
-                            overflow: TextOverflow
-                                .ellipsis, //Si es muy largo, añade "..." en vez de petar
-                            maxLines:
-                                1, //Evita que salte a otra línea desconfigurando la altura
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                           ),
                         ),
-                        if (isHistorial)
-                          //Botón de eliminar del historial
+                        if (widget.isHistorial)
                           IconButton(
                             onPressed: () {
-                              configProvider.eliminarDelHistorial(lugar.id);
+                              configProvider.eliminarDelHistorial(
+                                widget.lugar.id,
+                              );
                             },
-                            icon: const Icon(Icons.delete, color: Colors.red),
+                            icon: const Icon(
+                              Icons.delete,
+                              color: Colors.red,
+                            ),
                           ),
                       ],
                     ),
-                    isError
-                        ? Text(
-                            Utils.stringAdviceNoPreview(
-                              configProvider.idiomaActual,
-                            ),
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.amberAccent,
-                            ),
-                          )
-                        : SizedBox.shrink(),
+                    if (isError)
+                      Text(
+                        Utils.stringAdviceWeatherLocationNotAvailable(
+                          configProvider.idiomaActual,
+                        ),
+                        style: const TextStyle(
+                          fontSize: 15,
+                          color: Colors.amberAccent,
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -673,7 +798,7 @@ class _generalWeatherStatusNotAvailable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return const Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(Icons.cloud_off, size: 30, color: Colors.white),
@@ -697,18 +822,17 @@ class SearchHistoryModalBottomSheet extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: SizedBox(
-        width: double
-            .infinity, //obliga a todo el bloque a ocupar el 100% del ancho
+        width: double.infinity,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               Utils.stringSearchHistory(configProvider.idiomaActual),
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Divider(thickness: 5, color: Colors.grey[300]),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             if (configProvider.historialBusqueda.isNotEmpty)
               Center(
                 child: Text(
@@ -727,12 +851,13 @@ class SearchHistoryModalBottomSheet extends StatelessWidget {
                     ),
                   )
                 : ListView.builder(
-                    shrinkWrap: true, //Se encoge al tamaño real de los items
+                    shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: configProvider.historialBusqueda.length,
                     itemBuilder: (context, i) {
                       final lugar = configProvider.historialBusqueda[i];
                       return _widgetLugarBusqueda(
+                        key: ValueKey('hist_${lugar.id}_${lugar.placeName}'),
                         lugar: lugar,
                         isHistorial: true,
                       );

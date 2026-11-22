@@ -29,36 +29,37 @@ class NotificationService {
   }
 
   static Future<void> mostrarNotificacion({
-    required String titulo,
-    required String cuerpo,
-    required int id,
-  }) async {
-    final preferences = await SharedPreferences.getInstance();
-    if (preferences.getBool('notifications') ?? false) {
-      final AndroidNotificationDetails
-      androidDetails = AndroidNotificationDetails(
-        'canal_principal', // ID del canal (interno)
-        'Notificaciones de la App', // Nombre del canal (lo ve el usuario en ajustes)
-        importance: Importance.max,
-        priority: Priority.high,
-        onlyAlertOnce: true,
-        icon: 'ic_notifications_small',
-        ongoing: id == 1, //Solo la notificacion del tiempo actual será la que se quede activa, las demás el usuario las podrá descartar
-        autoCancel: id == 1 //La notificación del tiempo actual si se toca no se borrará automáticamente
-      );
+  required String titulo,
+  required String cuerpo,
+  required int id,
+}) async {
+  const List<int> idNotisAMostrar = [0,2,5,8,11,14,17,20];
+  final preferences = await SharedPreferences.getInstance();
+  if ((preferences.getBool('notifications') ?? false) || idNotisAMostrar.contains(id)) {
+    final AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+      'canal_principal_v2', // Cambia el ID del canal para que Android aplique la nueva importancia
+      'Notificaciones de la App',
+      importance: Importance.defaultImportance, // No lanza banner intrusivo en pantalla
+      priority: Priority.defaultPriority,
+      onlyAlertOnce: true, // Suena la primera vez de cada ID y luego se actualiza en silencio
+      icon: 'ic_notifications_small',
+      ongoing: id == 1,
+      autoCancel: id != 1,
+    );
 
-      NotificationDetails detalles = NotificationDetails(
-        android: androidDetails,
-      );
+    final NotificationDetails detalles = NotificationDetails(
+      android: androidDetails,
+    );
 
-      await _notificationsPlugin.show(
-        id: id, // ID de la notificación, 0 = Actualizaciones, 1 = Tiempo de hoy, del 2 para alante = Alertas
-        title: titulo,
-        body: cuerpo,
-        notificationDetails: detalles,
-      );
-    }
+    await _notificationsPlugin.show(
+      id: id,
+      title: titulo,
+      body: cuerpo,
+      notificationDetails: detalles,
+    );
   }
+}
 
   static Future<bool> estanPermitidas() async {
     final bool? concedido = await _notificationsPlugin

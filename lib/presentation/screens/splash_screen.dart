@@ -43,6 +43,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
     await configProvider.comprobarNotificaciones();
 
+    await configProvider.comprobarUbicacionActivada();
+
     //Antes de hacer toda la logica principal avisamos al usuario en el caso de que haya actualizacion
     await VersionService().comprobarActualizacion(
       configProvider.idiomaActual,
@@ -51,68 +53,30 @@ class _SplashScreenState extends State<SplashScreen> {
 
     configProvider.cambiarValorLineaDeCarga(12.5);
 
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    // Verifica si los servicios de ubicación están activados en el dispositivo
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      print('Los servicios de ubicación están desactivados.');
-      if (mounted)
-        context.go(
-          '/error',
-          extra: Utils.stringErrorServerDown(configProvider.idiomaActual),
-        );
-      return;
-    }
-
-    // Verifica el estado actual de los permisos
-    permission = await Geolocator.checkPermission();
-
-    if (permission == LocationPermission.denied) {
-      // Si están denegados, pide permiso al usuario
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        print('El usuario denegó los permisos.');
-        if (mounted)
-          context.go(
-            '/error',
-            extra: Utils.stringErrorServerDown(configProvider.idiomaActual),
-          );
-        return;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      // El usuario marcó no volver a preguntar, hay que enviarlo a ajustes
-      print('Permisos denegados permanentemente.');
-      if (mounted)
-        context.go(
-          '/error',
-          extra: Utils.stringErrorServerDown(configProvider.idiomaActual),
-        );
-      return;
-    }
-    configProvider.cambiarValorLineaDeCarga(25);
-
     print(configProvider.primeraVez);
 
     //Quiero hacer el await aquí y que luego siga con lo demás
     if (configProvider.primeraVez) {
-      await context.push('/onboarding');
+      await context.push('/onboardingLanguage');
+      await context.push('/locationSettings', extra:true);
+      configProvider.validarPrimeraVez();
     }
 
+    //Comprobamos las notificaciones internamente antes de ejecutar la app
     if (!await NotificationService.estanPermitidas()) {
       //Habilitamos notificaciones y pedimos el permiso para estas:
       await NotificationService.init();
       //Si el usuario no las habilita lo ponemos para que luego las pueda activar si quiere
       await configProvider.changeNotifications(
         await NotificationService.estanPermitidas(),
-        context
+        context,
       );
     }
 
+    configProvider.cambiarValorLineaDeCarga(25);
+
     // Tenemos permiso, ya podemos obtener la posición
+    //TODO: Cambiar lógica Geolocator para actualización de uso sin ubicación
     Position position = await Geolocator.getCurrentPosition();
     print("Latitud: ${position.latitude}, Longitud: ${position.longitude}");
     try {
@@ -165,7 +129,7 @@ class _SplashScreenState extends State<SplashScreen> {
         tiempoActual: weatherProvider.tiempoActual!,
         rainData: Utils.getRainLevelData(weatherProvider, null),
         snowData: Utils.getSnowLevelData(weatherProvider, null),
-        tiempoHoras: tiempoHoras
+        tiempoHoras: tiempoHoras,
       );
 
       weatherProvider.comprobarNocheDia();
