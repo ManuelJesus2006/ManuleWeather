@@ -53,8 +53,8 @@ class LocationSettingsScreen extends StatelessWidget {
                     ),
                     trailing: Switch(
                       value: configProvider.isUbiActive ?? false,
-                      onChanged: (value) =>
-                          configProvider.changeLocation(value, context),
+                      onChanged: (value) async =>
+                          await configProvider.changeLocation(value, context),
                     ),
                   ),
                 ),
@@ -249,14 +249,14 @@ class MostrarResultadosBusqueda extends StatelessWidget {
               ),
             ),
             FilledButton.icon(
-              onPressed: () {
+              onPressed: () async {
                 configProvider.cambiarUbiDefault(
                   lugar.placeName!,
                   lugar.id!,
                   lugar.center!.last,
                   lugar.center!.first,
                 );
-                configProvider.changeLocation(false, context);
+                await configProvider.changeLocation(false, context);
               },
               icon: (configProvider.defaultUbiID == lugar.id)
                   ? Icon(Icons.check_rounded, size: 20)
