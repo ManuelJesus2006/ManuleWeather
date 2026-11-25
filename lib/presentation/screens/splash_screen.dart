@@ -77,6 +77,14 @@ class _SplashScreenState extends State<SplashScreen> {
 
     configProvider.cambiarValorLineaDeCarga(25);
 
+    //Por seguridad para las personas que tenga la ubicación activada en versiones anteriores ponemos la ubicación en true
+    LocationPermission permiso = await Geolocator.checkPermission();
+    if (permiso == LocationPermission.whileInUse || permiso == LocationPermission.always) configProvider.changeLocation(true, context);
+    else if (configProvider.defaultUbiLongitude == 0 || configProvider.defaultUbiLatitude == 0){
+      //Si por algún casual no tienen la ubicacion activada y no tiene una latitud y longitud por defecto, le volvemos a abrir los ajustes de ubicación
+       await context.push('/locationSettings', extra: true);
+    }
+
     // Tenemos permiso, ya podemos obtener la posición
     //TODO: Cambiar lógica Geolocator para actualización de uso sin ubicación
     Position position = configProvider.isUbiActive
