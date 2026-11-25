@@ -81,7 +81,9 @@ class HomeScreen extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    final puntosUVA = weatherProvider.tiempoActual!.current.uvIndex != null ? Utils.getPuntosRayosUva(weatherProvider) : [];
+    final puntosUVA = weatherProvider.tiempoActual!.current.uvIndex != null
+        ? Utils.getPuntosRayosUva(weatherProvider)
+        : [];
     bool hayNieve = weatherProvider.tiempoHoras!.weatherCode
         .take(8)
         .any((code) => Utils.isNevando(code));
@@ -131,6 +133,9 @@ class HomeScreen extends StatelessWidget {
             try {
               await weatherProvider.actualizarDatos(
                 configProvider.idiomaActual,
+                configProvider.isUbiActive,
+                configProvider.defaultUbiLatitude,
+                configProvider.defaultUbiLongitude,
               );
             } on TimeoutException {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -286,13 +291,19 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.03),
-                if (hayNieve || Utils.isNevando(weatherProvider.tiempoActual!.current.weatherCode))
+                if (hayNieve ||
+                    Utils.isNevando(
+                      weatherProvider.tiempoActual!.current.weatherCode,
+                    ))
                   Utils.devolverPrevisionGraficaNieve(
                     screenWidth,
                     weatherProvider,
                     configProvider.idiomaActual,
                   )
-                else if (hayLluvia || Utils.isLloviendo(weatherProvider.tiempoActual!.current.weatherCode))
+                else if (hayLluvia ||
+                    Utils.isLloviendo(
+                      weatherProvider.tiempoActual!.current.weatherCode,
+                    ))
                   Utils.devolverPrevisionGraficaLluvia(
                     screenWidth,
                     weatherProvider,
@@ -369,10 +380,18 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.03),
-                SunriseSunsetWidget(screenWidth: screenWidth, screenHeight: screenHeight),
+                SunriseSunsetWidget(
+                  screenWidth: screenWidth,
+                  screenHeight: screenHeight,
+                ),
                 SizedBox(height: screenHeight * 0.02),
-                
-                puntosUVA.isNotEmpty ? UV_home_widget(screenWidth: screenWidth, puntosUVA: puntosUVA as List<FlSpot>) : const SizedBox.shrink(),
+
+                puntosUVA.isNotEmpty
+                    ? UV_home_widget(
+                        screenWidth: screenWidth,
+                        puntosUVA: puntosUVA as List<FlSpot>,
+                      )
+                    : const SizedBox.shrink(),
 
                 SizedBox(height: screenHeight * 0.02),
                 FaseLunarWidget(
@@ -550,6 +569,9 @@ class HomeScreen extends StatelessWidget {
                 try {
                   await weatherProvider.actualizarDatos(
                     configProvider.idiomaActual,
+                    configProvider.isUbiActive,
+                    configProvider.defaultUbiLatitude,
+                    configProvider.defaultUbiLongitude,
                   );
                 } on TimeoutException {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -666,35 +688,37 @@ class HomeScreen extends StatelessWidget {
     return SafeArea(
       child: RefreshIndicator(
         onRefresh: () async {
-          try{
-            await weatherProvider.actualizarDatos(configProvider.idiomaActual);
-          }on TimeoutException {
+          try {
+            await weatherProvider.actualizarDatos(
+              configProvider.idiomaActual,
+              configProvider.isUbiActive,
+              configProvider.defaultUbiLatitude,
+              configProvider.defaultUbiLongitude,
+            );
+          } on TimeoutException {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  Utils.stringErrorTimeout(configProvider.idiomaActual),
+                ),
+              ),
+            );
+          } catch (e) {
+            if (context.mounted && e is HttpException) {
+              context.go(
+                '/error',
+                extra: Utils.stringErrorServerDown(configProvider.idiomaActual),
+              );
+            } else if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    Utils.stringErrorTimeout(configProvider.idiomaActual),
+                    Utils.stringErrorApp(configProvider.idiomaActual),
                   ),
                 ),
               );
-            } catch (e) {
-              if (context.mounted && e is HttpException) {
-                context.go(
-                  '/error',
-                  extra: Utils.stringErrorServerDown(
-                    configProvider.idiomaActual,
-                  ),
-                );
-              } else if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      Utils.stringErrorApp(configProvider.idiomaActual),
-                    ),
-                  ),
-                );
-              }
             }
-          
+          }
         },
         child: CustomScrollView(
           slivers: [

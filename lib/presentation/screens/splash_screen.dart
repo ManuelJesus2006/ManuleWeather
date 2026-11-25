@@ -45,6 +45,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
     await configProvider.comprobarUbicacionActivada();
 
+    await configProvider.comprobarUbiDefault();
+
     //Antes de hacer toda la logica principal avisamos al usuario en el caso de que haya actualizacion
     await VersionService().comprobarActualizacion(
       configProvider.idiomaActual,
@@ -58,7 +60,7 @@ class _SplashScreenState extends State<SplashScreen> {
     //Quiero hacer el await aquí y que luego siga con lo demás
     if (configProvider.primeraVez) {
       await context.push('/onboardingLanguage');
-      await context.push('/locationSettings', extra:true);
+      await context.push('/locationSettings', extra: true);
       configProvider.validarPrimeraVez();
     }
 
@@ -77,7 +79,21 @@ class _SplashScreenState extends State<SplashScreen> {
 
     // Tenemos permiso, ya podemos obtener la posición
     //TODO: Cambiar lógica Geolocator para actualización de uso sin ubicación
-    Position position = await Geolocator.getCurrentPosition();
+    Position position = configProvider.isUbiActive
+        ? await Geolocator.getCurrentPosition()
+        : Position(
+            longitude: configProvider.defaultUbiLongitude,
+            latitude: configProvider.defaultUbiLatitude,
+            //Todo lo demás es para que funcione, no se usará
+            timestamp: DateTime.now(),
+            accuracy: 0.0,
+            altitude: 0.0,
+            altitudeAccuracy: 0.0,
+            heading: 0.0,
+            headingAccuracy: 0.0,
+            speed: 0.0,
+            speedAccuracy: 0.0,
+          );
     print("Latitud: ${position.latitude}, Longitud: ${position.longitude}");
     try {
       Tiempo? tiempoUbi = await TiempoService()

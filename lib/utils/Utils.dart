@@ -20,38 +20,53 @@ class Utils {
     return '${fecha.hour}:$minutos';
   }
 
-  static String getFlagEmoji(String idioma) {
-    switch (idioma) {
-      case 'es':
-        return '🇪🇸';
-      case 'en':
-        return '🇬🇧';
-      case 'fr':
-        return '🇫🇷';
-      case 'de':
-        return '🇩🇪';
-      case 'it':
-        return '🇮🇹';
-      case 'pt':
-        return '🇵🇹';
-      case 'uk':
-        return '🇺🇦';
-      case 'ru':
-        return '🇷🇺';
-      case 'he':
-        return '🇮🇱';
-      case 'ar':
-        return '🇸🇦';
-      case 'zh':
-        return '🇨🇳';
-      case 'ko':
-        return '🇰🇷';
-      case 'ja':
-        return '🇯🇵';
-      default:
-        return '🌐';
-    }
+  static Widget getFlagEmoji(String idioma, {double size = 26}) {
+  if (idioma == 'ca') {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Center(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(3),
+          child: Image.asset(
+            'assets/images/cataloniaFlag.png',
+            width: size * 0.9,
+            height: size * 0.68, // Proporción rectangular como los emojis de bandera
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
+    );
   }
+
+  final String emoji = switch (idioma) {
+    'es' => '🇪🇸',
+    'en' => '🇬🇧',
+    'fr' => '🇫🇷',
+    'de' => '🇩🇪',
+    'it' => '🇮🇹',
+    'pt' => '🇵🇹',
+    'uk' => '🇺🇦',
+    'ru' => '🇷🇺',
+    'he' => '🇮🇱',
+    'ar' => '🇸🇦',
+    'zh' => '🇨🇳',
+    'ko' => '🇰🇷',
+    'ja' => '🇯🇵',
+    _ => '🌐',
+  };
+
+  return SizedBox(
+    width: size,
+    height: size,
+    child: Center(
+      child: Text(
+        emoji,
+        style: TextStyle(fontSize: size * 0.85, height: 1.0),
+      ),
+    ),
+  );
+}
 
   static obtenerSimbolo(int weatherCode, bool isTiempoHora, bool isDeDia) {
     IconData iconData;
@@ -4137,21 +4152,21 @@ class Utils {
   }
 
   static String stringCheckingLocation(String idioma) {
-    if (idioma == 'es') return 'Comprobando ubicación...';
-    if (idioma == 'fr') return 'Vérification de l\'emplacement...';
-    if (idioma == 'it') return 'Controllo della posizione...';
-    if (idioma == 'de') return 'Standort wird überprüft...';
-    if (idioma == 'ru') return 'Проверка местоположения...';
-    if (idioma == 'pt') return 'Verificando localização...';
-    if (idioma == 'ca') return 'Comprovant la ubicació...';
-    if (idioma == 'he') return 'בודק מיקום...';
-    if (idioma == 'uk') return 'Перевірка місцезнаходження...';
-    if (idioma == 'ar') return 'جاري التحقق من الموقع...';
-    if (idioma == 'zh') return '正在检查位置...';
-    if (idioma == 'ko') return '위치 확인 중...';
-    if (idioma == 'ja') return '位置情報を確認中...';
-    return 'Checking location...';
-  }
+  if (idioma == 'es') return 'Comprobando ubicación y permisos...';
+  if (idioma == 'fr') return 'Vérification de l\'emplacement et des autorisations...';
+  if (idioma == 'it') return 'Controllo della posizione e dei permessi...';
+  if (idioma == 'de') return 'Standort und Berechtigungen werden überprüft...';
+  if (idioma == 'ru') return 'Проверка местоположения и разрешений...';
+  if (idioma == 'pt') return 'Verificando localização e permissões...';
+  if (idioma == 'ca') return 'Comprovant la ubicació i els permisos...';
+  if (idioma == 'he') return 'בודק מיקום והרשאות...';
+  if (idioma == 'uk') return 'Перевірка місцезнаходження та дозволів...';
+  if (idioma == 'ar') return 'جاري التحقق من الموقع والأذونات...';
+  if (idioma == 'zh') return '正在检查位置和权限...';
+  if (idioma == 'ko') return '위치 및 권한 확인 중...';
+  if (idioma == 'ja') return '位置情報と権限を確認中...';
+  return 'Checking location and permissions...';
+}
 
   static String stringGettingData(String idioma) {
     if (idioma == 'es') return 'Obteniendo datos...';
@@ -6546,5 +6561,73 @@ class Utils {
   if (idioma == 'ko') return '위치 서비스가 비활성화되어 있으므로 기본 위치를 검색하여 선택해야 합니다';
   if (idioma == 'ja') return '位置情報が無効になっているため、デフォルトの場所を検索して選択する必要があります';
   return 'If you have disabled the location you need to search and choose a default location';
+}
+
+  static String stringChoosen(String idioma) {
+  if (idioma == 'es') return 'ELEGIDO';
+  if (idioma == 'fr') return 'CHOISI';
+  if (idioma == 'it') return 'SCELTO';
+  if (idioma == 'de') return 'GEWÄHLT';
+  if (idioma == 'ru') return 'ВЫБРАНО';
+  if (idioma == 'pt') return 'ESCOLHIDO';
+  if (idioma == 'ca') return 'TRIAT';
+  if (idioma == 'he') return 'נבחר';
+  if (idioma == 'uk') return 'ОБРАНО';
+  if (idioma == 'ar') return 'مُختار';
+  if (idioma == 'zh') return '已选择';
+  if (idioma == 'ko') return '선택됨';
+  if (idioma == 'ja') return '選択済み';
+  return 'CHOSEN';
+}
+
+static String stringChoose(String idioma) {
+  if (idioma == 'es') return 'ELEGIR';
+  if (idioma == 'fr') return 'CHOISIR';
+  if (idioma == 'it') return 'SCEGLI';
+  if (idioma == 'de') return 'WÄHLEN';
+  if (idioma == 'ru') return 'ВЫБРАТЬ';
+  if (idioma == 'pt') return 'ESCOLHER';
+  if (idioma == 'ca') return 'TRIAR';
+  if (idioma == 'he') return 'בחר';
+  if (idioma == 'uk') return 'ОБРАТИ';
+  if (idioma == 'ar') return 'اختر';
+  if (idioma == 'zh') return '选择';
+  if (idioma == 'ko') return '선택';
+  if (idioma == 'ja') return '選択';
+  return 'CHOOSE';
+}
+
+  static String stringSaveChanges(String idioma) {
+  if (idioma == 'es') return 'Guardar cambios';
+  if (idioma == 'fr') return 'Enregistrer les modifications';
+  if (idioma == 'it') return 'Salva modifiche';
+  if (idioma == 'de') return 'Änderungen speichern';
+  if (idioma == 'ru') return 'Сохранить изменения';
+  if (idioma == 'pt') return 'Guardar alterações';
+  if (idioma == 'ca') return 'Desa els canvis';
+  if (idioma == 'he') return 'שמור שינויים';
+  if (idioma == 'uk') return 'Зберегти зміни';
+  if (idioma == 'ar') return 'حفظ التغييرات';
+  if (idioma == 'zh') return '保存更改';
+  if (idioma == 'ko') return '변경 사항 저장';
+  if (idioma == 'ja') return '変更を保存';
+  return 'Save changes';
+}
+
+  static String stringDefaultLocation(String idioma) {
+  if (idioma == 'es') return 'Ubicación por defecto';
+  if (idioma == 'fr') return 'Emplacement par défaut';
+  if (idioma == 'it') return 'Posizione predefinita';
+  if (idioma == 'de') return 'Standardstandort';
+  if (idioma == 'ru') return 'Местоположение по умолчанию';
+  if (idioma == 'pt') return 'Localização predefinida';
+  if (idioma == 'ca') return 'Ubicació per defecte';
+  if (idioma == 'he') return 'מיקום ברירת מחדל';
+  if (idioma == 'uk') return 'Місцезнаходження за замовчуванням';
+  if (idioma == 'ar') return 'الموقع الافتراضي';
+  if (idioma == 'zh') return '默认位置';
+  if (idioma == 'ko') return '기본 위치';
+  if (idioma == 'ja') return 'デフォルトの場所';
+  return 'Default location';
 }
 }

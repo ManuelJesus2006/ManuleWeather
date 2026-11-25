@@ -1,5 +1,5 @@
 {
-  "version": "1.0.3",
+  "version": "1.1.0",
   "url": "https://drive.google.com/file/d/1B1Ojsb_gF4Tw8oFm28FiFDGhux1T0b1H/view?usp=sharing",
-  "whatisnew": "Manejo de errores UX en la pantalla de búsqueda por fallos en el servidor de OpenMeteo"
+  "whatisnew": "Actualización MAYOR: Evitar poder clickar lugares no disponibles y feedback, quitar busqueda de tiempo actual en las ubicaciones del historial (para ahorrar peticiones innecesarias), arreglar texto ubicación (se salía de la pantalla cuando es una ubicación muy grande), manejar el uso de ubicación en la app (ya no es necesario usar la ubicación obligatoriamente en la app)"
 }

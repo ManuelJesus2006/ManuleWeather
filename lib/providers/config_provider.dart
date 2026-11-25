@@ -37,6 +37,10 @@ class ConfigProvider with ChangeNotifier {
   List<Localizacion> historialBusqueda = [];
   bool isNotificationsActive = false;
   bool isUbiActive = false;
+  String defaultUbiID = "";
+  double defaultUbiLatitude = 0;
+  double defaultUbiLongitude = 0;
+  String defaultUbiName = "";
   final int limitSearchHistory = 8;
 
   comprobarIdiomaYPrimeraVez() async {
@@ -94,15 +98,11 @@ class ConfigProvider with ChangeNotifier {
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(dialogContext, false),
-                      child: Text(
-                        Utils.stringCancelarDialog(idiomaActual),
-                      ),
+                      child: Text(Utils.stringCancelarDialog(idiomaActual)),
                     ),
                     TextButton(
                       onPressed: () => Navigator.pop(dialogContext, true),
-                      child: Text(
-                        Utils.stringIrAjustesDialog(idiomaActual),
-                      ),
+                      child: Text(Utils.stringIrAjustesDialog(idiomaActual)),
                     ),
                   ],
                 );
@@ -149,15 +149,11 @@ class ConfigProvider with ChangeNotifier {
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(dialogContext, false),
-                    child: Text(
-                      Utils.stringCancelarDialog(idiomaActual),
-                    ),
+                    child: Text(Utils.stringCancelarDialog(idiomaActual)),
                   ),
                   TextButton(
                     onPressed: () => Navigator.pop(dialogContext, true),
-                    child: Text(
-                      Utils.stringIrAjustesDialog(idiomaActual),
-                    ),
+                    child: Text(Utils.stringIrAjustesDialog(idiomaActual)),
                   ),
                 ],
               );
@@ -194,15 +190,11 @@ class ConfigProvider with ChangeNotifier {
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(dialogContext, false),
-                    child: Text(
-                      Utils.stringCancelarDialog(idiomaActual),
-                    ),
+                    child: Text(Utils.stringCancelarDialog(idiomaActual)),
                   ),
                   TextButton(
                     onPressed: () => Navigator.pop(dialogContext, true),
-                    child: Text(
-                      Utils.stringIrAjustesDialog(idiomaActual),
-                    ),
+                    child: Text(Utils.stringIrAjustesDialog(idiomaActual)),
                   ),
                 ],
               );
@@ -255,6 +247,7 @@ class ConfigProvider with ChangeNotifier {
     final preferences = await SharedPreferences.getInstance();
     bool? ubiPermission = preferences.getBool('ubication');
     if (ubiPermission != null) isUbiActive = ubiPermission;
+    else preferences.setBool('ubication',false);
     notifyListeners();
   }
 
@@ -307,6 +300,41 @@ class ConfigProvider with ChangeNotifier {
 
   cambiarValorLineaDeCarga(double nuevoValor) async {
     valorLineaDeCarga = nuevoValor;
+    notifyListeners();
+  }
+
+  Future<void> comprobarUbiDefault() async {
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    defaultUbiName = preferences.getString('defUbiName') ?? defaultUbiName;
+    defaultUbiID = preferences.getString('defUbiID') ?? defaultUbiID;
+    defaultUbiLatitude = preferences.getDouble('latDef') ?? defaultUbiLatitude;
+    defaultUbiLongitude =
+        preferences.getDouble('longDef') ?? defaultUbiLongitude;
+
+    notifyListeners();
+  }
+
+  void cambiarUbiDefault(
+    String newName,
+    String newId,
+    double newLatitude,
+    double newLongitude,
+  ) async {
+    final SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    defaultUbiName = newName;
+    await preferences.setString('defUbiName', newName);
+
+    defaultUbiID = newId;
+    await preferences.setString('defUbiID', newId);
+
+    defaultUbiLatitude = newLatitude;
+    await preferences.setDouble('latDef', newLatitude);
+
+    defaultUbiLongitude = newLongitude;
+    await preferences.setDouble('longDef', newLongitude);
+
     notifyListeners();
   }
 }

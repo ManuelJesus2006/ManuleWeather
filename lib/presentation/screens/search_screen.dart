@@ -382,7 +382,7 @@ class _widgetUbicacion extends StatelessWidget {
                   children: [
                     const Icon(LucideIcons.navigation),
                     Text(
-                      Utils.stringCurrentLocation(configProvider.idiomaActual),
+                      configProvider.isUbiActive ? Utils.stringCurrentLocation(configProvider.idiomaActual) : Utils.stringDefaultLocation(configProvider.idiomaActual),
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,

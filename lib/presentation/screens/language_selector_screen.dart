@@ -73,10 +73,7 @@ class LanguageSelectorScreen extends StatelessWidget {
                       ),
                       child: Row(
                         children: [
-                          Text(
-                            Utils.getFlagEmoji(idiomaActualBucle),
-                            style: TextStyle(fontSize: screenWidth * 0.07),
-                          ),
+                          Utils.getFlagEmoji(idiomaActualBucle),
                           SizedBox(width: screenWidth * 0.04),
                           Text(
                             Utils.obtenerIdiomaText(idiomaActualBucle),

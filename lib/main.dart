@@ -28,10 +28,8 @@ import 'package:workmanager/workmanager.dart';
 // Cascada de ubicación para background
 Future<Position?> _obtenerUbicacionBackground(SharedPreferences prefs) async {
   try {
-    final permission = await Geolocator.checkPermission();
-    if (permission != LocationPermission.denied &&
-        permission != LocationPermission.deniedForever) {
-      
+    bool ubiActive = prefs.getBool('ubication')!;
+    if (ubiActive) {
       //Intentar GPS en vivo rápido
       try {
         final pos = await Geolocator.getCurrentPosition(
@@ -50,6 +48,23 @@ Future<Position?> _obtenerUbicacionBackground(SharedPreferences prefs) async {
         await prefs.setDouble('last_longitude', lastKnown.longitude);
         return lastKnown;
       }
+    } else if (!ubiActive) {
+      try {
+        //Si ha desactivado la ubicación obtenemos la ubicación por defecto que introdució el usuario
+        final pos = Position(
+          longitude: prefs.getDouble('longDef')!,
+          latitude: prefs.getDouble('latDef')!,
+          timestamp: DateTime.now(),
+          accuracy: 0.0,
+          altitude: 0.0,
+          altitudeAccuracy: 0.0,
+          heading: 0.0,
+          headingAccuracy: 0.0,
+          speed: 0.0,
+          speedAccuracy: 0.0,
+        );
+        return pos;
+      } catch (_) {}
     }
   } catch (_) {}
 
@@ -93,7 +108,9 @@ void callbackDispatcher() {
       // RESOLUCIÓN DE UBICACIÓN POR CASCADA
       final posicion = await _obtenerUbicacionBackground(preferences);
       if (posicion == null) {
-        return Future.value(true); // Sin ubicación disponible, salimos sin error
+        return Future.value(
+          true,
+        ); // Sin ubicación disponible, salimos sin error
       }
 
       final double latitud = posicion.latitude;
@@ -201,18 +218,13 @@ void printHelloSonny() {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Workmanager().initialize(
-    callbackDispatcher,
-    isInDebugMode: false,
-  );
+  await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
 
   await Workmanager().registerPeriodicTask(
     "bucle_tiempoActual_widget_notification",
     "actualizarWidgetAndNotificationTask",
     frequency: const Duration(minutes: 15),
-    constraints: Constraints(
-      networkType: NetworkType.connected,
-    ),
+    constraints: Constraints(networkType: NetworkType.connected),
   );
 
   SystemChrome.setPreferredOrientations([

@@ -64,47 +64,60 @@ class WeatherProvider with ChangeNotifier {
   }
 
   Future<void> buscarUbicacionActual(String idioma) async {
-  nombreUbi = '';
-  tempUbi = 0;
-  estadoUbi = '';
-  notifyListeners(); // Notifica para que la UI pinte la rueda de carga
+    nombreUbi = '';
+    tempUbi = 0;
+    estadoUbi = '';
+    notifyListeners(); // Notifica para que la UI pinte la rueda de carga
 
-  try {
-    // Ubicación protegida con timeout de 8 segundos
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.medium,
-      timeLimit: const Duration(seconds: 8),
-    );
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    bool isUbiActive = preferences.getBool('ubication')!;
+    try {
+      //Comprobamos si esta la ubicación activada desde SharedPreferences
+      Position position = isUbiActive ? /*Ubicación protegida con timeout de 8 segundos*/ await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.medium,
+        timeLimit: const Duration(seconds: 8),
+      ) : Position(
+          longitude: preferences.getDouble('longDef')!,
+          latitude: preferences.getDouble('latDef')!,
+          timestamp: DateTime.now(),
+          accuracy: 0.0,
+          altitude: 0.0,
+          altitudeAccuracy: 0.0,
+          heading: 0.0,
+          headingAccuracy: 0.0,
+          speed: 0.0,
+          speedAccuracy: 0.0,
+        );
 
-    // 2. Peticiones de datos
-    final resultadosPeticion = await Future.wait([
-      TiempoService().getTiempoLatLon(position.latitude, position.longitude),
-      LocalizacionService().getNombreCiudadByCords(
-        position.longitude,
-        position.latitude,
-        idioma,
-      ),
-    ]).timeout(const Duration(seconds: 10));
+      // 2. Peticiones de datos
+      final resultadosPeticion = await Future.wait([
+        TiempoService().getTiempoLatLon(position.latitude, position.longitude),
+        LocalizacionService().getNombreCiudadByCords(
+          position.longitude,
+          position.latitude,
+          idioma,
+        ),
+      ]).timeout(const Duration(seconds: 10));
 
-    Tiempo tiempoUbiReq = resultadosPeticion[0] as Tiempo;
-    nombreUbi = resultadosPeticion[1] as String;
-    tempUbi = tiempoUbiReq.current.temperature2M;
-    iconoUbi = Utils.obtenerSimbolo(
-      tiempoUbiReq.current.weatherCode,
-      false,
-      tiempoUbiReq.current.isDay == 1,
-    );
-    geolocalizacion = position;
-  } on TimeoutException {
-    nombreUbi = "N/A";
-    tempUbi = -100;
-  } catch (e) {
-    nombreUbi = "N/A";
-    tempUbi = -100;
+      Tiempo tiempoUbiReq = resultadosPeticion[0] as Tiempo;
+      nombreUbi = resultadosPeticion[1] as String;
+      tempUbi = tiempoUbiReq.current.temperature2M;
+      iconoUbi = Utils.obtenerSimbolo(
+        tiempoUbiReq.current.weatherCode,
+        false,
+        tiempoUbiReq.current.isDay == 1,
+      );
+      geolocalizacion = position;
+    } on TimeoutException {
+      nombreUbi = "N/A";
+      tempUbi = -100;
+    } catch (e) {
+      nombreUbi = "N/A";
+      tempUbi = -100;
+    }
+    print(nombreUbi + " " + tempUbi.toString());
+    notifyListeners();
   }
-  print(nombreUbi + " " + tempUbi.toString());
-  notifyListeners();
-}
 
   void comprobarUbicacionUser() {
     isUbicacionUser = localizacion!.toLowerCase() == nombreUbi.toLowerCase();
@@ -158,10 +171,28 @@ class WeatherProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> actualizarDatos(String idioma) async {
+  Future<void> actualizarDatos(
+    String idioma,
+    bool isUbiActive,
+    double defLat,
+    double defLong,
+  ) async {
     if (isUbicacionUser!) {
       final preferences = await SharedPreferences.getInstance();
-      Position position = await Geolocator.getCurrentPosition();
+      Position position = isUbiActive
+          ? await Geolocator.getCurrentPosition()
+          : Position(
+              longitude: defLong,
+              latitude: defLat,
+              timestamp: DateTime.now(),
+              accuracy: 0.0,
+              altitude: 0.0,
+              altitudeAccuracy: 0.0,
+              heading: 0.0,
+              headingAccuracy: 0.0,
+              speed: 0.0,
+              speedAccuracy: 0.0,
+            );
       print("Latitud: ${position.latitude}, Longitud: ${position.longitude}");
 
       try {
