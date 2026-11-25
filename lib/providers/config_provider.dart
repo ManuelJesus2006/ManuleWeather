@@ -36,7 +36,7 @@ class ConfigProvider with ChangeNotifier {
   bool isDarkTheme = false;
   List<Localizacion> historialBusqueda = [];
   bool isNotificationsActive = false;
-  bool isUbiActive = false;
+  bool? isUbiActive = null;
   String defaultUbiID = "";
   double defaultUbiLatitude = 0;
   double defaultUbiLongitude = 0;
@@ -247,7 +247,6 @@ class ConfigProvider with ChangeNotifier {
     final preferences = await SharedPreferences.getInstance();
     bool? ubiPermission = preferences.getBool('ubication');
     if (ubiPermission != null) isUbiActive = ubiPermission;
-    else preferences.setBool('ubication',false);
     notifyListeners();
   }
 

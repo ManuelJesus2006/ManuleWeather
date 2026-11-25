@@ -133,7 +133,7 @@ class HomeScreen extends StatelessWidget {
             try {
               await weatherProvider.actualizarDatos(
                 configProvider.idiomaActual,
-                configProvider.isUbiActive,
+                configProvider.isUbiActive!,
                 configProvider.defaultUbiLatitude,
                 configProvider.defaultUbiLongitude,
               );
@@ -569,7 +569,7 @@ class HomeScreen extends StatelessWidget {
                 try {
                   await weatherProvider.actualizarDatos(
                     configProvider.idiomaActual,
-                    configProvider.isUbiActive,
+                    configProvider.isUbiActive!,
                     configProvider.defaultUbiLatitude,
                     configProvider.defaultUbiLongitude,
                   );
@@ -691,7 +691,7 @@ class HomeScreen extends StatelessWidget {
           try {
             await weatherProvider.actualizarDatos(
               configProvider.idiomaActual,
-              configProvider.isUbiActive,
+              configProvider.isUbiActive!,
               configProvider.defaultUbiLatitude,
               configProvider.defaultUbiLongitude,
             );

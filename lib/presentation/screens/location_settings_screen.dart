@@ -10,22 +10,28 @@ class LocationSettingsScreen extends StatelessWidget {
   const LocationSettingsScreen({super.key, required this.isPrimeraVez});
 
   final bool isPrimeraVez;
-  
+
   @override
   Widget build(BuildContext context) {
     final configProvider = Provider.of<ConfigProvider>(context);
-    bool ubiCorrect = (configProvider.defaultUbiID.isNotEmpty || configProvider.isUbiActive);
+    bool ubiCorrect =
+        configProvider.defaultUbiID.isNotEmpty ||
+        configProvider.isUbiActive == true;
     return PopScope(
-      canPop: !isPrimeraVez,
+      canPop: ubiCorrect,
       child: Scaffold(
         appBar: AppBar(
           title: Text(
             isPrimeraVez
-                ? Utils.stringLocationOnboardingTitle(configProvider.idiomaActual)
+                ? Utils.stringLocationOnboardingTitle(
+                    configProvider.idiomaActual,
+                  )
                 : Utils.stringLocationSettings(configProvider.idiomaActual),
           ),
           centerTitle: true,
-          automaticallyImplyLeading: (isPrimeraVez || !ubiCorrect) ? false : true,
+          automaticallyImplyLeading: (isPrimeraVez || !ubiCorrect)
+              ? false
+              : true,
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -46,39 +52,44 @@ class LocationSettingsScreen extends StatelessWidget {
                       Utils.stringLocationText(configProvider.idiomaActual),
                     ),
                     trailing: Switch(
-                      value: configProvider.isUbiActive,
+                      value: configProvider.isUbiActive ?? false,
                       onChanged: (value) =>
                           configProvider.changeLocation(value, context),
                     ),
                   ),
                 ),
                 SizedBox(height: 16),
-                !configProvider.isUbiActive
+                configProvider.isUbiActive != true
                     ? _locationSelector()
-                    : SizedBox.shrink(),
-                
+                    : const SizedBox.shrink(),
+
                 FilledButton.icon(
-                onPressed: ubiCorrect ? () {
-                  context.pop();
-                } : null,
-                label: Text(
-                  Utils.stringSaveChanges(configProvider.idiomaActual),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.1,
+                  onPressed: ubiCorrect
+                      ? () {
+                          context.pop();
+                        }
+                      : null,
+                  label: Text(
+                    Utils.stringSaveChanges(configProvider.idiomaActual),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 1.1,
+                    ),
+                  ),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 4,
+                    ),
+                    backgroundColor: ubiCorrect
+                        ? Colors.deepPurple
+                        : Colors.grey.shade400,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                   ),
                 ),
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 4,
-                  ),
-                  backgroundColor: ubiCorrect ? Colors.deepPurple : Colors.grey.shade400,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-              ),
               ],
             ),
           ),
@@ -121,6 +132,7 @@ class __locationSelectorState extends State<_locationSelector> {
           ),
           child: Text(
             Utils.stringAdvisoryLocationNotEnabled(configProvider.idiomaActual),
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
         //SizedBox(height: 8),
@@ -202,6 +214,7 @@ class MostrarResultadosBusqueda extends StatelessWidget {
                 key: ValueKey('${lugar.id}_${lugar.placeName}'),
                 lugar: lugar,
                 configProvider: configProvider,
+                context: context,
               )
             : const SizedBox.shrink();
       },
@@ -212,6 +225,7 @@ class MostrarResultadosBusqueda extends StatelessWidget {
     required Key key,
     required Localizacion lugar,
     required ConfigProvider configProvider,
+    required BuildContext context,
   }) {
     return Padding(
       key: key,
@@ -236,11 +250,21 @@ class MostrarResultadosBusqueda extends StatelessWidget {
             ),
             FilledButton.icon(
               onPressed: () {
-                configProvider.cambiarUbiDefault(lugar.placeName!, lugar.id!, lugar.center!.last, lugar.center!.first);
+                configProvider.cambiarUbiDefault(
+                  lugar.placeName!,
+                  lugar.id!,
+                  lugar.center!.last,
+                  lugar.center!.first,
+                );
+                configProvider.changeLocation(false, context);
               },
-              icon: (configProvider.defaultUbiID == lugar.id) ? Icon(Icons.check_rounded, size: 20) : null,
+              icon: (configProvider.defaultUbiID == lugar.id)
+                  ? Icon(Icons.check_rounded, size: 20)
+                  : null,
               label: Text(
-                (configProvider.defaultUbiID == lugar.id) ? Utils.stringChoosen(configProvider.idiomaActual) : Utils.stringChoose(configProvider.idiomaActual),
+                (configProvider.defaultUbiID == lugar.id)
+                    ? Utils.stringChoosen(configProvider.idiomaActual)
+                    : Utils.stringChoose(configProvider.idiomaActual),
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.1,

@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.1.1",
   "url": "https://drive.google.com/file/d/1B1Ojsb_gF4Tw8oFm28FiFDGhux1T0b1H/view?usp=sharing",
-  "whatisnew": "Actualización MAYOR: Evitar poder clickar lugares no disponibles y feedback, quitar busqueda de tiempo actual en las ubicaciones del historial (para ahorrar peticiones innecesarias), arreglar texto ubicación (se salía de la pantalla cuando es una ubicación muy grande), manejar el uso de ubicación en la app (ya no es necesario usar la ubicación obligatoriamente en la app)"
+  "whatisnew": "Arreglo de bug en la actualización MAYOR v1.1: Evitar poder clickar lugares no disponibles y feedback, quitar busqueda de tiempo actual en las ubicaciones del historial (para ahorrar peticiones innecesarias), arreglar texto ubicación (se salía de la pantalla cuando es una ubicación muy grande), manejar el uso de ubicación en la app (ya no es necesario usar la ubicación obligatoriamente en la app)"
 }
